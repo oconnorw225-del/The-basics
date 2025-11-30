@@ -9,10 +9,9 @@ Automated consolidation of best parts from:
 
 ## How To Use
 
-1. Go to your repository's **Actions** tab.
-2. Select **Consolidate Best Parts** from the workflows list.
-3. Click **Run workflow** to consolidate your code.
-4. Review and use your unified repo!
+1. Push this structure to GitHub.
+2. Go to Actions > Consolidate Best Parts > Run workflow.
+3. Review and use your unified repo!
 
 ## Contents
 - `/api` — consolidated APIs
