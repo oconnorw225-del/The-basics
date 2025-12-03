@@ -11,13 +11,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Clone source repositories
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           mkdir source
-          git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine
-          git clone https://github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb
-          git clone https://github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader
-          git clone https://github.com/oconnorw225-del/repository-web-app.git source/repository-web-app
-          git clone https://github.com/oconnorw225-del/The-new-ones.git source/The-new-ones
+          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine
+          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb
+          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader
+          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/repository-web-app.git source/repository-web-app
+          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/The-new-ones.git source/The-new-ones
 
       - name: Archive backups
         run: |
