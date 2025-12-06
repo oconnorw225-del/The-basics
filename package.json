@@ -1,16 +1,1 @@
-{
-  "name": "the-basics",
-  "version": "1.0.0",
-  "description": "Automated consolidation of best parts from multiple repositories",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
-  },
-  "keywords": [
-    "consolidation",
-    "automation"
-  ],
-  "author": "oconnorw225-del",
-  "license": "MIT"
-}
+{"name": "the-basics","version": "1.0.0","description": "Automated consolidation of best parts from multiple repositories","main": "server.js","scripts": {"start": "node server.js","build": "npm install","dev": "node server.js"},"keywords": ["consolidation","automation"],"author": "oconnorw225-del","license": "MIT","engines": {"node": ">=18"},"dependencies": {}}
