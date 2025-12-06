@@ -5,7 +5,7 @@ cp -r source/ndax-quantum-engine/* . 2>/dev/null || true
 
 # Copy from quantum-engine-dashb
 cp -r source/quantum-engine-dashb/src/* frontend/ 2>/dev/null || true
-cp -r source/quantum-engine-dashb/.github/workflows/* workflows/ 2>/dev/null
+cp -r source/quantum-engine-dashb/.github/workflows/* workflows/ 2>/dev/null || true
 
 # Copy entire contents of shadowforge-ai-trader
 cp -r source/shadowforge-ai-trader/* . 2>/dev/null || true
