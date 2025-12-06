@@ -5,6 +5,9 @@ const path = require('path');
 const PORT = process.env.PORT || 3000;
 
 const server = http.createServer((req, res) => {
+  // Set timeout and handle errors
+  req.setTimeout(30000); // 30 second timeout
+  
   if (req.url === '/' || req.url === '/index.html') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(`
@@ -107,7 +110,7 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log(`Visit http://localhost:${PORT} to view the application`);
+  console.log(`Application is ready to accept connections`);
 });
