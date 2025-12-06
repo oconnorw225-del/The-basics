@@ -1,0 +1,45 @@
+name: Cleanup Copilot Branches
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Perform a dry run (no actual deletions)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches
+      
+      - name: Configure Git
+        run: |
+          git config --global user.email "ci-bot@example.com"
+          git config --global user.name "CI Bot"
+      
+      - name: Fetch all branches
+        run: |
+          git fetch --all
+      
+      - name: Run cleanup script
+        env:
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          bash automation/cleanup-branches.sh
+      
+      - name: Summary
+        run: |
+          echo "## Cleanup Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Dry Run: ${{ github.event.inputs.dry_run }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See job logs for detailed information about branches processed." >> $GITHUB_STEP_SUMMARY
