@@ -82,7 +82,7 @@ jobs:
           find . -name "*.py" -not -path "./source/*" -not -path "./.git/*" | wc -l >> code_analysis_report.md
 
       - name: Upload analysis report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: code-analysis-report
           path: code_analysis_report.md
@@ -162,7 +162,7 @@ jobs:
           EOF
 
       - name: Upload system report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: system-status-report
           path: SYSTEM_STATUS.md
