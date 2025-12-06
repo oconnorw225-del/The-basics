@@ -25,6 +25,6 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log('Server running on port ' + PORT);
 });
 
-# Set server timeout to 5 minutes for long-running operations
-# (e.g., dashboard loading, Python system initialization)
+// Set server timeout to 5 minutes for long-running operations
+// (e.g., dashboard loading, Python system initialization)
 server.setTimeout(300000);
