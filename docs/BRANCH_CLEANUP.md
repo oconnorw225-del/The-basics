@@ -14,7 +14,7 @@ As of the cleanup date, the following Copilot branches existed:
 
 1. `copilot/add-apis-to-repo`
 2. `copilot/add-complete-codebase`
-3. `copilot/add-may-atonamus-solvency-data`
+3. `copilot/add-may-autonomous-solvency-data`
 4. `copilot/cleanup-and-merge-branches`
 5. `copilot/enhance-synchronization-and-integration`
 6. `copilot/fix-clone-repo-issue`
@@ -24,7 +24,7 @@ As of the cleanup date, the following Copilot branches existed:
 10. `copilot/integrate-related-repositories`
 11. `copilot/merge-all-changes`
 12. `copilot/optimize-synchronization-automation`
-13. `copilot/prepare-deployment-for-rainway`
+13. `copilot/prepare-deployment-for-railway`
 14. `copilot/remove-copilot-branches` (current cleanup branch)
 15. `copilot/resolve-issue`
 16. `copilot/setup-codespace-structure`
