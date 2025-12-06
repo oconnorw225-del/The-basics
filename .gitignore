@@ -15,3 +15,7 @@ coverage/
 source/
 backups/
 new_additions/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
