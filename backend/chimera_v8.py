@@ -181,7 +181,7 @@ class V8_TranscendentIntelligence:
         """Discover all market inefficiencies simultaneously."""
         return [
             {
-                "inefficiency": "btc_eth_pair_mispricin g",
+                "inefficiency": "btc_eth_pair_mispricing",
                 "expected_profit": 0.032,  # 3.2%
                 "persistence": "4_hours",
                 "confidence": 0.94

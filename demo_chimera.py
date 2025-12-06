@@ -5,7 +5,11 @@ Demonstrates all features from V4 through V8
 """
 
 import sys
-sys.path.insert(0, '/home/runner/work/The-basics/The-basics')
+from pathlib import Path
+
+# Add repository root to path
+repo_root = Path(__file__).parent
+sys.path.insert(0, str(repo_root))
 
 
 def demo_v4_features():
