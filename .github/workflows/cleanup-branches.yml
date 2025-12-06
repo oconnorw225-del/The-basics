@@ -23,8 +23,8 @@ jobs:
       
       - name: Configure Git
         run: |
-          git config --global user.email "ci-bot@example.com"
-          git config --global user.name "CI Bot"
+          git config --global user.email "noreply@github.com"
+          git config --global user.name "GitHub Actions Bot"
       
       - name: Fetch all branches
         run: |

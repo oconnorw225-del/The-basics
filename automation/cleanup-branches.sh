@@ -37,7 +37,14 @@ is_protected() {
 # Function to get days since last commit on a branch
 days_since_last_commit() {
     local branch=$1
-    local last_commit_date=$(git log -1 --format=%ct "origin/$branch" 2>/dev/null || echo "0")
+    local last_commit_date=$(git log -1 --format=%ct "origin/$branch" 2>/dev/null)
+    
+    # If git log fails or returns nothing, skip this branch (don't delete unknown branches)
+    if [ -z "$last_commit_date" ]; then
+        echo "-1"  # Return -1 to indicate error
+        return
+    fi
+    
     local current_date=$(date +%s)
     local days_diff=$(( (current_date - last_commit_date) / 86400 ))
     echo $days_diff
@@ -90,6 +97,14 @@ while IFS= read -r ref; do
     
     # Check if stale (not updated in STALE_DAYS days)
     days_old=$(days_since_last_commit "$branch")
+    
+    # Skip if we couldn't determine the age (error case)
+    if [ $days_old -eq -1 ]; then
+        echo -e "${RED}⚠${NC} $branch (unable to determine age - keeping for safety)"
+        branches_active+=("$branch")
+        continue
+    fi
+    
     if [ $days_old -gt $STALE_DAYS ]; then
         branches_stale+=("$branch")
         branches_to_delete+=("$branch")
