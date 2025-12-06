@@ -63,6 +63,8 @@ This repository contains multiple `copilot/*` branches created by GitHub Copilot
 - Most have already been merged into `main` via pull requests
 - Should be cleaned up periodically to keep the repository organized
 
+**📖 See [Copilot Branches FAQ](docs/COPILOT_BRANCHES_FAQ.md) for a detailed explanation**
+
 ### Cleaning Up Old Branches
 
 To remove old Copilot branches that have been merged:
