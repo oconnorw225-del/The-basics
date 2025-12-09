@@ -19,3 +19,35 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Build outputs
+.vite/
+*.tsbuildinfo
+
+# Testing
+.nyc_output/
+*.lcov
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# System files
+.unified-system/logs/
+.unified-system/generated/
+.unified-system/backups/
+
+# Database
+*.sqlite
+*.db
+
+# Editor directories
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+Thumbs.db
+Desktop.ini

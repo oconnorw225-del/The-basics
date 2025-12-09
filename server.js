@@ -1,30 +1,44 @@
-const http = require('http');
-const fs = require('fs');
+const express = require('express');
 const path = require('path');
-
+const app = express();
 const PORT = process.env.PORT || 3000;
 
-const server = http.createServer((req, res) => {
-    if (req.url === '/health') {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'healthy', timestamp: new Date().toISOString() }));
-        return;
-    }
-    
-    if (req.url === '/' || req.url === '/index.html') {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end('<html><body><h1>Unified System</h1><p>System Operational</p></body></html>');
-        return;
-    }
-    
-    res.writeHead(404);
-    res.end('Not Found');
+// Middleware
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    service: 'NDAX Quantum Engine',
+    version: '1.0.0',
+    timestamp: new Date().toISOString()
+  });
 });
 
-server.listen(PORT, '0.0.0.0', () => {
-    console.log('Server running on port ' + PORT);
+// API proxy to Python backend (if running)
+app.use('/api', (req, res) => {
+  const pythonBackend = process.env.PYTHON_PORT || 8000;
+  res.status(503).json({
+    error: 'Python backend not available',
+    message: `Start Python backend on port ${pythonBackend}`,
+    endpoints: {
+      frontend: `http://localhost:${PORT}`,
+      backend: `http://localhost:${pythonBackend}`,
+      bot: `http://localhost:${process.env.BOT_PORT || 9000}`
+    }
+  });
 });
 
-// Set server timeout to 5 minutes for long-running operations
-// (e.g., dashboard loading, Python system initialization)
-server.setTimeout(300000);
+// Serve React app for all other routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 NDAX Quantum Engine running on port ${PORT}`);
+  console.log(`📊 Dashboard: http://localhost:${PORT}`);
+  console.log(`❤️  Health check: http://localhost:${PORT}/health`);
+});
+
