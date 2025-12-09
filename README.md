@@ -101,6 +101,62 @@ This repository contains **PROJECT CHIMERA**, an autonomous, self-evolving AI sy
 
 ## 🚀 Quick Start
 
+### Installation & Setup
+
+#### Option 1: Local Development
+```bash
+# Clone repository
+git clone https://github.com/oconnorw225-del/The-basics.git
+cd The-basics
+
+# Run setup wizard
+python3 unified_system.py --setup
+
+# Start system
+python3 unified_system.py
+```
+
+#### Option 2: Cloud Server Deployment (Recommended for Production)
+```bash
+# Run setup wizard with cloud integration
+python3 unified_system.py --setup
+
+# When prompted, choose cloud deployment and enter your server details
+# Then deploy to your cloud server
+bash deploy_to_cloud.sh
+
+# Access from anywhere
+http://YOUR_SERVER_IP:8000
+```
+
+📖 **Full cloud deployment guide**: See [CLOUD_DEPLOYMENT_GUIDE.md](CLOUD_DEPLOYMENT_GUIDE.md)
+
+Supported cloud providers:
+- AWS EC2
+- Google Cloud Platform
+- Microsoft Azure
+- DigitalOcean
+- Linode, Vultr, and any VPS
+
+### Operating Modes
+
+```bash
+# Full autonomous mode (everything automatic)
+python3 unified_system.py --auto
+
+# Code management only
+python3 unified_system.py --code-only
+
+# Trading management only
+python3 unified_system.py --trading-only
+
+# Interactive mode (approve actions)
+python3 unified_system.py
+
+# Review only mode
+python3 unified_system.py --review
+```
+
 ### Basic Usage
 
 ```python
