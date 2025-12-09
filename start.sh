@@ -16,31 +16,39 @@ fi
 # Load environment variables
 source .env 2>/dev/null || true
 
+# Array to track background process IDs
+PIDS=()
+
 # Function to cleanup background processes
 cleanup() {
     echo ""
     echo "🛑 Shutting down..."
-    kill 0
+    for pid in "${PIDS[@]}"; do
+        if kill -0 "$pid" 2>/dev/null; then
+            kill "$pid" 2>/dev/null || true
+        fi
+    done
+    wait
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM
 
 # Start Python backend (if available)
 if command -v python3 &> /dev/null && [ -f unified_system.py ]; then
     echo "🐍 Starting Python backend..."
     python3 unified_system.py &
-    BACKEND_PID=$!
+    PIDS+=($!)
 fi
 
 # Start Node.js server
 echo "🌐 Starting Node.js server..."
 npm start &
-SERVER_PID=$!
+PIDS+=($!)
 
 # Start trading bot (if auto-start is enabled)
 if [ "$AUTO_START" = "true" ]; then
     echo "🤖 Starting trading bot..."
     node bot.js &
-    BOT_PID=$!
+    PIDS+=($!)
 fi
 
 # Start Vite dev server for frontend

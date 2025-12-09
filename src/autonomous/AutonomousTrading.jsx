@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import '../styles/AutonomousTrading.css'
 
+const MAX_TRADES_DISPLAY = 10
+
 const AutonomousTrading = () => {
   const [isEnabled, setIsEnabled] = useState(false)
   const [tradingMode, setTradingMode] = useState('paper')
@@ -17,7 +19,10 @@ const AutonomousTrading = () => {
           amount: (Math.random() * 10).toFixed(4),
           timestamp: new Date().toLocaleTimeString()
         }
-        setActiveTrades(prev => [newTrade, ...prev].slice(0, 10))
+        setActiveTrades(prev => {
+          const updated = [newTrade, ...prev]
+          return updated.length > MAX_TRADES_DISPLAY ? updated.slice(0, MAX_TRADES_DISPLAY) : updated
+        })
       }, 5000)
 
       return () => clearInterval(interval)
