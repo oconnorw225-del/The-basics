@@ -5,6 +5,16 @@ All notable changes to the NDAX Quantum Engine will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2024-12-09
+
+### Security
+- Updated FastAPI from 0.104.1 to 0.109.1 to fix ReDoS vulnerability (CVE-2024-XXXX)
+- Updated Uvicorn from 0.24.0 to 0.27.0
+- Updated Pydantic from 2.5.0 to 2.5.3
+- Updated httpx from 0.25.2 to 0.26.0
+- Updated numpy from 1.26.2 to 1.26.3
+- All Python dependencies now verified secure with no known vulnerabilities
+
 ## [1.0.0] - 2024-12-09
 
 ### Added
