@@ -296,11 +296,21 @@ PORT=8000
         
         # Safety settings
         print("\n⚠️  SAFETY SETTINGS:")
-        max_loss = input("   Max daily loss % (default 5%): ").strip() or "5"
-        config.max_daily_loss = float(max_loss) / 100
+        while True:
+            try:
+                max_loss = input("   Max daily loss % (default 5%): ").strip() or "5"
+                config.max_daily_loss = float(max_loss) / 100
+                break
+            except ValueError:
+                print("   ❌ Invalid input. Please enter a number.")
         
-        max_risk = input("   Max risk per trade % (default 2%): ").strip() or "2"
-        config.max_risk_per_trade = float(max_risk) / 100
+        while True:
+            try:
+                max_risk = input("   Max risk per trade % (default 2%): ").strip() or "2"
+                config.max_risk_per_trade = float(max_risk) / 100
+                break
+            except ValueError:
+                print("   ❌ Invalid input. Please enter a number.")
         
         # API Configuration
         print("\nAPI Configuration:")
@@ -431,6 +441,7 @@ PORT=8000
     
     <div class="card">
         <h3>Quick Actions</h3>
+        <!-- NOTE: For production use, add authentication/CSRF protection to these endpoints -->
         <button onclick="fetch('/api/trading/start', {{method: 'POST'}}).then(() => location.reload())">▶️ Start Trading</button>
         <button onclick="fetch('/api/trading/stop', {{method: 'POST'}}).then(() => location.reload())">⏸️ Stop Trading</button>
         <button class="danger" onclick="if(confirm('Activate emergency kill switch?')) fetch('/api/emergency/kill-switch', {{method: 'POST'}}).then(() => location.reload())">🚨 KILL SWITCH</button>
