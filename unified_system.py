@@ -49,11 +49,16 @@ class SystemConfig:
     auto_commit: bool = False
     auto_push: bool = False
     auto_merge_pr: bool = False
+    auto_deploy: bool = False
     
     # Trading & APIs
     trading_enabled: bool = False
     ndax_api_configured: bool = False
     exchange_api_configured: bool = False
+    auto_allocate_capital: bool = False
+    auto_deploy_strategies: bool = False
+    treasury_auto_sweep: bool = False
+    evolution_engine_enabled: bool = False
     
     # Wallets (auto-generated if missing)
     inflow_wallet: str = ""
@@ -73,6 +78,7 @@ class SystemConfig:
     require_approval: bool = True
     max_risk_per_trade: float = 0.02
     max_daily_loss: float = 0.05
+    kill_switch_active: bool = False
     
     # Auto-configuration
     auto_generate_missing: bool = True
@@ -222,6 +228,7 @@ PORT=8000
         """Interactive setup wizard"""
         print("\n" + "="*80)
         print("🚀 UNIFIED SYSTEM SETUP WIZARD")
+        print("   Repository Management + Trading Infrastructure")
         print("="*80 + "\n")
         
         # Load or create config
@@ -229,33 +236,71 @@ PORT=8000
         
         # Choose operating mode
         print("Choose Operating Mode:")
-        print("  [F]ull Autonomous - Everything automatic")
-        print("  [M]anual Trading - Auto code, manual trading")
-        print("  [I]nteractive - Approve important actions")
-        print("  [R]eview Only - No automatic changes")
+        print("  [F]ull Autonomous - Everything automatic (code + trading)")
+        print("  [C]ode Only - Auto-manage code, manual trading")
+        print("  [T]rading Only - Auto-manage trading, manual code")
+        print("  [I]nteractive - Approve each action")
+        print("  [R]eview Only - No changes")
         
-        mode = input("\nChoice (F/M/I/R): ").strip().upper()
+        mode = input("\nChoice (F/C/T/I/R): ").strip().upper()
         
-        # Accept first character or full word
+        # Configure based on mode
         if mode.startswith('F') or mode == 'FULL':
+            # Full autonomous mode
             config.auto_fix_code = True
             config.auto_commit = True
             config.auto_push = True
+            config.auto_merge_pr = True
+            config.auto_deploy = True
             config.trading_enabled = False  # Keep false for safety
-            print("✅ Full Autonomous mode selected (trading disabled for safety)")
-        elif mode.startswith('M') or mode == 'MANUAL':
+            config.auto_allocate_capital = False
+            config.auto_deploy_strategies = False
+            config.treasury_auto_sweep = False
+            config.evolution_engine_enabled = False
+            config.require_approval = False
+            print("✅ Full Autonomous mode (trading disabled for safety)")
+            
+        elif mode.startswith('C') or mode == 'CODE':
+            # Code management only
             config.auto_fix_code = True
             config.auto_commit = True
             config.auto_push = True
+            config.auto_merge_pr = True
+            config.auto_deploy = True
             config.trading_enabled = False
-            print("✅ Manual Trading mode selected")
+            config.require_approval = False
+            print("✅ Code Management mode")
+            
+        elif mode.startswith('T') or mode == 'TRADING':
+            # Trading only
+            config.auto_fix_code = False
+            config.trading_enabled = True
+            config.auto_allocate_capital = True
+            config.auto_deploy_strategies = True
+            config.treasury_auto_sweep = True
+            config.evolution_engine_enabled = True
+            config.require_approval = True  # Keep approval for safety
+            print("✅ Trading mode (with approval required)")
+            
         elif mode.startswith('I') or mode == 'INTERACTIVE':
+            # Interactive mode
             config.require_approval = True
-            print("✅ Interactive mode selected")
+            print("✅ Interactive mode")
+            
         else:
+            # Review only
             config.auto_fix_code = False
             config.trading_enabled = False
-            print("✅ Review Only mode selected")
+            config.require_approval = True
+            print("✅ Review Only mode")
+        
+        # Safety settings
+        print("\n⚠️  SAFETY SETTINGS:")
+        max_loss = input("   Max daily loss % (default 5%): ").strip() or "5"
+        config.max_daily_loss = float(max_loss) / 100
+        
+        max_risk = input("   Max risk per trade % (default 2%): ").strip() or "2"
+        config.max_risk_per_trade = float(max_risk) / 100
         
         # API Configuration
         print("\nAPI Configuration:")
@@ -326,36 +371,81 @@ PORT=8000
             
             @app.get("/")
             async def root():
-                return HTMLResponse("""
+                config = self.load_config()
+                return HTMLResponse(f"""
 <!DOCTYPE html>
 <html>
 <head>
     <title>Unified System Dashboard</title>
     <style>
-        body { font-family: sans-serif; max-width: 1200px; margin: 50px auto; padding: 20px; }
-        h1 { color: #667eea; }
-        .status { background: #10b981; color: white; padding: 10px 20px; border-radius: 5px; display: inline-block; }
-        .metric { background: #f3f4f6; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        body {{ font-family: 'Segoe UI', Arial, sans-serif; max-width: 1200px; margin: 50px auto; padding: 20px; background: #f5f5f5; }}
+        h1 {{ color: #667eea; }}
+        .status {{ background: #10b981; color: white; padding: 10px 20px; border-radius: 5px; display: inline-block; margin: 10px 0; }}
+        .status.warning {{ background: #f59e0b; }}
+        .status.danger {{ background: #ef4444; }}
+        .metric {{ background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
+        .metric strong {{ color: #374151; }}
+        .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin: 20px 0; }}
+        .card {{ background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
+        .card h3 {{ margin-top: 0; color: #667eea; }}
+        button {{ background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }}
+        button:hover {{ background: #5568d3; }}
+        button.danger {{ background: #ef4444; }}
+        button.danger:hover {{ background: #dc2626; }}
+        .tag {{ display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; margin: 2px; }}
+        .tag.on {{ background: #10b981; color: white; }}
+        .tag.off {{ background: #9ca3af; color: white; }}
     </style>
 </head>
 <body>
     <h1>🚀 Unified System Dashboard</h1>
-    <div class="status">✅ System Operational</div>
+    <div class="status {'danger' if config.kill_switch_active else ''} ">
+        {'🚨 KILL SWITCH ACTIVE' if config.kill_switch_active else '✅ System Operational'}
+    </div>
     
-    <h2>System Status</h2>
-    <div class="metric">
-        <strong>Mode:</strong> Autonomous<br>
-        <strong>Repository:</strong> ✓ Healthy<br>
-        <strong>Trading:</strong> Disabled (Paper Mode)<br>
-        <strong>Dashboard:</strong> ✓ Active
+    <div class="grid">
+        <div class="card">
+            <h3>Repository Management</h3>
+            <span class="tag {'on' if config.auto_fix_code else 'off'}">Auto-fix: {'ON' if config.auto_fix_code else 'OFF'}</span>
+            <span class="tag {'on' if config.auto_commit else 'off'}">Auto-commit: {'ON' if config.auto_commit else 'OFF'}</span>
+            <span class="tag {'on' if config.auto_push else 'off'}">Auto-push: {'ON' if config.auto_push else 'OFF'}</span>
+            <span class="tag {'on' if config.auto_merge_pr else 'off'}">Auto-merge PR: {'ON' if config.auto_merge_pr else 'OFF'}</span>
+        </div>
+        
+        <div class="card">
+            <h3>Trading System</h3>
+            <span class="tag {'on' if config.trading_enabled else 'off'}">Trading: {'ON' if config.trading_enabled else 'OFF'}</span>
+            <span class="tag {'on' if config.auto_allocate_capital else 'off'}">Auto-allocate: {'ON' if config.auto_allocate_capital else 'OFF'}</span>
+            <span class="tag {'on' if config.auto_deploy_strategies else 'off'}">Auto-deploy: {'ON' if config.auto_deploy_strategies else 'OFF'}</span>
+            <span class="tag {'on' if config.evolution_engine_enabled else 'off'}">Evolution: {'ON' if config.evolution_engine_enabled else 'OFF'}</span>
+        </div>
+        
+        <div class="card">
+            <h3>Safety Controls</h3>
+            <strong>Max Daily Loss:</strong> {config.max_daily_loss * 100}%<br>
+            <strong>Max Risk/Trade:</strong> {config.max_risk_per_trade * 100}%<br>
+            <strong>Approval Required:</strong> {'Yes' if config.require_approval else 'No'}<br>
+            <strong>Kill Switch:</strong> {'ACTIVE' if config.kill_switch_active else 'Ready'}
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3>Quick Actions</h3>
+        <button onclick="fetch('/api/trading/start', {{method: 'POST'}}).then(() => location.reload())">▶️ Start Trading</button>
+        <button onclick="fetch('/api/trading/stop', {{method: 'POST'}}).then(() => location.reload())">⏸️ Stop Trading</button>
+        <button class="danger" onclick="if(confirm('Activate emergency kill switch?')) fetch('/api/emergency/kill-switch', {{method: 'POST'}}).then(() => location.reload())">🚨 KILL SWITCH</button>
     </div>
     
     <h2>Quick Links</h2>
     <ul>
         <li><a href="/health">Health Check</a></li>
-        <li><a href="/api/status">API Status</a></li>
+        <li><a href="/api/status">System Status (JSON)</a></li>
         <li><a href="/docs">API Documentation</a></li>
     </ul>
+    
+    <p style="color: #6b7280; font-size: 14px; margin-top: 40px;">
+        Dashboard Port: {config.dashboard_port} | Version 2.0.0 | Timestamp: {datetime.now().isoformat()}
+    </p>
 </body>
 </html>
                 """)
@@ -380,6 +470,51 @@ PORT=8000
                     "version": "2.0.0",
                     "config": asdict(config),
                     "timestamp": datetime.now().isoformat()
+                })
+            
+            @app.post("/api/emergency/kill-switch")
+            async def kill_switch():
+                """Emergency stop all trading"""
+                config = self.load_config()
+                config.kill_switch_active = True
+                config.trading_enabled = False
+                config.auto_allocate_capital = False
+                config.auto_deploy_strategies = False
+                self.save_config(config)
+                logger.warning("🚨 KILL SWITCH ACTIVATED - All trading halted")
+                return JSONResponse({
+                    "success": True,
+                    "message": "Emergency stop activated - all trading halted",
+                    "timestamp": datetime.now().isoformat()
+                })
+            
+            @app.post("/api/trading/start")
+            async def start_trading():
+                """Start trading (if not in kill switch mode)"""
+                config = self.load_config()
+                if config.kill_switch_active:
+                    return JSONResponse({
+                        "success": False,
+                        "message": "Cannot start - kill switch is active"
+                    }, status_code=403)
+                config.trading_enabled = True
+                self.save_config(config)
+                logger.info("✅ Trading enabled")
+                return JSONResponse({
+                    "success": True,
+                    "message": "Trading started"
+                })
+            
+            @app.post("/api/trading/stop")
+            async def stop_trading():
+                """Stop trading"""
+                config = self.load_config()
+                config.trading_enabled = False
+                self.save_config(config)
+                logger.info("🛑 Trading disabled")
+                return JSONResponse({
+                    "success": True,
+                    "message": "Trading stopped"
                 })
             
             # Run server
@@ -443,16 +578,63 @@ PORT=8000
 
 def main():
     """Main entry point"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Unified Autonomous System')
+    parser.add_argument('--setup', action='store_true', help='Run setup wizard')
+    parser.add_argument('--railway', action='store_true', help='Run in Railway mode')
+    parser.add_argument('--auto', action='store_true', help='Full autonomous mode (override config)')
+    parser.add_argument('--review', action='store_true', help='Review only mode (override config)')
+    parser.add_argument('--code-only', action='store_true', help='Code management only')
+    parser.add_argument('--trading-only', action='store_true', help='Trading management only')
+    
+    args = parser.parse_args()
+    
     system = UnifiedSystem()
     
-    # Check for setup flag
-    if "--setup" in sys.argv:
+    # Run setup wizard
+    if args.setup:
         system.setup_wizard()
         return
     
+    # Override config based on command-line args
+    if args.auto or args.review or args.code_only or args.trading_only:
+        config = system.load_config()
+        
+        if args.auto:
+            config.auto_fix_code = True
+            config.auto_commit = True
+            config.auto_push = True
+            config.auto_merge_pr = True
+            config.auto_deploy = True
+            config.require_approval = False
+            logger.info("Running in FULL AUTONOMOUS mode")
+            
+        if args.review:
+            config.require_approval = True
+            config.auto_fix_code = False
+            config.auto_commit = False
+            config.auto_push = False
+            config.trading_enabled = False
+            logger.info("Running in REVIEW ONLY mode")
+            
+        if args.code_only:
+            config.trading_enabled = False
+            config.auto_allocate_capital = False
+            config.auto_deploy_strategies = False
+            logger.info("Running in CODE MANAGEMENT mode")
+            
+        if args.trading_only:
+            config.auto_fix_code = False
+            config.auto_commit = False
+            config.auto_push = False
+            logger.info("Running in TRADING mode")
+        
+        system.save_config(config)
+    
     # Check for Railway flag
-    if "--railway" in sys.argv:
-        logger.info("Running in Railway mode")
+    if args.railway:
+        logger.info("Running in Railway deployment mode")
     
     # Run the system
     try:
