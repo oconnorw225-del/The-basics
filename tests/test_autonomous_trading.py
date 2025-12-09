@@ -5,7 +5,8 @@ Test suite for autonomous trading module.
 import unittest
 from datetime import datetime
 import sys
-sys.path.insert(0, '/home/runner/work/The-basics/The-basics')
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from backend.autonomous_trading import AutonomousTrader, create_autonomous_trader
 

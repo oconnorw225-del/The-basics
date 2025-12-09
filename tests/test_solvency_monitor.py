@@ -4,7 +4,8 @@ Test suite for solvency monitoring module.
 
 import unittest
 import sys
-sys.path.insert(0, '/home/runner/work/The-basics/The-basics')
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from backend.solvency_monitor import SolvencyMonitor, create_solvency_monitor, SolvencyStatus
 
