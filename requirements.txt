@@ -1,0 +1,23 @@
+# Python requirements for NDAX Quantum Engine backend
+
+# FastAPI framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Environment and configuration
+python-dotenv==1.0.0
+
+# HTTP and async support
+httpx==0.25.2
+aiofiles==23.2.1
+
+# Data processing
+numpy==1.26.2
+pandas==2.1.4
+
+# Optional: For advanced features
+# requests==2.31.0
+# websockets==12.0
+# python-jose[cryptography]==3.3.0
+# passlib[bcrypt]==1.7.4
