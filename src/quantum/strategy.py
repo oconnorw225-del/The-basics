@@ -6,6 +6,10 @@ Uses quantum-inspired algorithms for trade optimization
 import random
 from typing import Dict, List, Tuple
 
+# Configuration constants
+VOLATILITY_MIN = 40
+VOLATILITY_MAX = 90
+
 class QuantumStrategy:
     """
     Quantum-inspired trading strategy
@@ -48,7 +52,7 @@ class QuantumStrategy:
     def _volatility_score(self, market_data: Dict) -> float:
         """Score based on market volatility"""
         # Simulated volatility calculation
-        return random.uniform(40, 90)
+        return random.uniform(VOLATILITY_MIN, VOLATILITY_MAX)
     
     def should_trade(self, market_data: Dict) -> Tuple[bool, str]:
         """

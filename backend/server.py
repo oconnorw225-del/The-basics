@@ -10,6 +10,10 @@ from typing import Optional, List
 import uvicorn
 import os
 from datetime import datetime
+import time
+
+# Track start time for uptime calculation
+START_TIME = time.time()
 
 app = FastAPI(title="NDAX Quantum Engine API")
 
@@ -66,12 +70,17 @@ async def health_check():
 
 @app.get("/api/status")
 async def get_status():
+    uptime_seconds = time.time() - START_TIME
+    hours, remainder = divmod(int(uptime_seconds), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    uptime_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+    
     return {
         "trading_active": trading_state["active"],
         "mode": trading_state["mode"],
         "total_trades": trading_state["total_trades"],
         "active_strategies": trading_state["active_strategies"],
-        "uptime": os.popen("ps -o etime= -p %d" % os.getpid()).read().strip()
+        "uptime": uptime_str
     }
 
 @app.post("/api/trade")

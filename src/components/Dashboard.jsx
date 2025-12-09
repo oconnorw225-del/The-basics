@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../styles/Dashboard.css'
 
@@ -11,27 +11,26 @@ const Dashboard = () => {
   })
   const navigate = useNavigate()
 
-  useEffect(() => {
-    // Fetch dashboard metrics
-    const fetchMetrics = async () => {
-      try {
-        // Placeholder for actual API call
-        setMetrics({
-          totalTrades: 127,
-          activeStrategies: 5,
-          profitLoss: 2450.75,
-          systemHealth: 98
-        })
-      } catch (error) {
-        console.error('Error fetching metrics:', error)
-      }
+  const fetchMetrics = useCallback(async () => {
+    try {
+      // Placeholder for actual API call
+      setMetrics({
+        totalTrades: 127,
+        activeStrategies: 5,
+        profitLoss: 2450.75,
+        systemHealth: 98
+      })
+    } catch (error) {
+      console.error('Error fetching metrics:', error)
     }
+  }, [])
 
+  useEffect(() => {
     fetchMetrics()
     const interval = setInterval(fetchMetrics, 30000) // Update every 30s
 
     return () => clearInterval(interval)
-  }, [])
+  }, [fetchMetrics])
 
   return (
     <div className="dashboard">
