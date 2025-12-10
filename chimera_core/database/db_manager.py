@@ -76,17 +76,31 @@ class DatabaseManager:
         if POSTGRES_AVAILABLE:
             try:
                 pg_config = self.config.get('postgres', {})
+                
+                # SECURITY: Validate password is set properly
+                password = pg_config.get('password')
+                if not password or password in ['changeme', 'password', 'test', 'demo']:
+                    logger.error("❌ SECURITY: Database password not configured properly!")
+                    logger.error("Set via environment: DATABASE_PASSWORD=<secure_password>")
+                    raise ValueError(
+                        "SECURITY: Database password must be set via environment variable. "
+                        "Never use default passwords in production!"
+                    )
+                
                 self.postgres_pool = await asyncpg.create_pool(
                     host=pg_config.get('host', 'localhost'),
                     port=pg_config.get('port', 5432),
                     user=pg_config.get('user', 'chimera'),
-                    password=pg_config.get('password', 'changeme'),
+                    password=password,
                     database=pg_config.get('database', 'chimera_trading'),
                     min_size=5,
                     max_size=20
                 )
                 await self._create_postgres_schema()
                 logger.info("✅ PostgreSQL connected")
+            except ValueError as e:
+                # Re-raise security errors
+                raise e
             except Exception as e:
                 logger.error(f"❌ PostgreSQL connection failed: {e}")
         

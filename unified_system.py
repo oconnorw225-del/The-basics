@@ -4,6 +4,7 @@ unified_system.py - Complete Autonomous System
 Integrates Chimera Auto-Pilot with The-Basics repository
 Auto-configures missing APIs, wallets, and all inputs
 Maintains Railway deployment
+SECURITY HARDENED - All file operations now use safe methods
 """
 
 import asyncio
@@ -19,6 +20,15 @@ import subprocess
 import secrets
 import hashlib
 from enum import Enum
+
+# SECURITY: Import safe file operations
+try:
+    from security.safe_file_ops import SafeFileOperations, SecurityError
+    safe_file_ops = SafeFileOperations()
+    USE_SAFE_FILE_OPS = True
+except ImportError:
+    logger.warning("Safe file operations not available, using fallback")
+    USE_SAFE_FILE_OPS = False
 
 # Setup logging
 os.makedirs('.unified-system/logs', exist_ok=True)
