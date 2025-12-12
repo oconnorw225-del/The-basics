@@ -350,6 +350,78 @@ python tests/test_autonomous_trading.py
 python tests/test_solvency_monitor.py
 ```
 
+## 🔄 Repository Consolidation
+
+This repository automatically consolidates the best parts from multiple source repositories into a unified system.
+
+### Automated Consolidation
+
+**GitHub Actions Workflow** (Recommended for production)
+
+The consolidation runs automatically:
+- 🕐 **Scheduled**: Daily at midnight UTC
+- 🖱️ **Manual**: Via GitHub Actions workflow_dispatch
+
+**Features:**
+- ✅ **Resilient Health Checks**: Continues even if some repositories are unavailable
+- ✅ **Timestamped Backups**: All source repositories are backed up with timestamps
+- ✅ **Error Handling**: Logs failures but completes consolidation with available sources
+- ✅ **Summary Reporting**: Shows successful and failed operations
+
+To trigger manually:
+1. Go to **Actions** → **Consolidate Best Parts**
+2. Click **Run workflow**
+3. Monitor progress in the workflow logs
+
+### Local Consolidation
+
+**Single Run** (One-time consolidation)
+```bash
+bash automation/consolidate.sh
+```
+
+**Continuous Mode** (Keep repository updated)
+```bash
+# Run continuously with default interval (24 hours)
+bash automation/consolidate.sh --continuous
+
+# Custom interval (e.g., every hour)
+bash automation/consolidate.sh --continuous --interval 3600
+
+# With logging to file
+bash automation/consolidate.sh --continuous --log-file /var/log/consolidation.log
+```
+
+**Configuration Options:**
+- `--continuous`: Enable continuous run mode
+- `--interval SECONDS`: Set sleep interval between runs (default: 86400 = 24h)
+- `--log-file FILE`: Write timestamped logs to specified file
+- `--help`: Show usage information
+
+### Health Check Behavior
+
+The consolidation system is designed to be resilient:
+
+1. **Non-blocking Errors**: Failed repository clones don't stop the workflow
+2. **Partial Success**: Consolidation proceeds with successfully cloned repositories
+3. **Detailed Logging**: All operations are logged with timestamps
+4. **Summary Report**: Shows total/successful/failed operations at completion
+
+Example output:
+```
+2025-12-12 23:11:27 - ========================================
+2025-12-12 23:11:27 - Starting Repository Consolidation
+2025-12-12 23:11:27 - ========================================
+2025-12-12 23:11:27 - ✅ SUCCESS: ndax-quantum-engine (full repository)
+2025-12-12 23:11:27 - ⚠️  SKIPPED: quantum-engine-dashb - Source not found
+2025-12-12 23:11:27 - ========================================
+2025-12-12 23:11:27 - Consolidation Summary
+2025-12-12 23:11:27 - ========================================
+2025-12-12 23:11:27 - Total operations: 7
+2025-12-12 23:11:27 - Successful: 5
+2025-12-12 23:11:27 - Failed/Skipped: 2
+```
+
 ## 📖 Documentation
 
 ### Core Documentation
