@@ -1,6 +1,6 @@
 # AWS Deployment Quick Start - 5 Minutes ⚡
 
-Get Chimera running on AWS in 5 minutes with automated deployment.
+Get Chimera running on AWS in 5 minutes with **fully automated** deployment.
 
 ## Prerequisites Checklist
 
@@ -10,23 +10,71 @@ Get Chimera running on AWS in 5 minutes with automated deployment.
 
 That's it! Everything else is automated.
 
-## Step 1: AWS Setup (2 minutes)
+---
 
-### Create IAM User
+## 🚀 One-Click Automated Setup (NEW!)
 
-```bash
-# 1. Go to AWS Console → IAM → Users → Create User
-# 2. Name: chimera-deployer
-# 3. Attach policies:
-#    - AmazonEC2ContainerRegistryFullAccess
-#    - AmazonECS_FullAccess
-#    - CloudWatchFullAccess
+### Step 1: AWS Setup (2 minutes)
 
-# 4. Create access key (Security credentials → Create access key)
-# 5. Save the Access Key ID and Secret Access Key
+#### Create IAM User
+
+1. Go to [AWS IAM Console](https://console.aws.amazon.com/iam/home#/users$new)
+2. Create user: `chimera-deployer`
+3. Attach these policies:
+   - `AmazonEC2ContainerRegistryFullAccess`
+   - `AmazonECS_FullAccess`
+   - `AmazonVPCFullAccess`
+   - `CloudWatchFullAccess`
+   - `IAMFullAccess`
+
+4. Create access key → Save the credentials
+
+### Step 2: Configure GitHub Secrets (1 minute)
+
+1. Go to: `Settings` → `Secrets and variables` → `Actions`
+2. Add three secrets:
+
+```
+AWS_ACCESS_KEY_ID = AKIA...
+AWS_SECRET_ACCESS_KEY = ...
+AWS_REGION = us-east-1
 ```
 
-**Quick Console Link**: https://console.aws.amazon.com/iam/home#/users$new
+### Step 3: Run Automated Setup (1 click!)
+
+1. Go to: **Actions** tab on GitHub
+2. Select: **🚀 Complete AWS Setup & Deploy** workflow
+3. Click: **Run workflow**
+4. Select:
+   - Setup type: `full`
+   - Environment: `production`
+5. Click: **Run workflow**
+
+**That's it!** ✅
+
+The workflow automatically:
+- ✅ Creates all AWS infrastructure (VPC, ECS, ALB, etc.)
+- ✅ Builds your Docker image
+- ✅ Deploys to AWS
+- ✅ Sets up monitoring
+- ✅ Configures auto-scaling
+
+**Time:** 5-8 minutes total
+
+### Step 4: Access Your System
+
+After the workflow completes, you'll see your application URL in the workflow summary:
+
+```
+🌐 Your application is available at:
+  http://your-load-balancer-xxx.us-east-1.elb.amazonaws.com
+```
+
+---
+
+## Alternative: Manual Step-by-Step
+
+If you prefer manual control:
 
 ## Step 2: Configure GitHub Secrets (1 minute)
 

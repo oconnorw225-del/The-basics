@@ -116,7 +116,18 @@ This repository contains **PROJECT CHIMERA**, an autonomous, self-evolving AI sy
 
 ### AWS Deployment (Recommended) ⭐
 
-**Get production-ready deployment in 5 minutes with auto-scaling:**
+**Get production-ready deployment in 5 minutes with one-click setup:**
+
+#### Option 1: Fully Automated (NEW! 🆕)
+
+1. **Set up AWS IAM user** with required permissions
+2. **Add GitHub Secrets**: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`
+3. **Run workflow**: Go to Actions → "🚀 Complete AWS Setup & Deploy" → Run workflow
+4. **Done!** Everything is automated - infrastructure, deployment, monitoring
+
+The workflow automatically creates all AWS infrastructure and deploys your system.
+
+#### Option 2: Push to Deploy
 
 1. **Configure GitHub Secrets** (Settings → Secrets → Actions):
    ```
@@ -125,14 +136,16 @@ This repository contains **PROJECT CHIMERA**, an autonomous, self-evolving AI sy
    AWS_REGION=us-east-1
    ```
 
-2. **Deploy:**
+2. **Set up infrastructure once** (manual or using Terraform)
+   
+3. **Deploy by pushing:**
    ```bash
    git push origin main
    ```
 
-3. **Done!** GitHub Actions automatically deploys with monitoring.
+4. **Done!** GitHub Actions automatically deploys with monitoring.
 
-📖 **AWS Quick Start**: [aws/QUICKSTART.md](aws/QUICKSTART.md)  
+📖 **AWS Quick Start**: [aws/QUICKSTART.md](aws/QUICKSTART.md) - Includes one-click setup instructions  
 📖 **Full AWS Guide**: [aws/README_AWS_DEPLOYMENT.md](aws/README_AWS_DEPLOYMENT.md)
 
 ### Local Development
