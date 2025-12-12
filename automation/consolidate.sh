@@ -32,8 +32,8 @@ log() {
     local message="$1"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     echo -e "${timestamp} - ${message}"
-    if [ -n "$LOG_FILE" ]; then
-        echo "${timestamp} - ${message}" | sed 's/\x1b\[[0-9;]*m//g' >> "$LOG_FILE"
+    if [ -n "$LOG_FILE" ] && [ -f "$LOG_FILE" -o -w "$(dirname "$LOG_FILE")" ]; then
+        echo -e "${timestamp} - ${message}" | sed 's/\x1b\[[0-9;]*m//g' >> "$LOG_FILE" 2>/dev/null || true
     fi
 }
 
@@ -116,11 +116,27 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --interval)
-            SLEEP_INTERVAL="$2"
+            # Validate interval is a positive integer
+            if [[ "$2" =~ ^[0-9]+$ ]] && [ "$2" -gt 0 ]; then
+                SLEEP_INTERVAL="$2"
+            else
+                log "${RED}Error: --interval must be a positive integer${NC}"
+                exit 1
+            fi
             shift 2
             ;;
         --log-file)
             LOG_FILE="$2"
+            # Validate log file directory exists and is writable
+            LOG_DIR=$(dirname "$LOG_FILE")
+            if [ ! -d "$LOG_DIR" ]; then
+                log "${RED}Error: Log directory does not exist: $LOG_DIR${NC}"
+                exit 1
+            fi
+            if [ ! -w "$LOG_DIR" ]; then
+                log "${RED}Error: Log directory is not writable: $LOG_DIR${NC}"
+                exit 1
+            fi
             shift 2
             ;;
         --help)
