@@ -15,6 +15,13 @@ on:
         options:
           - staging
           - production
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: string
+        default: 'staging'
 
 env:
   AWS_REGION: us-east-1
@@ -40,6 +47,24 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check if ECR repository exists
+        id: check-ecr
+        continue-on-error: true
+        run: |
+          if aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} 2>/dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create ECR repository if needed
+        if: steps.check-ecr.outputs.exists == 'false'
+        run: |
+          echo "Creating ECR repository..."
+          aws ecr create-repository \
+            --repository-name ${{ env.ECR_REPOSITORY }} \
+            --image-scanning-configuration scanOnPush=true
 
       - name: Login to Amazon ECR
         id: login-ecr
