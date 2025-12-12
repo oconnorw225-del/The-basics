@@ -6,7 +6,7 @@ const QuantumEngine = () => {
   const [quantumState, setQuantumState] = useState({
     entanglement: 0,
     superposition: 0,
-    optimization: 0
+    optimization: 0,
   })
 
   const handleActivate = () => {
@@ -16,7 +16,7 @@ const QuantumEngine = () => {
       setQuantumState({
         entanglement: Math.random() * 100,
         superposition: Math.random() * 100,
-        optimization: Math.random() * 100
+        optimization: Math.random() * 100,
       })
     }
   }
@@ -35,30 +35,21 @@ const QuantumEngine = () => {
           <div className="quantum-metric">
             <h3>Entanglement</h3>
             <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{width: `${quantumState.entanglement}%`}}
-              />
+              <div className="progress-fill" style={{ width: `${quantumState.entanglement}%` }} />
             </div>
             <p>{quantumState.entanglement.toFixed(2)}%</p>
           </div>
           <div className="quantum-metric">
             <h3>Superposition</h3>
             <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{width: `${quantumState.superposition}%`}}
-              />
+              <div className="progress-fill" style={{ width: `${quantumState.superposition}%` }} />
             </div>
             <p>{quantumState.superposition.toFixed(2)}%</p>
           </div>
           <div className="quantum-metric">
             <h3>Optimization</h3>
             <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{width: `${quantumState.optimization}%`}}
-              />
+              <div className="progress-fill" style={{ width: `${quantumState.optimization}%` }} />
             </div>
             <p>{quantumState.optimization.toFixed(2)}%</p>
           </div>

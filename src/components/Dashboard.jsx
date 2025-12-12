@@ -7,7 +7,7 @@ const Dashboard = () => {
     totalTrades: 0,
     activeStrategies: 0,
     profitLoss: 0,
-    systemHealth: 100
+    systemHealth: 100,
   })
   const navigate = useNavigate()
 
@@ -18,7 +18,7 @@ const Dashboard = () => {
         totalTrades: 127,
         activeStrategies: 5,
         profitLoss: 2450.75,
-        systemHealth: 98
+        systemHealth: 98,
       })
     } catch (error) {
       console.error('Error fetching metrics:', error)

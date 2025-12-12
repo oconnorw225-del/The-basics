@@ -25,15 +25,15 @@
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-.status-indicator[data-status="ready"] {
+.status-indicator[data-status='ready'] {
   color: var(--secondary-color);
 }
 
-.status-indicator[data-status="error"] {
+.status-indicator[data-status='error'] {
   color: var(--danger-color);
 }
 
-.status-indicator[data-status="initializing"] {
+.status-indicator[data-status='initializing'] {
   color: var(--text-secondary);
 }
 
