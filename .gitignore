@@ -48,3 +48,9 @@ htmlcov/
 # Temp files
 /tmp/
 *.tmp
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
