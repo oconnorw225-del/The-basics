@@ -67,7 +67,46 @@ The cleanup script uses the following criteria:
 
 ## Cleanup Process
 
-The cleanup is performed by the script `automation/cleanup-branches.sh` which:
+There are two ways to perform branch cleanup:
+
+### 1. Automated GitHub Action (Recommended)
+
+The **Cleanup Stale Branches** workflow (`.github/workflows/cleanup-stale-branches.yml`) automates the deletion of specific stale branches listed in `DELETE_BRANCHES.sh`.
+
+**How to use:**
+
+1. Navigate to **Actions** tab in GitHub
+2. Select **Cleanup Stale Branches** workflow
+3. Click **Run workflow**
+4. Configure the inputs:
+   - **Dry run mode**: `true` (default) to preview, `false` to delete
+   - **Confirm deletion**: `false` (default) safety check, must be `true` to delete
+
+**Safety Features:**
+- **Dual confirmation required**: Both `dry_run=false` AND `confirm_deletion=true` must be set to delete branches
+- **Dry-run by default**: Always shows what would be deleted before taking action
+- **Protected branches**: `main` and `master` are never deleted
+- **Graceful error handling**: Missing branches don't fail the workflow
+- **Detailed reporting**: Comprehensive summary of all actions taken
+
+**Branch List:**
+The workflow deletes the following specific branches (from `DELETE_BRANCHES.sh`):
+- All redundant merge/cleanup branches
+- All redundant setup branches
+- All redundant fix branches
+- Branches already consolidated into other branches
+- Deprecated dependabot branches
+
+**Workflow Outputs:**
+- List of branches found vs. already deleted
+- List of protected branches
+- Summary statistics (found, missing, protected)
+- Deletion results (success/failure counts)
+- Detailed logs for troubleshooting
+
+### 2. Dynamic Cleanup Script
+
+The cleanup is also performed by the script `automation/cleanup-branches.sh` which uses dynamic criteria:
 
 1. Lists all remote Copilot branches
 2. Checks each branch's merge status and last commit date
@@ -77,7 +116,7 @@ The cleanup is performed by the script `automation/cleanup-branches.sh` which:
 4. Deletes marked branches (unless in dry-run mode)
 5. Provides a detailed summary of actions taken
 
-### Configuration Options
+### Configuration Options (Script Only)
 
 - `DRY_RUN`: Set to `true` to see what would be deleted without actually deleting (default: `true`)
 - `STALE_DAYS`: Number of days of inactivity before a branch is considered stale (default: `30`)
@@ -105,6 +144,13 @@ STALE_DAYS=14 DRY_RUN=false bash automation/cleanup-branches.sh
 
 ## Manual Cleanup Commands
 
+### Using GitHub Action
+The recommended method is to use the GitHub Action workflow:
+1. Go to **Actions** → **Cleanup Stale Branches**
+2. Click **Run workflow**
+3. Set **dry_run** to `false` and **confirm_deletion** to `true`
+
+### Using Command Line
 If you need to manually delete a specific Copilot branch:
 
 ```bash
