@@ -253,8 +253,7 @@ setup_redis() {
     # Generate secure random password
     REDIS_PASSWORD=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-32)
     
-    # Configure Redis for production
-    sed -i 's/^bind 127.0.0.1/bind 127.0.0.1/' /etc/redis/redis.conf
+    # Configure Redis for production (bind to localhost only for security)
     sed -i "s/^# requirepass.*/requirepass $REDIS_PASSWORD/" /etc/redis/redis.conf
     
     # Save password to secure file
