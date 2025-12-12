@@ -95,7 +95,7 @@ The workflow deletes the following specific branches (from `DELETE_BRANCHES.sh`)
 - All redundant setup branches
 - All redundant fix branches
 - Branches already consolidated into other branches
-- Deprecated dependabot branches
+- Deprecated Dependabot branches
 
 **Workflow Outputs:**
 - List of branches found vs. already deleted
