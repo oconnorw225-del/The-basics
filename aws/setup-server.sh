@@ -224,15 +224,22 @@ setup_postgresql() {
     
     log_step "Configuring PostgreSQL"
     
-    sudo -u postgres psql -c "CREATE USER chimera WITH PASSWORD 'chimera_secure_password';" 2>/dev/null || true
+    # Generate secure random password
+    DB_PASSWORD=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-32)
+    
+    sudo -u postgres psql -c "CREATE USER chimera WITH PASSWORD '$DB_PASSWORD';" 2>/dev/null || true
     sudo -u postgres psql -c "CREATE DATABASE chimera OWNER chimera;" 2>/dev/null || true
     sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE chimera TO chimera;" 2>/dev/null || true
+    
+    # Save password to secure file
+    echo "DB_PASSWORD=$DB_PASSWORD" >> /etc/chimera/secrets.env
+    chmod 600 /etc/chimera/secrets.env
     
     # Enable and start PostgreSQL
     systemctl enable postgresql
     systemctl start postgresql
     
-    log_success "PostgreSQL configured"
+    log_success "PostgreSQL configured (password saved to /etc/chimera/secrets.env)"
 }
 
 setup_redis() {
@@ -243,15 +250,22 @@ setup_redis() {
     
     log_step "Configuring Redis"
     
+    # Generate secure random password
+    REDIS_PASSWORD=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-32)
+    
     # Configure Redis for production
     sed -i 's/^bind 127.0.0.1/bind 127.0.0.1/' /etc/redis/redis.conf
-    sed -i 's/^# requirepass/requirepass chimera_redis_password/' /etc/redis/redis.conf
+    sed -i "s/^# requirepass.*/requirepass $REDIS_PASSWORD/" /etc/redis/redis.conf
+    
+    # Save password to secure file
+    echo "REDIS_PASSWORD=$REDIS_PASSWORD" >> /etc/chimera/secrets.env
+    chmod 600 /etc/chimera/secrets.env
     
     # Enable and start Redis
     systemctl enable redis-server
     systemctl start redis-server
     
-    log_success "Redis configured"
+    log_success "Redis configured (password saved to /etc/chimera/secrets.env)"
 }
 
 setup_nginx() {
@@ -357,22 +371,35 @@ install_node_dependencies() {
 configure_environment() {
     log_step "Configuring environment"
     
-    cat > "$INSTALL_DIR/.env" << 'EOF'
+    # Generate secure secrets
+    SECRET_KEY=$(openssl rand -base64 32)
+    JWT_SECRET=$(openssl rand -base64 32)
+    
+    # Load database passwords if they were generated
+    if [ -f /etc/chimera/secrets.env ]; then
+        source /etc/chimera/secrets.env
+    else
+        # Fallback if running in minimal mode
+        DB_PASSWORD="CHANGE_THIS_IN_PRODUCTION"
+        REDIS_PASSWORD="CHANGE_THIS_IN_PRODUCTION"
+    fi
+    
+    cat > "$INSTALL_DIR/.env" << EOF
 # Chimera Production Configuration
 NODE_ENV=production
 PYTHON_ENV=production
 
 # Database
-DATABASE_URL=postgresql://chimera:chimera_secure_password@localhost/chimera
-REDIS_URL=redis://:chimera_redis_password@localhost:6379
+DATABASE_URL=postgresql://chimera:${DB_PASSWORD}@localhost/chimera
+REDIS_URL=redis://:${REDIS_PASSWORD}@localhost:6379
 
 # API
 API_PORT=8000
 API_HOST=0.0.0.0
 
 # Security
-SECRET_KEY=CHANGE_THIS_IN_PRODUCTION
-JWT_SECRET=CHANGE_THIS_IN_PRODUCTION
+SECRET_KEY=${SECRET_KEY}
+JWT_SECRET=${JWT_SECRET}
 
 # AWS (if using)
 AWS_REGION=us-east-1
@@ -381,7 +408,7 @@ EOF
     chown "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR/.env"
     chmod 600 "$INSTALL_DIR/.env"
     
-    log_success "Environment configured"
+    log_success "Environment configured with secure credentials"
 }
 
 setup_systemd_service() {

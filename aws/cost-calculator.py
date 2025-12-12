@@ -13,7 +13,7 @@ from typing import Dict, List
 class AWSCostCalculator:
     """Calculate estimated AWS costs for Chimera deployment"""
     
-    # Pricing (us-east-1, as of 2024, approximate)
+    # Pricing (us-east-1, as of January 2025, approximate - verify current pricing)
     PRICES = {
         'ecs_fargate_cpu_per_vcpu_hour': 0.04048,
         'ecs_fargate_memory_per_gb_hour': 0.004445,
