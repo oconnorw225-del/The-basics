@@ -17,11 +17,13 @@ const AutonomousTrading = () => {
           pair: ['BTC/USD', 'ETH/USD', 'LTC/USD'][Math.floor(Math.random() * 3)],
           type: Math.random() > 0.5 ? 'BUY' : 'SELL',
           amount: (Math.random() * 10).toFixed(4),
-          timestamp: new Date().toLocaleTimeString()
+          timestamp: new Date().toLocaleTimeString(),
         }
         setActiveTrades(prev => {
           const updated = [newTrade, ...prev]
-          return updated.length > MAX_TRADES_DISPLAY ? updated.slice(0, MAX_TRADES_DISPLAY) : updated
+          return updated.length > MAX_TRADES_DISPLAY
+            ? updated.slice(0, MAX_TRADES_DISPLAY)
+            : updated
         })
       }, 5000)
 
@@ -36,9 +38,9 @@ const AutonomousTrading = () => {
         <div className="mode-selector">
           <label>
             Trading Mode:
-            <select 
-              value={tradingMode} 
-              onChange={(e) => setTradingMode(e.target.value)}
+            <select
+              value={tradingMode}
+              onChange={e => setTradingMode(e.target.value)}
               disabled={isEnabled}
             >
               <option value="paper">Paper Trading</option>
@@ -46,7 +48,7 @@ const AutonomousTrading = () => {
             </select>
           </label>
         </div>
-        <button 
+        <button
           className={isEnabled ? 'stop-button' : 'start-button'}
           onClick={() => setIsEnabled(!isEnabled)}
         >

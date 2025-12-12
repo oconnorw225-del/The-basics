@@ -2,13 +2,7 @@
  * Constants for the application
  */
 
-export const TRADING_PAIRS = [
-  'BTC/USD',
-  'ETH/USD',
-  'LTC/USD',
-  'XRP/USD',
-  'BCH/USD',
-]
+export const TRADING_PAIRS = ['BTC/USD', 'ETH/USD', 'LTC/USD', 'XRP/USD', 'BCH/USD']
 
 export const TRADING_MODES = {
   PAPER: 'paper',

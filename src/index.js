@@ -1,2 +1,2 @@
 // Alternative entry point for compatibility
-export { default } from './App';
+export { default } from './App'
