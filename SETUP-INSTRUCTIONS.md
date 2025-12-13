@@ -200,11 +200,13 @@ VITE_API_URL=http://localhost:8000
 
 ## Deployment
 
-### Railway
+### AWS
 
-1. Connect your GitHub repository to Railway
-2. Configure environment variables in Railway dashboard
-3. Deploy automatically on push
+1. Configure GitHub Secrets with AWS credentials
+2. Push to repository
+3. GitHub Actions automatically deploys to AWS
+
+See [`DEPLOYMENT.md`](DEPLOYMENT.md) for complete AWS deployment instructions.
 
 ### Docker
 

@@ -3,7 +3,6 @@
 unified_system.py - Complete Autonomous System
 Integrates Chimera Auto-Pilot with The-Basics repository
 Auto-configures missing APIs, wallets, and all inputs
-Maintains Railway deployment
 SECURITY HARDENED - All file operations now use safe methods
 """
 
@@ -79,10 +78,6 @@ class SystemConfig:
     # Dashboard
     dashboard_enabled: bool = True
     dashboard_port: int = 8000
-    
-    # Railway
-    railway_deployed: bool = False
-    railway_url: str = ""
     
     # Cloud Server Integration
     cloud_server_enabled: bool = False
@@ -585,10 +580,6 @@ echo ""
         else:
             print("✅ Cloud deployment skipped")
         
-        # Railway
-        config.railway_deployed = True
-        print("\n✅ Railway deployment configured")
-        
         # Save configuration
         self.save_config(config)
         print(f"\n✅ Configuration saved to: {self.config_file}")
@@ -603,7 +594,7 @@ echo ""
             print("  3. Deploy to cloud: bash deploy_to_cloud.sh")
             print("  4. Access cloud dashboard: http://{}:{}".format(config.cloud_server_host, config.cloud_server_port))
         else:
-            print("  3. Push to GitHub for Railway deployment")
+            print("  3. Push to GitHub for AWS deployment (if configured)")
         print()
     
     async def start_api_server(self):
@@ -832,7 +823,6 @@ def main():
     
     parser = argparse.ArgumentParser(description='Unified Autonomous System')
     parser.add_argument('--setup', action='store_true', help='Run setup wizard')
-    parser.add_argument('--railway', action='store_true', help='Run in Railway mode')
     parser.add_argument('--auto', action='store_true', help='Full autonomous mode (override config)')
     parser.add_argument('--review', action='store_true', help='Review only mode (override config)')
     parser.add_argument('--code-only', action='store_true', help='Code management only')
@@ -881,10 +871,6 @@ def main():
             logger.info("Running in TRADING mode")
         
         system.save_config(config)
-    
-    # Check for Railway flag
-    if args.railway:
-        logger.info("Running in Railway deployment mode")
     
     # Run the system
     try:
