@@ -30,7 +30,7 @@ jobs:
 
       - name: Setup directory structure
         run: |
-          mkdir -p api backend frontend workflows docs automation tests
+          mkdir -p api backend frontend .github/workflows docs automation tests
 
       - name: Run consolidation script
         run: |
