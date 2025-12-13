@@ -6,7 +6,8 @@
     "notifyWebhook": "",
     "maxRetries": 3,
     "retryDelay": 1000,
-    "circuitBreakerThreshold": 5
+    "circuitBreakerThreshold": 5,
+    "fatalErrorExitDelay": 1000
   },
   "healthMonitor": {
     "heartbeatInterval": 5000,
@@ -15,7 +16,8 @@
     "checkInterval": 10000,
     "autoRestart": true,
     "maxRestarts": 5,
-    "freezeTimeout": 30000
+    "freezeTimeout": 30000,
+    "restartExitDelay": 1000
   },
   "shutdownHandler": {
     "gracePeriod": 30000,

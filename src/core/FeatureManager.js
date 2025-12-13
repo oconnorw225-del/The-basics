@@ -36,8 +36,8 @@ class FeatureManager extends EventEmitter {
       FeatureClass,
       enabled: options.enabled ?? true,
       critical: options.critical ?? false,
-      dependencies: options.dependencies || [],
-      config: options.config || {},
+      dependencies: options.dependencies ?? [],
+      config: options.config ?? {},
       autoStart: options.autoStart ?? true
     };
 

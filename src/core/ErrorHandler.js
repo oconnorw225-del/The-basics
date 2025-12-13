@@ -14,13 +14,13 @@ class ErrorHandler extends EventEmitter {
     
     this.config = {
       logErrors: config.logErrors ?? true,
-      logPath: config.logPath || './logs/errors.log',
+      logPath: config.logPath ?? './logs/errors.log',
       notifyOnError: config.notifyOnError ?? true,
-      notifyWebhook: config.notifyWebhook || '',
-      maxRetries: config.maxRetries || 3,
-      retryDelay: config.retryDelay || 1000,
-      circuitBreakerThreshold: config.circuitBreakerThreshold || 5,
-      ...config
+      notifyWebhook: config.notifyWebhook ?? '',
+      maxRetries: config.maxRetries ?? 3,
+      retryDelay: config.retryDelay ?? 1000,
+      circuitBreakerThreshold: config.circuitBreakerThreshold ?? 5,
+      fatalErrorExitDelay: config.fatalErrorExitDelay ?? 1000
     };
 
     // Circuit breaker state for external services
@@ -88,11 +88,11 @@ class ErrorHandler extends EventEmitter {
 
     // Give time for cleanup before exit
     console.error('💥 FATAL: Uncaught exception:', error);
-    console.error('Process will exit in 1 second...');
+    console.error(`Process will exit in ${this.config.fatalErrorExitDelay}ms...`);
     
     setTimeout(() => {
       process.exit(1);
-    }, 1000);
+    }, this.config.fatalErrorExitDelay);
   }
 
   /**

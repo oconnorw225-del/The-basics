@@ -10,14 +10,14 @@ class HealthMonitor extends EventEmitter {
     super();
     
     this.config = {
-      heartbeatInterval: config.heartbeatInterval || 5000,
-      memoryThreshold: config.memoryThreshold || 0.9,
-      cpuThreshold: config.cpuThreshold || 0.8,
-      checkInterval: config.checkInterval || 10000,
+      heartbeatInterval: config.heartbeatInterval ?? 5000,
+      memoryThreshold: config.memoryThreshold ?? 0.9,
+      cpuThreshold: config.cpuThreshold ?? 0.8,
+      checkInterval: config.checkInterval ?? 10000,
       autoRestart: config.autoRestart ?? true,
-      maxRestarts: config.maxRestarts || 5,
-      freezeTimeout: config.freezeTimeout || 30000,
-      ...config
+      maxRestarts: config.maxRestarts ?? 5,
+      freezeTimeout: config.freezeTimeout ?? 30000,
+      restartExitDelay: config.restartExitDelay ?? 1000
     };
 
     this.state = {
@@ -337,7 +337,7 @@ class HealthMonitor extends EventEmitter {
       // Give other systems time to cleanup
       setTimeout(() => {
         process.exit(1);
-      }, 1000);
+      }, this.config.restartExitDelay);
     } else {
       console.error('❌ Max restart attempts reached, manual intervention required');
       this.emit('maxRestartsReached', { reason: 'freeze' });
@@ -361,7 +361,7 @@ class HealthMonitor extends EventEmitter {
 
       setTimeout(() => {
         process.exit(1);
-      }, 5000);
+      }, this.config.restartExitDelay);
     } else {
       console.error('❌ Max restart attempts reached');
       this.emit('maxRestartsReached', { reason: 'unhealthy' });

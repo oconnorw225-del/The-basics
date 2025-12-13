@@ -211,9 +211,14 @@ class ProcessLinker extends EventEmitter {
     console.log(`🔗 Connected: ${connectionKey}`);
     this.emit('connected', { from: fromName, to: toName });
 
-    // If services have onConnect handler, call it
+    // If services have onConnect handler, call it with error handling
     if (typeof from.service.onConnect === 'function') {
-      await from.service.onConnect(toName, to.service);
+      try {
+        await from.service.onConnect(toName, to.service);
+      } catch (error) {
+        console.error(`❌ Error in onConnect handler for ${fromName}:`, error.message);
+        this.emit('connectionError', { from: fromName, to: toName, error });
+      }
     }
   }
 

@@ -108,7 +108,8 @@ class FreelanceOrchestrator:
             'execution_max_time': 3600,  # 1 hour
             'auto_bid': True,
             'auto_execute': False,  # Requires approval by default
-            'platforms': ['upwork', 'freelancer', 'fiverr', 'toptal']
+            'platforms': ['upwork', 'freelancer', 'fiverr', 'toptal'],
+            'max_backoff_time': 60  # Maximum backoff time in seconds for retry
         }
     
     async def start(self):
@@ -176,8 +177,9 @@ class FreelanceOrchestrator:
                         logger.critical(f"💥 Too many consecutive errors ({consecutive_errors}), shutting down...")
                         break
                     
-                    # Exponential backoff before retry
-                    await asyncio.sleep(min(60, 2 ** consecutive_errors))
+                    # Exponential backoff before retry (configurable max)
+                    backoff_time = min(self.config['max_backoff_time'], 2 ** consecutive_errors)
+                    await asyncio.sleep(backoff_time)
                 
         except KeyboardInterrupt:
             logger.info("🛑 Keyboard interrupt received...")
