@@ -1,0 +1,35 @@
+{
+  "name": "paid-ai-bot",
+  "version": "1.0.0",
+  "description": "Premium AI-powered bot with Stripe payment integration and multi-provider task sourcing",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "nodemon bot.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "ai",
+    "bot",
+    "stripe",
+    "payments",
+    "huggingface",
+    "mturk",
+    "appen",
+    "rapidapi"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.7",
+    "stripe": "^12.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22",
+    "jest": "^29.5.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
