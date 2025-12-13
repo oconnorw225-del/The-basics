@@ -466,6 +466,73 @@ Example output:
 - Cost estimation and tracking
 - Multi-environment support (staging/production)
 
+## ☁️ Cloud Deployment
+
+### Deploy to AWS
+
+PROJECT CHIMERA can be deployed to AWS with a single click using our unified deployment workflow.
+
+#### Prerequisites
+
+1. **AWS Account**: Create an account at [aws.amazon.com](https://aws.amazon.com)
+2. **IAM Credentials**: Create an IAM user with programmatic access
+3. **Required Permissions**: Apply the IAM policy from `aws/iam-policy.json`
+4. **GitHub Secrets**: Configure `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+
+#### Quick Deployment
+
+1. Go to **Actions** → **AWS Complete Setup & Deployment**
+2. Click **Run workflow**
+3. Select options:
+   - **Environment**: `production` or `staging`
+   - **Setup type**: `full` (recommended for first deployment)
+   - **Auto-destroy**: `false`
+4. Click **Run workflow**
+5. Wait 5-8 minutes for completion
+6. Access your application at the provided URL
+
+#### What Gets Deployed
+
+The workflow automatically creates:
+- **VPC** with public/private subnets across 2 availability zones
+- **Application Load Balancer** for high availability
+- **ECS Fargate Cluster** with auto-scaling (1-10 tasks)
+- **ECR Repository** for Docker images
+- **CloudWatch** logging and monitoring
+- **NAT Gateway** for secure outbound connectivity
+- **IAM Roles** with least-privilege permissions
+- **Security Groups** with proper network isolation
+
+#### Cost Estimate
+
+Monthly costs: **$50-100 USD**
+- NAT Gateway: ~$32/month
+- Load Balancer: ~$16/month
+- ECS Fargate: ~$15-30/month
+- Other services: ~$5-10/month
+
+💡 See `aws/README.md` for detailed deployment guide, troubleshooting, and cost optimization tips.
+
+#### Managing Your Deployment
+
+**View logs:**
+```bash
+aws logs tail /ecs/chimera-system --follow --region us-east-1
+```
+
+**Update deployment:**
+```bash
+# Re-run the workflow with setup_type: deploy-only
+```
+
+**Destroy resources:**
+```bash
+cd aws/terraform
+terraform destroy -auto-approve
+```
+
+For complete documentation, see: [`aws/README.md`](aws/README.md)
+
 ## 🔄 Continuous Evolution
 
 Chimera is designed to continuously evolve:

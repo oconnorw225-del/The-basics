@@ -6,8 +6,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (use npm install if no lock file exists)
+RUN npm install || npm ci
 
 # Copy source files
 COPY . .
@@ -44,7 +44,7 @@ COPY --from=frontend-builder /app/dist ./dist 2>/dev/null || mkdir -p ./dist
 COPY --from=frontend-builder /app/package*.json ./
 
 # Install Node production dependencies
-RUN npm ci --only=production || true
+RUN npm install --only=production || true
 
 # Create non-root user for security
 RUN useradd -m -u 1000 appuser && \
