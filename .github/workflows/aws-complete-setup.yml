@@ -79,9 +79,19 @@ jobs:
           set -euo pipefail
           echo "Verifying AWS access..."
           
-          ACCOUNT_INFO=$(aws sts get-caller-identity)
-          ACCOUNT_ID=$(echo $ACCOUNT_INFO | jq -r '.Account')
-          USER_ARN=$(echo $ACCOUNT_INFO | jq -r '.Arn')
+          if ! ACCOUNT_INFO=$(aws sts get-caller-identity 2>&1); then
+            echo "❌ ERROR: Failed to get AWS account information"
+            echo "$ACCOUNT_INFO"
+            exit 1
+          fi
+          
+          ACCOUNT_ID=$(echo "$ACCOUNT_INFO" | jq -r '.Account' || echo "")
+          USER_ARN=$(echo "$ACCOUNT_INFO" | jq -r '.Arn' || echo "")
+          
+          if [ -z "$ACCOUNT_ID" ]; then
+            echo "❌ ERROR: Failed to parse AWS account ID"
+            exit 1
+          fi
           
           echo "✅ AWS access verified"
           echo "Account ID: $ACCOUNT_ID"
@@ -479,16 +489,20 @@ jobs:
           
           for i in {1..5}; do
             echo "Attempt $i/5..."
-            if curl -f -s -o /dev/null -w "%{http_code}" "$URL" | grep -q "200\|404"; then
-              echo "✅ Health check passed!"
+            HTTP_CODE=$(curl -f -s -o /dev/null -w "%{http_code}" "$URL" || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✅ Health check passed! (HTTP $HTTP_CODE)"
               exit 0
+            else
+              echo "⚠️  Health check returned HTTP $HTTP_CODE"
             fi
             echo "Waiting 10 seconds before retry..."
             sleep 10
           done
           
-          echo "⚠️  Health check did not pass, but deployment may still be warming up"
+          echo "⚠️  Health check did not return HTTP 200, but deployment may still be warming up"
           echo "Check the application manually at: $URL"
+          echo "View logs: aws logs tail /ecs/${{ env.PROJECT_NAME }}-system --follow"
 
   cost-estimation:
     name: 💰 Cost Estimation

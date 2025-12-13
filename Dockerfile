@@ -39,8 +39,9 @@ COPY unified_system.py .
 COPY bot.js .
 COPY server.js .
 
-# Copy built frontend from builder (if available)
-COPY --from=frontend-builder /app/dist ./dist 2>/dev/null || mkdir -p ./dist
+# Create dist directory and copy built frontend if available
+RUN mkdir -p ./dist
+COPY --from=frontend-builder /app/dist ./dist/ || true
 COPY --from=frontend-builder /app/package*.json ./
 
 # Install Node production dependencies
