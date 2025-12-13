@@ -31,7 +31,7 @@ export const formatNumber = (value, decimals = 2) => {
 /**
  * Format timestamp
  */
-export const formatTimestamp = (timestamp) => {
+export const formatTimestamp = timestamp => {
   const date = new Date(timestamp)
   return date.toLocaleString('en-US', {
     month: 'short',
