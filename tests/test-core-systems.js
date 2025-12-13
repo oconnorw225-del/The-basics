@@ -214,10 +214,29 @@ console.log('  - HealthMonitor: Heartbeat, metrics ✅');
 console.log('  - ProcessLinker: Discovery, linking ✅');
 console.log('  - ShutdownHandler: Hooks, operations ✅');
 
-// Cleanup
-await errorHandler.shutdown();
-await featureManager.shutdown();
-await healthMonitor.shutdown();
-await processLinker.shutdown();
+// Cleanup with error handling
+try {
+  await errorHandler.shutdown();
+} catch (error) {
+  console.error('Error during ErrorHandler shutdown:', error.message);
+}
+
+try {
+  await featureManager.shutdown();
+} catch (error) {
+  console.error('Error during FeatureManager shutdown:', error.message);
+}
+
+try {
+  await healthMonitor.shutdown();
+} catch (error) {
+  console.error('Error during HealthMonitor shutdown:', error.message);
+}
+
+try {
+  await processLinker.shutdown();
+} catch (error) {
+  console.error('Error during ProcessLinker shutdown:', error.message);
+}
 
 process.exit(0);

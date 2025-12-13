@@ -369,9 +369,15 @@ import HealthMonitor from './core/HealthMonitor.js';
 
 const healthMonitor = new HealthMonitor(config);
 
-// Send metrics to dashboard every 5 seconds
+// Example: Send metrics to dashboard every 5 seconds
 setInterval(() => {
   const metrics = healthMonitor.getMetrics();
+  
+  // NOTE: Replace 'dashboard' with your actual dashboard implementation
+  // Example implementations:
+  // - WebSocket: ws.send(JSON.stringify(metrics))
+  // - HTTP: fetch('/api/metrics', { method: 'POST', body: JSON.stringify(metrics) })
+  // - EventEmitter: eventBus.emit('metrics', metrics)
   
   dashboard.update({
     memory: metrics.memoryUsagePercent,

@@ -246,11 +246,16 @@ async function startSystem() {
     // Display system status
     displayStatus();
 
-    // Setup periodic status display
-    setInterval(() => {
+    // Setup periodic status display (store interval for cleanup)
+    const statusInterval = setInterval(() => {
       console.log('\n' + '='.repeat(60));
       displayStatus();
     }, 30000); // Every 30 seconds
+    
+    // Register cleanup for status interval
+    shutdownHandler.registerHook('status-display', async () => {
+      clearInterval(statusInterval);
+    }, 50);
 
   } catch (error) {
     console.error('\n❌ Failed to start system:', error.message);
