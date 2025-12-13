@@ -3,12 +3,17 @@ name: Consolidate Best Parts
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   consolidate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the-basics repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Clone source repositories
         run: |
