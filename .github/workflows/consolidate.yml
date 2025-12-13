@@ -21,7 +21,7 @@ jobs:
 
       - name: Archive backups
         run: |
-          mkdir backups
+          mkdir -p backups
           [ -d source/ndax-quantum-engine ] && tar czf backups/ndax-quantum-engine.tar.gz -C source ndax-quantum-engine || true
           [ -d source/quantum-engine-dashb ] && tar czf backups/quantum-engine-dashb.tar.gz -C source quantum-engine-dashb || true
           [ -d source/shadowforge-ai-trader ] && tar czf backups/shadowforge-ai-trader.tar.gz -C source shadowforge-ai-trader || true
