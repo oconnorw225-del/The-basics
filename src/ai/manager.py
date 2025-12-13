@@ -209,8 +209,9 @@ class AIManager:
                 self.logger.warning("Task queue full")
             return None
         
-        # Create task
-        task_id = f"{task_type}_{int(time.time() * 1000)}"
+        # Create task with unique ID
+        import uuid
+        task_id = f"{task_type}_{uuid.uuid4().hex[:12]}"
         task = AITask(
             task_id=task_id,
             task_type=task_type,

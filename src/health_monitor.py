@@ -269,11 +269,19 @@ class HealthMonitor:
         }
     
     def _check_network_connectivity(self) -> bool:
-        """Check basic network connectivity."""
+        """
+        Check basic network connectivity.
+        
+        NOTE: Uses Google's DNS (8.8.8.8) for connectivity test.
+        Configure CONNECTIVITY_TEST_HOST env var to use a different host.
+        """
         try:
-            # Try to ping a reliable host
+            # Get test host from environment or use default
+            test_host = os.getenv('CONNECTIVITY_TEST_HOST', '8.8.8.8')
+            
+            # Try to ping the test host
             result = subprocess.run(
-                ['ping', '-c', '1', '-W', '2', '8.8.8.8'],
+                ['ping', '-c', '1', '-W', '2', test_host],
                 capture_output=True,
                 timeout=3
             )

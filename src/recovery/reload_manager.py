@@ -239,7 +239,21 @@ class ReloadManager:
             self.rollback_snapshots.pop(0)
     
     def _rollback_last_snapshot(self) -> bool:
-        """Rollback to last snapshot."""
+        """
+        Rollback to last snapshot.
+        
+        NOTE: This is a simplified rollback implementation.
+        Current limitations:
+        - Only basic data restoration
+        - No database transaction rollback
+        - No distributed state rollback
+        
+        Production requirements:
+        - Database transaction management
+        - Distributed state coordination
+        - Service dependency rollback
+        - Data consistency validation
+        """
         if not self.rollback_snapshots:
             if self.logger:
                 self.logger.warning("No snapshots available for rollback")
@@ -251,8 +265,7 @@ class ReloadManager:
             self.logger.warning(f"Rolling back to snapshot: {snapshot['timestamp']}")
         
         # Restore data from snapshot
-        # This is a simplified implementation
-        # In production, you'd want more sophisticated rollback logic
+        # Currently only supports basic configuration rollback
         
         return True
     

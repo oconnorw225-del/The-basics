@@ -38,7 +38,9 @@ class Message:
             priority: Message priority
             persistent: Whether message should be persisted
         """
-        self.message_id = f"{topic}_{int(time.time() * 1000)}"
+        import uuid
+        # Use UUID for guaranteed uniqueness
+        self.message_id = f"{topic}_{uuid.uuid4().hex[:12]}"
         self.topic = topic
         self.data = data
         self.priority = priority

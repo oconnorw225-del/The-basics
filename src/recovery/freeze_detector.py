@@ -158,6 +158,13 @@ class FreezeDetector:
         """
         Attempt to detect thread deadlock.
         
+        NOTE: This is a simplified deadlock detection mechanism.
+        Production systems should implement:
+        - Thread stack trace analysis
+        - Lock graph construction
+        - Resource dependency tracking
+        - Integration with debugger tools
+        
         Args:
             process_name: Process name
             
@@ -165,7 +172,7 @@ class FreezeDetector:
             True if deadlock suspected
         """
         # This is a simplified deadlock detection
-        # In production, you'd want more sophisticated detection
+        # Currently detects based on repeated freeze patterns
         
         freeze_type = self.check_for_freeze(process_name)
         
