@@ -34,6 +34,29 @@ const PRICING_PLANS = {
 const subscriptions = new Map();
 const customerUsage = new Map();
 
+// Rate limiting for webhook endpoint
+const webhookRateLimiter = {
+  requests: new Map(),
+  maxRequests: 100,
+  windowMs: 60000, // 1 minute
+
+  check(ip) {
+    const now = Date.now();
+    const requests = this.requests.get(ip) || [];
+    
+    // Clean old requests
+    const recentRequests = requests.filter(time => now - time < this.windowMs);
+    
+    if (recentRequests.length >= this.maxRequests) {
+      return false;
+    }
+    
+    recentRequests.push(now);
+    this.requests.set(ip, recentRequests);
+    return true;
+  }
+};
+
 /**
  * Initialize payment system
  */
@@ -205,6 +228,13 @@ function getUsageStats(customerId) {
  * Handle Stripe webhook events
  */
 async function handleWebhook(req, res) {
+  // Rate limiting
+  const ip = req.ip || req.connection.remoteAddress;
+  if (!webhookRateLimiter.check(ip)) {
+    console.warn(`Rate limit exceeded for IP: ${ip}`);
+    return res.status(429).send('Too many requests');
+  }
+
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

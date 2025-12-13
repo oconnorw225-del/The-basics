@@ -41,6 +41,16 @@ async function queryHuggingFace(modelUrl, payload, retries = 3) {
     throw new Error('HUGGINGFACE_API_KEY not configured');
   }
 
+  // Validate modelUrl
+  if (!modelUrl || typeof modelUrl !== 'string' || !modelUrl.startsWith(API_URL)) {
+    throw new Error('Invalid model URL');
+  }
+
+  // Validate payload
+  if (!payload || typeof payload !== 'object') {
+    throw new Error('Invalid payload');
+  }
+
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(modelUrl, {

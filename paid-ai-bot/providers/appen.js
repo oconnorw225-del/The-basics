@@ -41,7 +41,7 @@ async function submitTask(task, priority = 'normal') {
     throw new Error('Appen provider not enabled');
   }
 
-  const taskId = `appen_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const taskId = `appen_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
   
   const taskData = {
     id: taskId,

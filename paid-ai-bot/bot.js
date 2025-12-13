@@ -22,8 +22,34 @@ const PORT = process.env.BOT_PORT || 9000;
 const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL) || 30000; // 30 seconds default
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
+// Simple API key authentication middleware
+const authenticateApiKey = (req, res, next) => {
+  // Skip auth for health check and webhook (webhook has its own verification)
+  if (req.path === '/health' || req.path === '/webhook/stripe') {
+    return next();
+  }
+
+  const apiKey = req.headers['x-api-key'] || req.query.api_key;
+  const validApiKey = process.env.API_KEY;
+
+  // If API_KEY is not configured, allow all requests (dev mode)
+  if (!validApiKey) {
+    console.warn('⚠️  API_KEY not configured - authentication disabled');
+    return next();
+  }
+
+  if (!apiKey || apiKey !== validApiKey) {
+    return res.status(401).json({ error: 'Unauthorized - Invalid API key' });
+  }
+
+  next();
+};
+
+// Apply authentication to all routes except health and webhook
+app.use(authenticateApiKey);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -42,7 +68,7 @@ app.get('/health', (req, res) => {
 });
 
 // Stripe webhook endpoint (raw body needed for signature verification)
-app.post('/webhook/stripe', express.raw({ type: 'application/json' }), handleWebhook);
+app.post('/webhook/stripe', express.raw({ type: 'application/json', limit: '1mb' }), handleWebhook);
 
 // Task submission endpoint
 app.post('/api/tasks', async (req, res) => {

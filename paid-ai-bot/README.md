@@ -2,16 +2,14 @@
 
 Premium AI-powered bot with Stripe payment integration and multi-provider AI task sourcing.
 
-## Features
+## Security Features
 
-- **💳 Stripe Payment Integration**: Subscription-based payment processing with webhook support
-- **🤖 HuggingFace AI**: Text generation, classification, Q&A, summarization, and translation
-- **🔄 Multi-Provider Task Sourcing**: 5 different task providers
-  - Custom Queue (internal task management)
-  - Direct Clients (direct client relationships)
-  - Amazon MTurk (human intelligence tasks)
-  - Appen (crowd-sourced data annotation)
-  - RapidAPI (AI/ML marketplace APIs)
+- ✅ **API Key Authentication**: Optional API key protection for all endpoints (except health and webhooks)
+- ✅ **Request Size Limits**: 1MB limit on all requests to prevent DoS attacks
+- ✅ **Rate Limiting**: Webhook endpoint limited to 100 requests per minute per IP
+- ✅ **Input Validation**: HuggingFace API validates model URLs and payloads
+- ✅ **Stripe Signature Verification**: All webhook events verified with signature
+- ✅ **Environment Variables**: All secrets stored in environment, never hardcoded
 
 ## Quick Start
 
@@ -65,6 +63,7 @@ Returns bot status and enabled providers.
 ```
 POST /api/tasks
 Content-Type: application/json
+X-API-Key: your_api_key  # Optional, if API_KEY is configured
 
 {
   "task": {
@@ -185,12 +184,15 @@ npm test
 
 ## Security Notes
 
+- **Authentication**: Set `API_KEY` environment variable to enable API key authentication
+- **Rate Limiting**: Webhook endpoint automatically rate-limited (100 req/min per IP)
+- **Request Limits**: All endpoints limited to 1MB request size
+- **Input Validation**: All inputs validated before processing
 - Never commit API keys or secrets
 - Use environment variables for all sensitive data
 - Validate Stripe webhook signatures
-- Implement rate limiting in production
-- Use HTTPS for all endpoints
-- Implement proper authentication/authorization
+- Use HTTPS for all endpoints in production
+- Implement proper user authentication/authorization for production use
 
 ## Support
 
