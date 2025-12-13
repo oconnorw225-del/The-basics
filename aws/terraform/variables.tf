@@ -45,19 +45,24 @@ variable "private_subnet_cidrs" {
 # ECS Task Configuration
 variable "task_cpu" {
   description = "CPU units for ECS task (256, 512, 1024, 2048, 4096)"
-  type        = string
-  default     = "512"
+  type        = number
+  default     = 512
   
   validation {
-    condition     = contains(["256", "512", "1024", "2048", "4096"], var.task_cpu)
+    condition     = contains([256, 512, 1024, 2048, 4096], var.task_cpu)
     error_message = "Task CPU must be one of: 256, 512, 1024, 2048, 4096."
   }
 }
 
 variable "task_memory" {
   description = "Memory for ECS task in MB (512-30720)"
-  type        = string
-  default     = "1024"
+  type        = number
+  default     = 1024
+  
+  validation {
+    condition     = var.task_memory >= 512 && var.task_memory <= 30720
+    error_message = "Task memory must be between 512 and 30720 MB."
+  }
 }
 
 variable "desired_count" {
@@ -137,7 +142,7 @@ variable "health_check_unhealthy_threshold" {
 variable "health_check_matcher" {
   description = "HTTP status codes to consider healthy"
   type        = string
-  default     = "200,404"
+  default     = "200"
 }
 
 # Logging Configuration
