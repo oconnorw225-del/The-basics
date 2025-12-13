@@ -2,10 +2,13 @@
 Freelance Job Orchestrator - Enhanced Autonomous System
 Unified master loop for job processing, execution, and payment collection.
 Cherry-picked from AI jobs orchestration engine.
+ENHANCED WITH ERROR HANDLING AND RETRY LOGIC
 """
 
 import asyncio
 import logging
+import sys
+import signal
 from typing import Dict, List, Optional
 from datetime import datetime
 from enum import Enum
@@ -16,12 +19,26 @@ from internal_coding_agent import CodingAgent
 from payment_handler import PaymentHandler
 
 
-# Configure logging
+# Configure logging with error tracking
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('logs/freelance-orchestrator.log')
+    ]
 )
 logger = logging.getLogger('FreelanceOrchestrator')
+
+# Error statistics
+error_stats = {
+    'total_errors': 0,
+    'scan_errors': 0,
+    'bid_errors': 0,
+    'execution_errors': 0,
+    'payment_errors': 0,
+    'recoveries': 0
+}
 
 
 class JobStatus(Enum):
@@ -91,53 +108,87 @@ class FreelanceOrchestrator:
             'execution_max_time': 3600,  # 1 hour
             'auto_bid': True,
             'auto_execute': False,  # Requires approval by default
-            'platforms': ['upwork', 'freelancer', 'fiverr', 'toptal']
+            'platforms': ['upwork', 'freelancer', 'fiverr', 'toptal'],
+            'max_backoff_time': 60  # Maximum backoff time in seconds for retry
         }
     
     async def start(self):
-        """Start the autonomous freelance operation loop."""
+        """Start the autonomous freelance operation loop with error handling."""
         logger.info("🎯 Starting autonomous freelance operations...")
         logger.info(f"Configuration: {self.config}")
         
+        # Setup signal handlers for graceful shutdown
+        self.shutdown_event = asyncio.Event()
+        signal.signal(signal.SIGTERM, lambda s, f: self.shutdown_event.set())
+        signal.signal(signal.SIGINT, lambda s, f: self.shutdown_event.set())
+        
+        consecutive_errors = 0
+        max_consecutive_errors = 5
+        
         try:
-            while True:
-                # Step 1: Scan for jobs
-                await self._scan_platforms()
-                
-                # Step 2: Process job queue
-                await self._process_job_queue()
-                
-                # Step 3: Check pending acceptances
-                await self._check_pending_jobs()
-                
-                # Step 4: Execute active work
-                await self._execute_active_jobs()
-                
-                # Step 5: Deliver completed work
-                await self._deliver_completed_work()
-                
-                # Step 6: Collect payments
-                await self._collect_payments()
-                
-                # Step 7: Update statistics
-                self._update_statistics()
-                
-                # Log status
-                logger.info(f"📊 Status: {len(self.active_jobs)} active | "
-                          f"{len(self.job_queue)} queued | "
-                          f"${self.statistics['total_revenue']:.2f} revenue")
-                
-                # Wait before next cycle
-                await asyncio.sleep(self.config['scan_interval'])
+            while not self.shutdown_event.is_set():
+                try:
+                    # Step 1: Scan for jobs
+                    await self._scan_platforms()
+                    
+                    # Step 2: Process job queue
+                    await self._process_job_queue()
+                    
+                    # Step 3: Check pending acceptances
+                    await self._check_pending_jobs()
+                    
+                    # Step 4: Execute active work
+                    await self._execute_active_jobs()
+                    
+                    # Step 5: Deliver completed work
+                    await self._deliver_completed_work()
+                    
+                    # Step 6: Collect payments
+                    await self._collect_payments()
+                    
+                    # Step 7: Update statistics
+                    self._update_statistics()
+                    
+                    # Log status
+                    logger.info(f"📊 Status: {len(self.active_jobs)} active | "
+                              f"{len(self.job_queue)} queued | "
+                              f"${self.statistics['total_revenue']:.2f} revenue | "
+                              f"Errors: {error_stats['total_errors']}")
+                    
+                    # Reset consecutive error counter on success
+                    consecutive_errors = 0
+                    
+                    # Wait before next cycle
+                    await asyncio.wait_for(
+                        self.shutdown_event.wait(),
+                        timeout=self.config['scan_interval']
+                    )
+                    
+                except asyncio.TimeoutError:
+                    # Normal timeout, continue loop
+                    continue
+                    
+                except Exception as e:
+                    consecutive_errors += 1
+                    error_stats['total_errors'] += 1
+                    logger.error(f"❌ Error in main loop (attempt {consecutive_errors}/{max_consecutive_errors}): {e}", exc_info=True)
+                    
+                    if consecutive_errors >= max_consecutive_errors:
+                        logger.critical(f"💥 Too many consecutive errors ({consecutive_errors}), shutting down...")
+                        break
+                    
+                    # Exponential backoff before retry (configurable max)
+                    backoff_time = min(self.config['max_backoff_time'], 2 ** consecutive_errors)
+                    await asyncio.sleep(backoff_time)
                 
         except KeyboardInterrupt:
+            logger.info("🛑 Keyboard interrupt received...")
+        finally:
             logger.info("🛑 Shutting down gracefully...")
             await self._shutdown()
-        except Exception as e:
-            logger.error(f"❌ Error in main loop: {e}", exc_info=True)
     
     async def _scan_platforms(self):
-        """Scan freelance platforms for new opportunities."""
+        """Scan freelance platforms for new opportunities with error handling."""
         logger.info("🔍 Scanning platforms for jobs...")
         
         for platform_name in self.config['platforms']:

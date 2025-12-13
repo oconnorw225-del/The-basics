@@ -1,6 +1,7 @@
 {
   "name": "the-basics",
   "version": "1.0.0",
+  "type": "module",
   "description": "NDAX Quantum Trading Engine - Consolidated autonomous trading system",
   "main": "server.js",
   "scripts": {
