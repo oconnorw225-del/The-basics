@@ -50,7 +50,7 @@ app.get('*', (req, res) => {
 1. **Current approach (RECOMMENDED)**: Accept this as standard SPA serving pattern
    - Static file serving is generally safe without rate limiting
    - The actual API endpoints (in Python backend) have their own rate limiting controls
-   - Production deployments (Railway, etc.) provide DDoS protection at infrastructure level
+   - Production deployments (AWS, cloud providers) provide DDoS protection at infrastructure level
 
 2. **Add rate limiting** (if needed in future):
    ```javascript
@@ -104,10 +104,11 @@ During development, the following security improvements were implemented:
 
 ### Deployment Security
 
-**Railway Deployment:**
-- ✅ Environment variables managed securely via Railway dashboard
-- ✅ HTTPS enforced automatically
+**AWS Deployment:**
+- ✅ Environment variables managed securely via GitHub Secrets
+- ✅ HTTPS enforced via AWS Certificate Manager
 - ✅ DDoS protection at infrastructure level
+- ✅ IAM-based access control
 - ✅ Automated security updates
 
 **Docker Deployment:**
