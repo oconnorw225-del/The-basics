@@ -1,5 +1,5 @@
 # Chimera AWS Infrastructure
-# Terraform configuration for automated AWS deployment
+# Complete Terraform configuration for automated AWS deployment with Fargate
 
 terraform {
   required_version = ">= 1.0"
@@ -14,49 +14,22 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
+  
+  default_tags {
+    tags = merge(
+      {
+        Project     = var.project_name
+        Environment = var.environment
+        ManagedBy   = "Terraform"
+      },
+      var.tags
+    )
+  }
 }
 
-# Variables
-variable "aws_region" {
-  description = "AWS region for deployment"
-  type        = string
-  default     = "us-east-1"
-}
-
-variable "project_name" {
-  description = "Project name for resource naming"
-  type        = string
-  default     = "chimera"
-}
-
-variable "environment" {
-  description = "Environment name"
-  type        = string
-  default     = "production"
-}
-
-variable "vpc_cidr" {
-  description = "VPC CIDR block"
-  type        = string
-  default     = "10.0.0.0/16"
-}
-
-variable "task_cpu" {
-  description = "CPU units for ECS task"
-  type        = string
-  default     = "512"
-}
-
-variable "task_memory" {
-  description = "Memory for ECS task"
-  type        = string
-  default     = "1024"
-}
-
-variable "desired_count" {
-  description = "Desired number of ECS tasks"
-  type        = number
-  default     = 2
+# Data source for availability zones
+data "aws_availability_zones" "available" {
+  state = "available"
 }
 
 # VPC
@@ -123,11 +96,60 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Route Table Association
+# Route Table Association for Public Subnets
 resource "aws_route_table_association" "public" {
   count          = 2
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
+}
+
+# Elastic IP for NAT Gateway
+resource "aws_eip" "nat" {
+  count  = 1
+  domain = "vpc"
+
+  tags = {
+    Name        = "${var.project_name}-nat-eip"
+    Environment = var.environment
+  }
+
+  depends_on = [aws_internet_gateway.main]
+}
+
+# NAT Gateway
+resource "aws_nat_gateway" "main" {
+  count         = 1
+  allocation_id = aws_eip.nat[0].id
+  subnet_id     = aws_subnet.public[0].id
+
+  tags = {
+    Name        = "${var.project_name}-nat-gateway"
+    Environment = var.environment
+  }
+
+  depends_on = [aws_internet_gateway.main]
+}
+
+# Route Table for Private Subnets
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.main[0].id
+  }
+
+  tags = {
+    Name        = "${var.project_name}-private-rt"
+    Environment = var.environment
+  }
+}
+
+# Route Table Association for Private Subnets
+resource "aws_route_table_association" "private" {
+  count          = 2
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private.id
 }
 
 # Security Group for ALB
@@ -170,8 +192,8 @@ resource "aws_security_group" "ecs_tasks" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port       = 8000
-    to_port         = 8000
+    from_port       = var.container_port
+    to_port         = var.container_port
     protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
   }
@@ -206,18 +228,18 @@ resource "aws_lb" "main" {
 # Target Group
 resource "aws_lb_target_group" "main" {
   name        = "${var.project_name}-tg"
-  port        = 8000
+  port        = var.container_port
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
 
   health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 10
-    timeout             = 60
-    interval            = 300
-    path                = "/"
-    matcher             = "200,404"
+    healthy_threshold   = var.health_check_healthy_threshold
+    unhealthy_threshold = var.health_check_unhealthy_threshold
+    timeout             = var.health_check_timeout
+    interval            = var.health_check_interval
+    path                = var.health_check_path
+    matcher             = var.health_check_matcher
   }
 
   tags = {
@@ -296,6 +318,28 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# Additional ECR permissions for task execution role
+resource "aws_iam_role_policy" "ecs_task_execution_ecr" {
+  name = "${var.project_name}-ecs-task-execution-ecr"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 # ECS Task Role
 resource "aws_iam_role" "ecs_task_role" {
   name = "${var.project_name}-ecs-task-role"
@@ -319,10 +363,32 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
+# CloudWatch metrics and logs permissions for task role
+resource "aws_iam_role_policy" "ecs_task_cloudwatch" {
+  name = "${var.project_name}-ecs-task-cloudwatch"
+  role = aws_iam_role.ecs_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:PutMetricData",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 # CloudWatch Log Group
 resource "aws_cloudwatch_log_group" "main" {
   name              = "/ecs/${var.project_name}-system"
-  retention_in_days = 7
+  retention_in_days = var.log_retention_days
 
   tags = {
     Name        = "${var.project_name}-logs"
@@ -348,7 +414,7 @@ resource "aws_ecs_task_definition" "main" {
 
       portMappings = [
         {
-          containerPort = 8000
+          containerPort = var.container_port
           protocol      = "tcp"
         }
       ]
@@ -361,6 +427,10 @@ resource "aws_ecs_task_definition" "main" {
         {
           name  = "PYTHON_ENV"
           value = "production"
+        },
+        {
+          name  = "PORT"
+          value = tostring(var.container_port)
         }
       ]
 
@@ -371,6 +441,14 @@ resource "aws_ecs_task_definition" "main" {
           "awslogs-region"        = var.aws_region
           "awslogs-stream-prefix" = "ecs"
         }
+      }
+
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -f http://localhost:${var.container_port}${var.health_check_path} || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
       }
     }
   ])
@@ -398,7 +476,7 @@ resource "aws_ecs_service" "main" {
   load_balancer {
     target_group_arn = aws_lb_target_group.main.arn
     container_name   = "${var.project_name}-container"
-    container_port   = 8000
+    container_port   = var.container_port
   }
 
   depends_on = [aws_lb_listener.main]
@@ -411,8 +489,8 @@ resource "aws_ecs_service" "main" {
 
 # Auto Scaling Target
 resource "aws_appautoscaling_target" "ecs" {
-  max_capacity       = 10
-  min_capacity       = 1
+  max_capacity       = var.autoscaling_max_capacity
+  min_capacity       = var.autoscaling_min_capacity
   resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.main.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
@@ -430,7 +508,7 @@ resource "aws_appautoscaling_policy" "ecs_cpu" {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
-    target_value = 70.0
+    target_value = var.autoscaling_cpu_target
   }
 }
 
@@ -446,32 +524,6 @@ resource "aws_appautoscaling_policy" "ecs_memory" {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageMemoryUtilization"
     }
-    target_value = 80.0
+    target_value = var.autoscaling_memory_target
   }
-}
-
-# Data source for availability zones
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
-# Outputs
-output "load_balancer_dns" {
-  description = "DNS name of the load balancer"
-  value       = aws_lb.main.dns_name
-}
-
-output "ecr_repository_url" {
-  description = "URL of the ECR repository"
-  value       = aws_ecr_repository.main.repository_url
-}
-
-output "ecs_cluster_name" {
-  description = "Name of the ECS cluster"
-  value       = aws_ecs_cluster.main.name
-}
-
-output "ecs_service_name" {
-  description = "Name of the ECS service"
-  value       = aws_ecs_service.main.name
 }

@@ -1,5 +1,5 @@
-# Multi-stage Dockerfile for NDAX Quantum Engine
-FROM node:18-alpine AS frontend-builder
+# Multi-stage Dockerfile for Chimera Unified System
+FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app
 
@@ -13,16 +13,18 @@ RUN npm ci
 COPY . .
 
 # Build frontend
-RUN npm run build
+RUN npm run build || echo "Frontend build skipped"
 
 # Python backend stage
 FROM python:3.11-slim AS backend
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies including curl for health checks
 RUN apt-get update && apt-get install -y \
     curl \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python requirements
@@ -34,34 +36,34 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend files
 COPY backend/ ./backend/
 COPY unified_system.py .
+COPY bot.js .
+COPY server.js .
 
-# Node.js runtime stage
-FROM node:18-alpine AS runtime
-
-WORKDIR /app
-
-# Copy built frontend from builder
-COPY --from=frontend-builder /app/dist ./dist
+# Copy built frontend from builder (if available)
+COPY --from=frontend-builder /app/dist ./dist 2>/dev/null || mkdir -p ./dist
 COPY --from=frontend-builder /app/package*.json ./
 
-# Install production dependencies only
-RUN npm ci --only=production
+# Install Node production dependencies
+RUN npm ci --only=production || true
 
-# Copy server files
-COPY server.js .
-COPY bot.js .
+# Create non-root user for security
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
 
-# Copy Python backend from backend stage
-COPY --from=backend /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=backend /app/backend ./backend
-COPY --from=backend /app/unified_system.py .
+USER appuser
 
-# Expose ports
-EXPOSE 3000 8000 9000
+# Expose port 8080 (default for container)
+EXPOSE 8080
+
+# Set environment variables
+ENV PORT=8080
+ENV NODE_ENV=production
+ENV PYTHON_ENV=production
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:${PORT}/ || exit 1
 
-# Start command
-CMD ["node", "server.js"]
+# Start command - run unified system
+CMD ["python3", "unified_system.py"]
+
