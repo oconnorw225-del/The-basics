@@ -35,6 +35,8 @@ jobs:
   validate-prerequisites:
     name: ✅ Validate Prerequisites
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       aws_account_id: ${{ steps.get-account.outputs.account_id }}
     
@@ -178,6 +180,8 @@ jobs:
     needs: validate-prerequisites
     if: ${{ github.event.inputs.setup_type == 'full' || github.event.inputs.setup_type == 'infrastructure-only' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       load_balancer_dns: ${{ steps.tf-outputs.outputs.load_balancer_dns }}
       ecr_repository_url: ${{ steps.tf-outputs.outputs.ecr_repository_url }}
@@ -304,6 +308,8 @@ jobs:
       (needs.setup-infrastructure.result == 'success' || needs.setup-infrastructure.result == 'skipped') &&
       (github.event.inputs.setup_type == 'full' || github.event.inputs.setup_type == 'deploy-only')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       image_tag: ${{ steps.meta.outputs.image_tag }}
     
@@ -443,6 +449,8 @@ jobs:
       (needs.setup-infrastructure.result == 'success' || needs.setup-infrastructure.result == 'skipped') &&
       needs.deploy-application.result == 'success'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Configure AWS credentials
@@ -511,6 +519,8 @@ jobs:
       always() &&
       needs.setup-infrastructure.result == 'success'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Display cost estimate
@@ -542,6 +552,8 @@ jobs:
     needs: [validate-prerequisites, setup-infrastructure, deploy-application, health-check]
     if: always()
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Display final summary
@@ -603,6 +615,8 @@ jobs:
       github.event.inputs.auto_destroy == 'true' &&
       needs.setup-infrastructure.result == 'success'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
