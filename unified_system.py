@@ -591,7 +591,7 @@ echo ""
             print("  3. Deploy to cloud: bash deploy_to_cloud.sh")
             print("  4. Access cloud dashboard: http://{}:{}".format(config.cloud_server_host, config.cloud_server_port))
         else:
-            print("  3. Push to GitHub for AWS deployment (if configured)")
+            print("  3. Push to GitHub for automatic AWS deployment (requires AWS GitHub Actions setup)")
         print()
     
     async def start_api_server(self):

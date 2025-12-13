@@ -100,7 +100,7 @@ git commit -m "✅ Unified system configured"
 git push
 ```
 
-AWS deployment is automated through GitHub Actions. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for full instructions.
+AWS deployment is automated through GitHub Actions when you push changes. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for setup and deployment instructions.
 
 ## Branch Cleanup Tools
 
