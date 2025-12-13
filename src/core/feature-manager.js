@@ -377,11 +377,11 @@ module.exports = {
 };
 
 // Add yaml parsing support inline for environments without js-yaml
-if (!yaml) {
+if (typeof yaml === 'undefined') {
   console.warn('[FeatureManager] js-yaml not available, using JSON fallback');
   
   // Simple YAML parser for basic feature configs
-  yaml = {
+  const yamlFallback = {
     load: (content) => {
       try {
         // Try JSON first
@@ -414,4 +414,10 @@ if (!yaml) {
     },
     dump: (obj) => JSON.stringify(obj, null, 2)
   };
+  
+  // Make available if yaml is undefined
+  if (typeof module !== 'undefined' && module.exports) {
+    // In CommonJS environment, use the fallback internally
+    module.exports.yaml = yamlFallback;
+  }
 }
