@@ -2,9 +2,6 @@ name: Consolidate Best Parts
 
 on:
   workflow_dispatch:
-  schedule:
-    # Run daily at midnight UTC
-    - cron: '0 0 * * *'
 
 jobs:
   consolidate:
@@ -14,42 +11,35 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Clone source repositories
-        continue-on-error: true
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           mkdir source
-          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine || echo "⚠️ Failed to clone ndax-quantum-engine"
-          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb || echo "⚠️ Failed to clone quantum-engine-dashb"
-          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader || echo "⚠️ Failed to clone shadowforge-ai-trader"
-          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/repository-web-app.git source/repository-web-app || echo "⚠️ Failed to clone repository-web-app"
-          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/The-new-ones.git source/The-new-ones || echo "⚠️ Failed to clone The-new-ones"
+          git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine
+          git clone https://github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb
+          git clone https://github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader
+          git clone https://github.com/oconnorw225-del/repository-web-app.git source/repository-web-app
+          git clone https://github.com/oconnorw225-del/The-new-ones.git source/The-new-ones
 
       - name: Archive backups
-        continue-on-error: true
         run: |
-          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          mkdir -p backups
-          [ -d source/ndax-quantum-engine ] && tar czf backups/ndax-quantum-engine_${TIMESTAMP}.tar.gz -C source ndax-quantum-engine || echo "⚠️ Skipping ndax-quantum-engine backup"
-          [ -d source/quantum-engine-dashb ] && tar czf backups/quantum-engine-dashb_${TIMESTAMP}.tar.gz -C source quantum-engine-dashb || echo "⚠️ Skipping quantum-engine-dashb backup"
-          [ -d source/shadowforge-ai-trader ] && tar czf backups/shadowforge-ai-trader_${TIMESTAMP}.tar.gz -C source shadowforge-ai-trader || echo "⚠️ Skipping shadowforge-ai-trader backup"
-          [ -d source/repository-web-app ] && tar czf backups/repository-web-app_${TIMESTAMP}.tar.gz -C source repository-web-app || echo "⚠️ Skipping repository-web-app backup"
-          [ -d source/The-new-ones ] && tar czf backups/The-new-ones_${TIMESTAMP}.tar.gz -C source The-new-ones || echo "⚠️ Skipping The-new-ones backup"
+          mkdir backups
+          tar czf backups/ndax-quantum-engine.tar.gz -C source ndax-quantum-engine
+          tar czf backups/quantum-engine-dashb.tar.gz -C source quantum-engine-dashb
+          tar czf backups/shadowforge-ai-trader.tar.gz -C source shadowforge-ai-trader
+          tar czf backups/repository-web-app.tar.gz -C source repository-web-app
+          tar czf backups/The-new-ones.tar.gz -C source The-new-ones
 
       - name: Setup directory structure
         run: |
           mkdir -p api backend frontend workflows docs automation tests
 
       - name: Run consolidation script
-        continue-on-error: true
         run: |
           bash automation/consolidate.sh
 
       - name: Commit consolidated code
-        continue-on-error: true
         run: |
           git config --global user.email "ci-bot@example.com"
           git config --global user.name "CI Bot"
           git add .
-          git diff --staged --quiet || git commit -m "Automated consolidation of best parts - $(date +%Y-%m-%d)"
+          git diff --staged --quiet || git commit -m "Automated consolidation of best parts"
           git push
