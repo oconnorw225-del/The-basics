@@ -1,0 +1,227 @@
+# The-basics Feature Configuration
+# This file controls which features are enabled/disabled in the system
+
+features:
+  # Trading features
+  trading:
+    enabled: false
+    auto_approve: false
+    paper_mode: true
+    max_concurrent_trades: 5
+    risk_level: low
+    depends_on: []
+  
+  # AI Platform integrations
+  ai_platforms:
+    # Amazon Mechanical Turk
+    mturk:
+      enabled: true
+      sandbox_mode: true
+      auto_approve_delay: 2592000  # 30 days in seconds
+      max_assignments: 10
+    
+    # Appen data annotation
+    appen:
+      enabled: true
+      auto_submit: false
+      quality_threshold: 0.95
+    
+    # RapidAPI marketplace
+    rapidapi:
+      enabled: true
+      rate_limit: 100
+      timeout: 30000  # milliseconds
+    
+    # HuggingFace AI models
+    huggingface:
+      enabled: true
+      model_cache: true
+      max_concurrent: 3
+    
+    # OpenAI GPT
+    openai:
+      enabled: false
+      model: gpt-3.5-turbo
+      max_tokens: 2000
+  
+  # Freelance platform integrations
+  freelance:
+    # Upwork
+    upwork:
+      enabled: false
+      auto_bid: false
+      max_bid_amount: 500
+      depends_on:
+        - ai_platforms.openai
+    
+    # Fiverr
+    fiverr:
+      enabled: false
+      auto_respond: true
+      response_delay: 300  # seconds
+    
+    # Freelancer.com
+    freelancer:
+      enabled: false
+      auto_bid: false
+      bid_strategy: conservative
+  
+  # Monitoring and observability
+  monitoring:
+    # Prometheus metrics
+    prometheus:
+      enabled: true
+      port: 9090
+      scrape_interval: 15  # seconds
+    
+    # AWS CloudWatch
+    cloudwatch:
+      enabled: false
+      log_retention_days: 7
+      metrics_namespace: TheBasics
+      depends_on:
+        - deployment.aws
+    
+    # Error tracking
+    sentry:
+      enabled: false
+      sample_rate: 1.0
+      environment: development
+    
+    # Health checks
+    health_checks:
+      enabled: true
+      interval: 30  # seconds
+      timeout: 5  # seconds
+  
+  # Deployment platforms
+  deployment:
+    # Local development
+    local:
+      enabled: true
+      hot_reload: true
+    
+    # Railway deployment
+    railway:
+      enabled: false
+      auto_deploy: true
+    
+    # AWS deployment
+    aws:
+      enabled: false
+      region: us-east-1
+      ecs_fargate: true
+    
+    # Heroku deployment
+    heroku:
+      enabled: false
+      dyno_type: hobby
+  
+  # Security features
+  security:
+    # Credential encryption
+    encryption:
+      enabled: true
+      algorithm: aes-256-gcm
+    
+    # JWT authentication
+    jwt:
+      enabled: true
+      expiry: 86400  # 24 hours in seconds
+      refresh_enabled: true
+    
+    # Rate limiting
+    rate_limiting:
+      enabled: true
+      window: 900  # 15 minutes in seconds
+      max_requests: 100
+    
+    # Input validation
+    input_validation:
+      enabled: true
+      strict_mode: true
+  
+  # Error handling and recovery
+  error_handling:
+    # Global error handler
+    global_handler:
+      enabled: true
+      auto_restart: true
+      max_restarts: 5
+    
+    # Freeze detection
+    freeze_detector:
+      enabled: true
+      heartbeat_interval: 5000  # milliseconds
+      freeze_threshold: 30000  # milliseconds
+    
+    # Recovery system
+    recovery:
+      enabled: true
+      checkpoint_interval: 300  # seconds
+      max_checkpoints: 10
+      retry_attempts: 3
+  
+  # Database features
+  database:
+    # PostgreSQL
+    postgresql:
+      enabled: false
+      connection_pool_size: 10
+    
+    # MongoDB
+    mongodb:
+      enabled: false
+      connection_pool_size: 10
+    
+    # Redis caching
+    redis:
+      enabled: false
+      cache_ttl: 3600  # seconds
+  
+  # Payment processing
+  payments:
+    # Stripe
+    stripe:
+      enabled: false
+      webhook_enabled: true
+      test_mode: true
+    
+    # PayPal
+    paypal:
+      enabled: false
+      sandbox: true
+  
+  # Notifications
+  notifications:
+    # Email
+    email:
+      enabled: false
+      provider: smtp  # smtp or sendgrid
+    
+    # Webhooks
+    webhooks:
+      enabled: true
+      retry_attempts: 3
+    
+    # Alerts
+    alerts:
+      enabled: true
+      critical_only: true
+
+# Global settings
+settings:
+  # System mode
+  mode: development  # development, staging, production
+  
+  # Logging
+  log_level: info  # debug, info, warn, error
+  log_rotation: true
+  
+  # Performance
+  enable_caching: true
+  cache_ttl: 3600
+  
+  # Auto-updates
+  auto_update: false
+  update_check_interval: 86400  # 24 hours
