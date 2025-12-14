@@ -222,7 +222,7 @@ jobs:
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "🔧 Initializing Terraform"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          terraform init -input=false
+          terraform init
           echo "✅ Terraform initialized"
 
       - name: Terraform Validate
@@ -253,7 +253,6 @@ jobs:
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
           terraform plan \
-            -input=false \
             -var="environment=${{ github.event.inputs.environment }}" \
             -var="aws_region=${{ env.AWS_REGION }}" \
             -var="project_name=${{ env.PROJECT_NAME }}" \
@@ -269,7 +268,7 @@ jobs:
           echo "🚀 Applying Infrastructure Changes"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
-          terraform apply -input=false tfplan
+          terraform apply tfplan
           
           echo "✅ Infrastructure created successfully"
 
@@ -660,14 +659,13 @@ jobs:
 
       - name: Terraform Init
         working-directory: ./aws/terraform
-        run: terraform init -input=false
+        run: terraform init
 
       - name: Terraform Destroy
         working-directory: ./aws/terraform
         run: |
           echo "Destroying all infrastructure..."
           terraform destroy \
-            -input=false \
             -var="environment=${{ github.event.inputs.environment }}" \
             -var="aws_region=${{ env.AWS_REGION }}" \
             -var="project_name=${{ env.PROJECT_NAME }}" \
