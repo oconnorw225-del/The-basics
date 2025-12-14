@@ -23,12 +23,12 @@
     /* Path aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./frontend/src/*"],
-      "@components/*": ["./frontend/src/components/*"],
-      "@services/*": ["./frontend/src/services/*"],
-      "@types/*": ["./frontend/src/types/*"]
+      "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@services/*": ["./src/services/*"],
+      "@types/*": ["./src/types/*"]
     }
   },
-  "include": ["frontend/src"],
+  "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

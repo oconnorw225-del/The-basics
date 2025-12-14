@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import SystemStatusPanel from './components/SystemStatusPanel';
 import TradingControlPanel from './components/TradingControlPanel';
