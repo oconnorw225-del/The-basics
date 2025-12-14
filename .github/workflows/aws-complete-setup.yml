@@ -28,7 +28,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  PROJECT_NAME: chimera
+  PROJECT_NAME: the-basics
   TERRAFORM_VERSION: '1.6.0'
 
 jobs:
@@ -222,7 +222,7 @@ jobs:
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "🔧 Initializing Terraform"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          terraform init
+          terraform init -input=false
           echo "✅ Terraform initialized"
 
       - name: Terraform Validate
@@ -253,6 +253,7 @@ jobs:
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
           terraform plan \
+            -input=false \
             -var="environment=${{ github.event.inputs.environment }}" \
             -var="aws_region=${{ env.AWS_REGION }}" \
             -var="project_name=${{ env.PROJECT_NAME }}" \
@@ -268,7 +269,7 @@ jobs:
           echo "🚀 Applying Infrastructure Changes"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
-          terraform apply tfplan
+          terraform apply -input=false tfplan
           
           echo "✅ Infrastructure created successfully"
 
@@ -556,7 +557,7 @@ jobs:
           echo "  • Use smaller CPU/memory: -\$5-10/month"
           echo "  • Remove NAT Gateway (less secure): -\$32/month"
           echo ""
-          echo "Monitor costs: AWS Cost Explorer → Filter by Project=chimera"
+          echo "Monitor costs: AWS Cost Explorer → Filter by Project=the-basics"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
   deployment-summary:
@@ -572,7 +573,7 @@ jobs:
         run: |
           echo ""
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "🎉 Chimera AWS Deployment Summary"
+          echo "🎉 The-basics AWS Deployment Summary"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo ""
           echo "📋 Job Status:"
@@ -659,13 +660,14 @@ jobs:
 
       - name: Terraform Init
         working-directory: ./aws/terraform
-        run: terraform init
+        run: terraform init -input=false
 
       - name: Terraform Destroy
         working-directory: ./aws/terraform
         run: |
           echo "Destroying all infrastructure..."
           terraform destroy \
+            -input=false \
             -var="environment=${{ github.event.inputs.environment }}" \
             -var="aws_region=${{ env.AWS_REGION }}" \
             -var="project_name=${{ env.PROJECT_NAME }}" \
