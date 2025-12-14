@@ -268,7 +268,7 @@ jobs:
           echo "🚀 Applying Infrastructure Changes"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
-          terraform apply -auto-approve tfplan
+          terraform apply tfplan
           
           echo "✅ Infrastructure created successfully"
 
