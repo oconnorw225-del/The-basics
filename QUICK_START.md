@@ -7,7 +7,7 @@ Your repository now includes a complete **Unified Autonomous System** that combi
 1. ✅ **Branch Cleanup Tools** - Manage Copilot branches
 2. ✅ **Unified System** - Python-based autonomous dashboard
 3. ✅ **Auto-Configuration** - Generates missing APIs/wallets
-4. ✅ **Railway Integration** - Ready to deploy
+4. ✅ **AWS Integration** - Ready to deploy
 5. ✅ **CI/CD Pipeline** - Automated testing and deployment
 
 ## Installation (3 Simple Steps)
@@ -89,9 +89,9 @@ cat .unified-system/generated/wallets.json
 cat .unified-system/generated/secrets.json
 ```
 
-## Railway Deployment
+## AWS Deployment
 
-Your system is already Railway-ready!
+Your system is ready for AWS deployment!
 
 ```bash
 # Commit your changes
@@ -100,13 +100,7 @@ git commit -m "✅ Unified system configured"
 git push
 ```
 
-Railway will automatically:
-1. Detect the changes
-2. Build your app
-3. Deploy to production
-4. Your dashboard goes live!
-
-Access at: `https://your-app.railway.app`
+AWS deployment is automated through GitHub Actions when you push changes. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for setup and deployment instructions.
 
 ## Branch Cleanup Tools
 
@@ -139,7 +133,6 @@ npm run start      # Start Node.js server
 npm run unified    # Start unified system
 npm run unified:setup  # Run setup wizard
 npm run dev        # Development mode
-npm run railway    # Railway deployment mode
 ```
 
 ### Direct Python Commands
@@ -147,7 +140,6 @@ npm run railway    # Railway deployment mode
 ```bash
 python3 unified_system.py           # Start system
 python3 unified_system.py --setup   # Setup wizard
-python3 unified_system.py --railway # Railway mode
 ```
 
 ## Testing the System
@@ -317,7 +309,7 @@ The-basics/
 2. ✅ System configured
 3. ✅ Dashboard accessible
 4. ⏭️ Push to GitHub
-5. ⏭️ Railway auto-deploys
+5. ⏭️ AWS deployment (if configured)
 6. ⏭️ Replace test credentials (when ready)
 7. ⏭️ Enable features as needed
 

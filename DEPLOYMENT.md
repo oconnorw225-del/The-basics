@@ -9,7 +9,6 @@ Choose the deployment method that best fits your needs:
 | Method | Best For | Setup Time | Monthly Cost | Complexity |
 |--------|----------|------------|--------------|------------|
 | [AWS Auto-Deploy](#aws-deployment-recommended) | Production | 5 min | ~$50-150 | Low |
-| [Railway](#railway-deployment) | Quick Testing | 2 min | ~$20-50 | Very Low |
 | [Docker](#docker-deployment) | Self-Hosting | 5 min | Variable | Medium |
 | [Local Development](#local-development) | Development | 3 min | $0 | Low |
 
@@ -84,59 +83,6 @@ python aws/cost-calculator.py
 - Minimal setup: ~$50/month
 - Standard production: ~$150/month
 - High-traffic: ~$400/month
-
----
-
-## Railway Deployment
-
-**Best for**: Quick testing and simple deployments
-
-### Features
-- ✅ One-click deployment
-- ✅ Automatic SSL certificates
-- ✅ Built-in monitoring
-- ✅ Simple environment variables
-
-### Setup
-
-1. **Click Deploy on Railway:**
-   [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new)
-
-2. **Connect Your GitHub Repo:**
-   - Select `oconnorw225-del/The-basics`
-   - Railway automatically detects configuration
-
-3. **Configure Environment Variables** (optional):
-   ```
-   NODE_ENV=production
-   PYTHON_ENV=production
-   ```
-
-4. **Deploy:**
-   - Railway automatically builds and deploys
-   - You'll get a URL like `https://your-app.railway.app`
-
-### Configuration File
-
-The project includes [`railway.json`](railway.json):
-
-```json
-{
-  "build": {
-    "builder": "nixpacks",
-    "buildCommand": "npm install && pip install -r requirements.txt"
-  },
-  "deploy": {
-    "startCommand": "npm start",
-    "restartPolicyType": "ON_FAILURE"
-  }
-}
-```
-
-### Cost
-
-- Free tier: $5 credit/month
-- Pay-as-you-go: ~$20-50/month depending on usage
 
 ---
 
@@ -328,16 +274,16 @@ See [`CLOUD_DEPLOYMENT_GUIDE.md`](CLOUD_DEPLOYMENT_GUIDE.md) for details.
 
 ## Comparison Matrix
 
-| Feature | AWS | Railway | Docker | Local |
-|---------|-----|---------|--------|-------|
-| Auto-scaling | ✅ | ✅ | ⚠️ Manual | ❌ |
-| SSL/HTTPS | ✅ | ✅ | ⚠️ Manual | ❌ |
-| Monitoring | ✅ Built-in | ✅ Basic | ⚠️ Manual | ⚠️ Manual |
-| Cost | $50-150/mo | $20-50/mo | Variable | $0 |
-| Setup Time | 5 min | 2 min | 5 min | 3 min |
-| Maintenance | Low | Very Low | Medium | High |
-| Control | High | Low | Very High | Very High |
-| Production Ready | ✅ | ✅ | ✅ | ❌ |
+| Feature | AWS | Docker | Local |
+|---------|-----|--------|-------|
+| Auto-scaling | ✅ | ⚠️ Manual | ❌ |
+| SSL/HTTPS | ✅ | ⚠️ Manual | ❌ |
+| Monitoring | ✅ Built-in | ⚠️ Manual | ⚠️ Manual |
+| Cost | $50-150/mo | Variable | $0 |
+| Setup Time | 5 min | 5 min | 3 min |
+| Maintenance | Low | Medium | High |
+| Control | High | Very High | Very High |
+| Production Ready | ✅ | ✅ | ❌ |
 
 ---
 
@@ -429,16 +375,12 @@ docker-compose up -d
    # AWS
    aws logs tail /ecs/chimera-system --follow
    
-   # Railway
-   # Check logs in Railway dashboard
-   
    # Local
    tail -f /var/log/chimera/chimera.log
    ```
 
 3. **Monitor performance:**
    - AWS: Use CloudWatch or `aws/monitor-dashboard.html`
-   - Railway: Built-in metrics dashboard
    - Docker: Use `docker stats`
    - Local: Use `htop` or system monitoring tools
 
@@ -450,9 +392,6 @@ docker-compose up -d
 # Attach certificate to ALB listener
 ```
 
-#### Railway
-Automatic - Railway provides SSL by default
-
 #### Docker/Local
 ```bash
 # Use Let's Encrypt with Certbot
@@ -463,7 +402,6 @@ sudo certbot --nginx
 
 1. **Point your domain to deployment:**
    - AWS: Create Route 53 record pointing to ALB
-   - Railway: Add custom domain in dashboard
    - Docker/Local: Point A record to server IP
 
 2. **Update DNS:**
@@ -545,10 +483,6 @@ services:
 - Automated health checks every 15 minutes
 - Custom dashboard: `aws/monitor-dashboard.html`
 
-### Railway
-- Built-in metrics dashboard
-- Automatic log aggregation
-
 ### Docker/Local
 - Set up monitoring with Prometheus + Grafana
 - Configure log rotation
@@ -606,7 +540,6 @@ Add to crontab:
 - **GitHub Issues**: Report bugs or request features
 - **Workflow Logs**: Check GitHub Actions for deployment issues
 - **AWS Console**: Monitor AWS resources
-- **Railway Dashboard**: View Railway deployment status
 
 ---
 
@@ -620,7 +553,7 @@ Add to crontab:
 6. Enable HTTPS
 7. Configure backups
 
-**Recommended**: Start with [AWS Auto-Deploy](#aws-deployment-recommended) for production or [Railway](#railway-deployment) for quick testing.
+**Recommended**: Start with [AWS Auto-Deploy](#aws-deployment-recommended) for production deployments.
 
 ---
 
