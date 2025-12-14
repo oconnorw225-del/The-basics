@@ -23,7 +23,7 @@ jobs:
           echo "📦 Cloning Source Repositories"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
-          # Configure git to not prompt for credentials
+          # Configure git to not prompt for any interactive input
           export GIT_TERMINAL_PROMPT=0
           
           mkdir -p source
@@ -127,7 +127,7 @@ jobs:
           echo "💾 Committing Changes"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
-          # Configure git to not prompt for input
+          # Configure git to not prompt for any interactive input
           export GIT_TERMINAL_PROMPT=0
           
           git config --global user.email "ci-bot@example.com"
