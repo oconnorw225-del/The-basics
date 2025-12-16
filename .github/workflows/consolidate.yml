@@ -3,162 +3,43 @@ name: Consolidate Best Parts
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   consolidate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the-basics repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Clone source repositories
-        continue-on-error: true
-        id: clone-repos
         run: |
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "📦 Cloning Source Repositories"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          
-          mkdir -p source
-          CLONED_COUNT=0
-          
-          echo "Attempting to clone repositories..."
-          if git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine 2>/dev/null; then
-            echo "✅ Cloned ndax-quantum-engine"
-            CLONED_COUNT=$((CLONED_COUNT + 1))
-          else
-            echo "⚠️  Failed to clone ndax-quantum-engine (may be private or not exist)"
-          fi
-          
-          if git clone https://github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb 2>/dev/null; then
-            echo "✅ Cloned quantum-engine-dashb"
-            CLONED_COUNT=$((CLONED_COUNT + 1))
-          else
-            echo "⚠️  Failed to clone quantum-engine-dashb (may be private or not exist)"
-          fi
-          
-          if git clone https://github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader 2>/dev/null; then
-            echo "✅ Cloned shadowforge-ai-trader"
-            CLONED_COUNT=$((CLONED_COUNT + 1))
-          else
-            echo "⚠️  Failed to clone shadowforge-ai-trader (may be private or not exist)"
-          fi
-          
-          if git clone https://github.com/oconnorw225-del/repository-web-app.git source/repository-web-app 2>/dev/null; then
-            echo "✅ Cloned repository-web-app"
-            CLONED_COUNT=$((CLONED_COUNT + 1))
-          else
-            echo "⚠️  Failed to clone repository-web-app (may be private or not exist)"
-          fi
-          
-          if git clone https://github.com/oconnorw225-del/The-new-ones.git source/The-new-ones 2>/dev/null; then
-            echo "✅ Cloned The-new-ones"
-            CLONED_COUNT=$((CLONED_COUNT + 1))
-          else
-            echo "⚠️  Failed to clone The-new-ones (may be private or not exist)"
-          fi
-          
-          echo ""
-          echo "Successfully cloned $CLONED_COUNT out of 5 repositories"
-          echo "repos_cloned=$CLONED_COUNT" >> $GITHUB_OUTPUT
-          
-          if [ $CLONED_COUNT -eq 0 ]; then
-            echo ""
-            echo "⚠️  WARNING: No repositories were successfully cloned."
-            echo "   This may be because:"
-            echo "   - Repositories are private (need GITHUB_TOKEN with proper permissions)"
-            echo "   - Repositories don't exist"
-            echo "   - Network connectivity issues"
-            echo ""
-            echo "Consolidation workflow will be skipped."
-          fi
+          mkdir source
+          git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine
+          git clone https://github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb
+          git clone https://github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader
+          git clone https://github.com/oconnorw225-del/repository-web-app.git source/repository-web-app
+          git clone https://github.com/oconnorw225-del/The-new-ones.git source/The-new-ones
 
       - name: Archive backups
-        if: steps.clone-repos.outputs.repos_cloned != '0'
-        continue-on-error: true
         run: |
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "📦 Creating Backup Archives"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          
-          mkdir -p backups
-          [ -d source/ndax-quantum-engine ] && tar czf backups/ndax-quantum-engine.tar.gz -C source ndax-quantum-engine && echo "✅ Archived ndax-quantum-engine" || true
-          [ -d source/quantum-engine-dashb ] && tar czf backups/quantum-engine-dashb.tar.gz -C source quantum-engine-dashb && echo "✅ Archived quantum-engine-dashb" || true
-          [ -d source/shadowforge-ai-trader ] && tar czf backups/shadowforge-ai-trader.tar.gz -C source shadowforge-ai-trader && echo "✅ Archived shadowforge-ai-trader" || true
-          [ -d source/repository-web-app ] && tar czf backups/repository-web-app.tar.gz -C source repository-web-app && echo "✅ Archived repository-web-app" || true
-          [ -d source/The-new-ones ] && tar czf backups/The-new-ones.tar.gz -C source The-new-ones && echo "✅ Archived The-new-ones" || true
-          
-          ARCHIVE_COUNT=$(ls -1 backups/*.tar.gz 2>/dev/null | wc -l)
-          echo ""
-          echo "Created $ARCHIVE_COUNT backup archive(s)"
+          mkdir backups
+          tar czf backups/ndax-quantum-engine.tar.gz -C source ndax-quantum-engine
+          tar czf backups/quantum-engine-dashb.tar.gz -C source quantum-engine-dashb
+          tar czf backups/shadowforge-ai-trader.tar.gz -C source shadowforge-ai-trader
+          tar czf backups/repository-web-app.tar.gz -C source repository-web-app
+          tar czf backups/The-new-ones.tar.gz -C source The-new-ones
 
       - name: Setup directory structure
-        if: steps.clone-repos.outputs.repos_cloned != '0'
         run: |
-          mkdir -p api backend frontend .github/workflows docs automation tests
+          mkdir -p api backend frontend workflows docs automation tests
 
       - name: Run consolidation script
-        if: steps.clone-repos.outputs.repos_cloned != '0'
-        continue-on-error: true
         run: |
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "🔄 Running Consolidation Script"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          
-          if [ -f "automation/consolidate.sh" ]; then
-            bash automation/consolidate.sh
-            echo "✅ Consolidation script completed"
-          else
-            echo "⚠️  Consolidation script not found at automation/consolidate.sh"
-          fi
+          bash automation/consolidate.sh
 
       - name: Commit consolidated code
-        if: steps.clone-repos.outputs.repos_cloned != '0'
-        continue-on-error: true
         run: |
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "💾 Committing Changes"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          
           git config --global user.email "ci-bot@example.com"
           git config --global user.name "CI Bot"
           git add .
-          
-          if git diff --staged --quiet; then
-            echo "ℹ️  No changes to commit"
-          else
-            git commit -m "Automated consolidation of best parts"
-            git push
-            echo "✅ Changes committed and pushed"
-          fi
-      
-      - name: Workflow Summary
-        if: always()
-        run: |
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "📊 Consolidation Workflow Summary"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo ""
-          echo "Repositories cloned: ${{ steps.clone-repos.outputs.repos_cloned }}/5"
-          echo ""
-          
-          if [ "${{ steps.clone-repos.outputs.repos_cloned }}" = "0" ]; then
-            echo "⚠️  No repositories were available for consolidation."
-            echo ""
-            echo "This is expected if:"
-            echo "  • Source repositories are private or don't exist"
-            echo "  • GITHUB_TOKEN doesn't have access to private repos"
-            echo ""
-            echo "To enable consolidation:"
-            echo "  1. Ensure source repositories exist and are accessible"
-            echo "  2. Configure personal access token with repo access if needed"
-          else
-            echo "✅ Consolidation completed successfully"
-          fi
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          git diff --staged --quiet || git commit -m "Automated consolidation of best parts"
+          git push

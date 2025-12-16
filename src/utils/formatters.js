@@ -69,3 +69,45 @@ export const throttle = (func, limit) => {
     }
   }
 }
+
+/**
+ * Format relative time (e.g., "5 minutes ago", "2 hours ago")
+ * Note: Uses 30-day month approximation for simplicity
+ */
+export const formatRelativeTime = timestamp => {
+  const now = Date.now()
+  const date = timestamp instanceof Date ? timestamp.getTime() : timestamp
+  const diffInSeconds = Math.floor((now - date) / 1000)
+
+  // Handle future timestamps
+  if (diffInSeconds < 0) {
+    return 'in the future'
+  }
+
+  if (diffInSeconds < 60) {
+    return diffInSeconds <= 1 ? 'just now' : `${diffInSeconds} seconds ago`
+  }
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60)
+  if (diffInMinutes < 60) {
+    return diffInMinutes === 1 ? '1 minute ago' : `${diffInMinutes} minutes ago`
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  if (diffInHours < 24) {
+    return diffInHours === 1 ? '1 hour ago' : `${diffInHours} hours ago`
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24)
+  if (diffInDays < 30) {
+    return diffInDays === 1 ? '1 day ago' : `${diffInDays} days ago`
+  }
+
+  const diffInMonths = Math.floor(diffInDays / 30)
+  if (diffInMonths < 12) {
+    return diffInMonths === 1 ? '1 month ago' : `${diffInMonths} months ago`
+  }
+
+  const diffInYears = Math.floor(diffInMonths / 12)
+  return diffInYears === 1 ? '1 year ago' : `${diffInYears} years ago`
+}
