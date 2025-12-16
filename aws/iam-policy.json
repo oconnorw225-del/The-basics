@@ -99,8 +99,11 @@
         "iam:PutRolePolicy",
         "iam:DeleteRolePolicy",
         "iam:GetRolePolicy",
+        "iam:ListRoles",
         "iam:ListRolePolicies",
         "iam:ListAttachedRolePolicies",
+        "iam:ListInstanceProfilesForRole",
+        "iam:CreateServiceLinkedRole",
         "iam:TagRole",
         "iam:UntagRole"
       ],
