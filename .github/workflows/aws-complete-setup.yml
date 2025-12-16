@@ -1,5 +1,27 @@
 name: 🚀 AWS Complete Setup & Deployment
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# AWS CREDENTIALS CONFIGURATION
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#
+# This workflow requires AWS credentials to be configured as repository secrets:
+#
+#   Required Secrets:
+#     - AWS_ACCESS_KEY_ID: Your AWS access key ID
+#     - AWS_SECRET_ACCESS_KEY: Your AWS secret access key
+#
+# How to configure:
+#   1. Go to repository Settings → Secrets and variables → Actions
+#   2. Add both secrets with your AWS credentials
+#
+# Important Notes:
+#   - All jobs explicitly inherit secrets using 'secrets: inherit'
+#   - Each job validates credentials are present before use
+#   - GitHub automatically masks secret values in logs for security
+#   - Secrets are isolated from environment variables to prevent confusion
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 on:
   workflow_dispatch:
     inputs:
@@ -37,6 +59,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Explicitly inherit secrets from workflow to prevent confusion with env vars
+    secrets: inherit
     outputs:
       aws_account_id: ${{ steps.get-account.outputs.account_id }}
       aws_configured: ${{ steps.check-aws.outputs.aws_configured }}
@@ -51,6 +75,12 @@ jobs:
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "🔍 Validating Prerequisites"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # Debug output - GitHub automatically masks secret values
+          echo "Checking secret availability..."
+          echo "AWS_ACCESS_KEY_ID is set: $([ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && echo 'YES' || echo 'NO')"
+          echo "AWS_SECRET_ACCESS_KEY is set: $([ -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && echo 'YES' || echo 'NO')"
+          echo ""
           
           if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
             echo "aws_configured=false" >> $GITHUB_OUTPUT
@@ -70,7 +100,7 @@ jobs:
           fi
           
           echo "aws_configured=true" >> $GITHUB_OUTPUT
-          echo "✅ AWS credentials are configured"
+          echo "✅ AWS credentials are configured and available"
 
       - name: Configure AWS credentials
         if: steps.check-aws.outputs.aws_configured == 'true'
@@ -191,6 +221,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Explicitly inherit secrets to ensure AWS credentials are available
+    secrets: inherit
     outputs:
       load_balancer_dns: ${{ steps.tf-outputs.outputs.load_balancer_dns }}
       ecr_repository_url: ${{ steps.tf-outputs.outputs.ecr_repository_url }}
@@ -201,6 +233,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Validate AWS secrets availability
+        run: |
+          echo "🔍 Validating AWS credentials in setup-infrastructure job..."
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "❌ ERROR: AWS credentials not available in this job"
+            echo "This should not happen - credentials were validated in previous job"
+            exit 1
+          fi
+          echo "✅ AWS credentials are available"
+          # Debug output - GitHub automatically masks secret values
+          echo "AWS_ACCESS_KEY_ID is set: $([ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && echo 'YES' || echo 'NO')"
+          echo "AWS_SECRET_ACCESS_KEY is set: $([ -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && echo 'YES' || echo 'NO')"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -320,12 +365,27 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Explicitly inherit secrets to ensure AWS credentials are available
+    secrets: inherit
     outputs:
       image_tag: ${{ steps.meta.outputs.image_tag }}
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Validate AWS secrets availability
+        run: |
+          echo "🔍 Validating AWS credentials in deploy-application job..."
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "❌ ERROR: AWS credentials not available in this job"
+            echo "This should not happen - credentials were validated in previous job"
+            exit 1
+          fi
+          echo "✅ AWS credentials are available"
+          # Debug output - GitHub automatically masks secret values
+          echo "AWS_ACCESS_KEY_ID is set: $([ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && echo 'YES' || echo 'NO')"
+          echo "AWS_SECRET_ACCESS_KEY is set: $([ -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && echo 'YES' || echo 'NO')"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -462,8 +522,23 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Explicitly inherit secrets to ensure AWS credentials are available
+    secrets: inherit
     
     steps:
+      - name: Validate AWS secrets availability
+        run: |
+          echo "🔍 Validating AWS credentials in health-check job..."
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "❌ ERROR: AWS credentials not available in this job"
+            echo "This should not happen - credentials were validated in previous job"
+            exit 1
+          fi
+          echo "✅ AWS credentials are available"
+          # Debug output - GitHub automatically masks secret values
+          echo "AWS_ACCESS_KEY_ID is set: $([ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && echo 'YES' || echo 'NO')"
+          echo "AWS_SECRET_ACCESS_KEY is set: $([ -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && echo 'YES' || echo 'NO')"
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -630,10 +705,25 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Explicitly inherit secrets to ensure AWS credentials are available
+    secrets: inherit
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Validate AWS secrets availability
+        run: |
+          echo "🔍 Validating AWS credentials in auto-destroy job..."
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "❌ ERROR: AWS credentials not available in this job"
+            echo "This should not happen - credentials were validated in previous job"
+            exit 1
+          fi
+          echo "✅ AWS credentials are available"
+          # Debug output - GitHub automatically masks secret values
+          echo "AWS_ACCESS_KEY_ID is set: $([ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && echo 'YES' || echo 'NO')"
+          echo "AWS_SECRET_ACCESS_KEY is set: $([ -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && echo 'YES' || echo 'NO')"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
