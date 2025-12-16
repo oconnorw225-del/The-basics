@@ -22,17 +22,22 @@ Automated consolidation of best parts from:
 - `/automation` — scripts for consolidation
 - `/backups` — archived original sources
 
-## Running the Consolidation
+## Usage Instructions
 
-Once this repository is set up:
-1. Navigate to the **Actions** tab in GitHub
-2. Select **"Consolidate Best Parts"** workflow
-3. Click **"Run workflow"**
-4. The automation will clone all source repositories, back them up, and consolidate the best parts
+After merging this PR:
+1. Navigate to the **Actions** tab in your repository
+2. Select the **"Consolidate Best Parts"** workflow
+3. Click **"Run workflow"** button
+4. Wait for the automation to complete
+5. All source repositories will be backed up and their best parts will be automatically consolidated!
 
-All source repositories will be backed up and the best parts will be consolidated automatically!
-
-## System Architecture
+## Source Repositories
+This consolidation pulls from the following repositories:
+- [ndax-quantum-engine](https://github.com/oconnorw225-del/ndax-quantum-engine)
+- [quantum-engine-dashb](https://github.com/oconnorw225-del/quantum-engine-dashb)
+- [shadowforge-ai-trader](https://github.com/oconnorw225-del/shadowforge-ai-trader)
+- [repository-web-app](https://github.com/oconnorw225-del/repository-web-app)
+- [The-new-ones](https://github.com/oconnorw225-del/The-new-ones)
 
 ### Core Systems
 
