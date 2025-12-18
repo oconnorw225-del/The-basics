@@ -89,7 +89,18 @@ class SimpleWalletGenerator:
         return self.wallets
     
     def encrypt_simple(self, data, password="CHANGE_THIS_PASSWORD"):
-        """Simple XOR encryption (use proper crypto in production)"""
+        """
+        Simple XOR encryption (use proper crypto in production)
+        
+        WARNING: This is a demonstration function only!
+        - The default password MUST be changed for any real usage
+        - XOR encryption is NOT secure for production
+        - Use proper encryption libraries (e.g., cryptography, PyCryptodome) in production
+        - Never use hardcoded passwords in production code
+        """
+        if password == "CHANGE_THIS_PASSWORD":
+            print("⚠️  WARNING: Using default password! Change this for production use!")
+        
         key = hashlib.sha256(password.encode()).digest()
         encrypted = bytearray()
         for i, byte in enumerate(data.encode()):
