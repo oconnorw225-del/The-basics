@@ -3,27 +3,27 @@
  * Manages clean shutdown of all system components
  */
 
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'events'
 
 class ShutdownHandler extends EventEmitter {
   constructor(config = {}) {
-    super();
-    
+    super()
+
     this.config = {
       gracePeriod: config.gracePeriod || 30000, // 30 seconds
       forceShutdownDelay: config.forceShutdownDelay || 5000,
-      ...config
-    };
+      ...config,
+    }
 
     this.state = {
       shutdownInitiated: false,
       shutdownReason: null,
-      shutdownStartTime: null
-    };
+      shutdownStartTime: null,
+    }
 
-    this.shutdownHooks = [];
-    this.activeOperations = new Set();
-    this.initialized = false;
+    this.shutdownHooks = []
+    this.activeOperations = new Set()
+    this.initialized = false
   }
 
   /**
@@ -31,26 +31,26 @@ class ShutdownHandler extends EventEmitter {
    */
   initialize() {
     if (this.initialized) {
-      return;
+      return
     }
 
     // Handle SIGTERM (normal shutdown, e.g., from systemd)
     process.on('SIGTERM', () => {
-      this.initiateShutdown('SIGTERM');
-    });
+      this.initiateShutdown('SIGTERM')
+    })
 
     // Handle SIGINT (Ctrl+C)
     process.on('SIGINT', () => {
-      this.initiateShutdown('SIGINT');
-    });
+      this.initiateShutdown('SIGINT')
+    })
 
     // Handle SIGHUP (reload config)
     process.on('SIGHUP', () => {
-      this.handleReload();
-    });
+      this.handleReload()
+    })
 
-    this.initialized = true;
-    console.log('✅ ShutdownHandler initialized');
+    this.initialized = true
+    console.log('✅ ShutdownHandler initialized')
   }
 
   /**
@@ -62,13 +62,13 @@ class ShutdownHandler extends EventEmitter {
       name,
       handler,
       priority,
-      executed: false
-    });
+      executed: false,
+    })
 
     // Sort by priority (higher priority runs first)
-    this.shutdownHooks.sort((a, b) => b.priority - a.priority);
+    this.shutdownHooks.sort((a, b) => b.priority - a.priority)
 
-    console.log(`🔗 Registered shutdown hook: ${name} (priority: ${priority})`);
+    console.log(`🔗 Registered shutdown hook: ${name} (priority: ${priority})`)
   }
 
   /**
@@ -78,10 +78,10 @@ class ShutdownHandler extends EventEmitter {
     this.activeOperations.add({
       id: operationId,
       description,
-      startedAt: Date.now()
-    });
+      startedAt: Date.now(),
+    })
 
-    return () => this.completeOperation(operationId);
+    return () => this.completeOperation(operationId)
   }
 
   /**
@@ -90,8 +90,8 @@ class ShutdownHandler extends EventEmitter {
   completeOperation(operationId) {
     for (const op of this.activeOperations) {
       if (op.id === operationId) {
-        this.activeOperations.delete(op);
-        break;
+        this.activeOperations.delete(op)
+        break
       }
     }
   }
@@ -101,47 +101,46 @@ class ShutdownHandler extends EventEmitter {
    */
   async initiateShutdown(reason = 'manual') {
     if (this.state.shutdownInitiated) {
-      console.log('⚠️ Shutdown already in progress...');
-      return;
+      console.log('⚠️ Shutdown already in progress...')
+      return
     }
 
-    this.state.shutdownInitiated = true;
-    this.state.shutdownReason = reason;
-    this.state.shutdownStartTime = Date.now();
+    this.state.shutdownInitiated = true
+    this.state.shutdownReason = reason
+    this.state.shutdownStartTime = Date.now()
 
-    console.log(`\n🛑 Graceful shutdown initiated: ${reason}`);
-    console.log(`⏱️ Grace period: ${this.config.gracePeriod}ms`);
+    console.log(`\n🛑 Graceful shutdown initiated: ${reason}`)
+    console.log(`⏱️ Grace period: ${this.config.gracePeriod}ms`)
 
-    this.emit('shutdownInitiated', { reason });
+    this.emit('shutdownInitiated', { reason })
 
     try {
       // Step 1: Stop accepting new requests
-      await this.stopAcceptingRequests();
+      await this.stopAcceptingRequests()
 
       // Step 2: Wait for in-flight operations with timeout
-      await this.waitForOperations();
+      await this.waitForOperations()
 
       // Step 3: Execute shutdown hooks
-      await this.executeShutdownHooks();
+      await this.executeShutdownHooks()
 
       // Step 4: Final cleanup
-      await this.finalCleanup();
+      await this.finalCleanup()
 
-      console.log('✅ Graceful shutdown complete');
-      this.emit('shutdownComplete');
+      console.log('✅ Graceful shutdown complete')
+      this.emit('shutdownComplete')
 
       // Exit with success code
-      process.exit(0);
-
+      process.exit(0)
     } catch (error) {
-      console.error('❌ Error during shutdown:', error);
-      this.emit('shutdownError', error);
+      console.error('❌ Error during shutdown:', error)
+      this.emit('shutdownError', error)
 
       // Force shutdown after delay
-      console.log(`⚠️ Forcing shutdown in ${this.config.forceShutdownDelay}ms...`);
+      console.log(`⚠️ Forcing shutdown in ${this.config.forceShutdownDelay}ms...`)
       setTimeout(() => {
-        process.exit(1);
-      }, this.config.forceShutdownDelay);
+        process.exit(1)
+      }, this.config.forceShutdownDelay)
     }
   }
 
@@ -149,13 +148,13 @@ class ShutdownHandler extends EventEmitter {
    * Stop accepting new requests
    */
   async stopAcceptingRequests() {
-    console.log('🚫 Stopping new requests...');
-    this.emit('stopNewRequests');
-    
+    console.log('🚫 Stopping new requests...')
+    this.emit('stopNewRequests')
+
     // Give signal handlers time to process
-    await this.sleep(100);
-    
-    console.log('✅ No longer accepting new requests');
+    await this.sleep(100)
+
+    console.log('✅ No longer accepting new requests')
   }
 
   /**
@@ -163,25 +162,25 @@ class ShutdownHandler extends EventEmitter {
    */
   async waitForOperations() {
     if (this.activeOperations.size === 0) {
-      console.log('✅ No active operations');
-      return;
+      console.log('✅ No active operations')
+      return
     }
 
-    console.log(`⏳ Waiting for ${this.activeOperations.size} active operations...`);
-    
-    const deadline = Date.now() + this.config.gracePeriod;
-    
+    console.log(`⏳ Waiting for ${this.activeOperations.size} active operations...`)
+
+    const deadline = Date.now() + this.config.gracePeriod
+
     while (this.activeOperations.size > 0 && Date.now() < deadline) {
-      await this.sleep(100);
+      await this.sleep(100)
     }
 
     if (this.activeOperations.size > 0) {
-      console.warn(`⚠️ ${this.activeOperations.size} operations still active, proceeding anyway`);
+      console.warn(`⚠️ ${this.activeOperations.size} operations still active, proceeding anyway`)
       this.activeOperations.forEach(op => {
-        console.warn(`  - ${op.description} (running for ${Date.now() - op.startedAt}ms)`);
-      });
+        console.warn(`  - ${op.description} (running for ${Date.now() - op.startedAt}ms)`)
+      })
     } else {
-      console.log('✅ All operations completed');
+      console.log('✅ All operations completed')
     }
   }
 
@@ -190,87 +189,87 @@ class ShutdownHandler extends EventEmitter {
    */
   async executeShutdownHooks() {
     if (this.shutdownHooks.length === 0) {
-      console.log('✅ No shutdown hooks registered');
-      return;
+      console.log('✅ No shutdown hooks registered')
+      return
     }
 
-    console.log(`🔧 Executing ${this.shutdownHooks.length} shutdown hooks...`);
+    console.log(`🔧 Executing ${this.shutdownHooks.length} shutdown hooks...`)
 
     for (const hook of this.shutdownHooks) {
       if (hook.executed) {
-        continue;
+        continue
       }
 
       try {
-        console.log(`  ▶️ ${hook.name}...`);
-        await hook.handler();
-        hook.executed = true;
-        console.log(`  ✅ ${hook.name} complete`);
+        console.log(`  ▶️ ${hook.name}...`)
+        await hook.handler()
+        hook.executed = true
+        console.log(`  ✅ ${hook.name} complete`)
       } catch (error) {
-        console.error(`  ❌ ${hook.name} failed:`, error.message);
+        console.error(`  ❌ ${hook.name} failed:`, error.message)
         // Continue with other hooks even if one fails
       }
     }
 
-    console.log('✅ Shutdown hooks executed');
+    console.log('✅ Shutdown hooks executed')
   }
 
   /**
    * Final cleanup tasks
    */
   async finalCleanup() {
-    console.log('🧹 Final cleanup...');
+    console.log('🧹 Final cleanup...')
 
     // Clear all timers and intervals (those tracked by us)
-    this.emit('cleanup');
+    this.emit('cleanup')
 
     // Give final cleanup time to complete
-    await this.sleep(100);
+    await this.sleep(100)
 
-    console.log('✅ Cleanup complete');
+    console.log('✅ Cleanup complete')
   }
 
   /**
    * Handle config reload (SIGHUP)
    */
   handleReload() {
-    console.log('🔄 Config reload requested (SIGHUP)');
-    this.emit('reload');
-    
+    console.log('🔄 Config reload requested (SIGHUP)')
+    this.emit('reload')
+
     // Don't exit on reload
-    console.log('✅ Config reload signal handled');
+    console.log('✅ Config reload signal handled')
   }
 
   /**
    * Trigger immediate shutdown
    */
   async forceShutdown(reason = 'forced') {
-    console.warn(`⚡ Force shutdown: ${reason}`);
-    
-    this.emit('forceShutdown', { reason });
-    
+    console.warn(`⚡ Force shutdown: ${reason}`)
+
+    this.emit('forceShutdown', { reason })
+
     // Skip graceful shutdown, execute critical hooks only
-    const criticalHooks = this.shutdownHooks.filter(h => h.priority >= 100);
-    
+    const criticalHooks = this.shutdownHooks.filter(h => h.priority >= 100)
+
     for (const hook of criticalHooks) {
       try {
         await Promise.race([
           hook.handler(),
-          this.timeout(1000) // 1 second max per hook
-        ]);
+          this.timeout(1000), // 1 second max per hook
+        ])
       } catch (error) {
-        console.error(`❌ Critical hook ${hook.name} failed:`, error.message);
+        console.error(`❌ Critical hook ${hook.name} failed:`, error.message)
       }
     }
 
-    process.exit(1);
+    process.exit(1)
   }
 
   /**
    * Check if shutdown is in progress
    */
   isShuttingDown() {
-    return this.state.shutdownInitiated;
+    return this.state.shutdownInitiated
   }
 
   /**
@@ -281,27 +280,23 @@ class ShutdownHandler extends EventEmitter {
       ...this.state,
       activeOperations: this.activeOperations.size,
       shutdownHooks: this.shutdownHooks.length,
-      elapsedTime: this.state.shutdownStartTime 
-        ? Date.now() - this.state.shutdownStartTime 
-        : 0
-    };
+      elapsedTime: this.state.shutdownStartTime ? Date.now() - this.state.shutdownStartTime : 0,
+    }
   }
 
   /**
    * Helper: sleep for specified milliseconds
    */
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms))
   }
 
   /**
    * Helper: timeout promise
    */
   timeout(ms) {
-    return new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Timeout')), ms)
-    );
+    return new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))
   }
 }
 
-export default ShutdownHandler;
+export default ShutdownHandler
