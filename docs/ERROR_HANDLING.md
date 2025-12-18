@@ -2,498 +2,424 @@
 
 ## Overview
 
-The system implements comprehensive error handling across all components with automatic recovery, retry logic, and detailed logging.
+The Error Handling System provides comprehensive error management across the entire application, including:
+- Automatic error recovery
+- Circuit breaker pattern for external services
+- Retry logic with exponential backoff
+- Error logging and notification
+- Graceful degradation
 
-## Error Categories
+## Components
 
-### 1. Network Errors
-- **Examples**: Connection timeouts, DNS failures, network unreachable
-- **Severity**: Usually recoverable
-- **Recovery**: Automatic retry with exponential backoff
-- **Timeout**: 30-60 seconds before giving up
+### ErrorHandler Class
 
-### 2. Database Errors
-- **Examples**: Connection lost, query timeout, deadlock
-- **Severity**: Recoverable
-- **Recovery**: Retry with connection reset
-- **Timeout**: 3 retries with increasing delays
+The `ErrorHandler` class is the central component for error management.
+
+```javascript
+import ErrorHandler from './core/ErrorHandler.js';
+
+const errorHandler = new ErrorHandler({
+  logErrors: true,
+  logPath: './logs/errors.log',
+  maxRetries: 3,
+  retryDelay: 1000,
+  circuitBreakerThreshold: 5
+});
+
+errorHandler.initialize();
+```
+
+## Error Types Handled
+
+### 1. Uncaught Exceptions
+
+Automatically caught and logged. The system will attempt graceful shutdown.
+
+```javascript
+// Automatically handled by ErrorHandler
+process.on('uncaughtException', (error) => {
+  // ErrorHandler manages this
+});
+```
+
+### 2. Unhandled Promise Rejections
+
+All unhandled promise rejections are caught and logged.
+
+```javascript
+// Automatically handled
+process.on('unhandledRejection', (reason, promise) => {
+  // ErrorHandler manages this
+});
+```
 
 ### 3. API Errors
-- **Examples**: 4xx/5xx responses, rate limits, timeout
-- **Severity**: Recoverable
-- **Recovery**: 
-  - 429 (Rate Limit): Back off and retry
-  - 5xx: Retry with exponential backoff
-  - 4xx: Log and fail (client error)
 
-### 4. Filesystem Errors
-- **Examples**: Permission denied, disk full, file not found
-- **Severity**: Usually fatal
-- **Recovery**: Alert and manual intervention required
+Use the API error handler for external service calls:
 
-### 5. Configuration Errors
-- **Examples**: Missing required env vars, invalid config
-- **Severity**: Fatal (prevents startup)
-- **Recovery**: System won't start; fix configuration
-
-### 6. Security Errors
-- **Examples**: Authentication failure, authorization denied
-- **Severity**: Fatal
-- **Recovery**: Log incident, no automatic retry
-
-## Error Severity Levels
-
-### WARNING
-- **Description**: Non-critical issues that don't affect functionality
-- **Examples**: 
-  - Missing optional configuration
-  - Slow response time
-  - Temporary resource spike
-- **Action**: Log and continue
-- **Notification**: None
-
-### RECOVERABLE
-- **Description**: Errors that can be automatically recovered
-- **Examples**:
-  - Network timeout
-  - API rate limit hit
-  - Temporary service unavailability
-- **Action**: Retry with backoff, log attempt count
-- **Notification**: After 3 failed retries
-
-### FATAL
-- **Description**: Critical errors requiring immediate attention
-- **Examples**:
-  - Security breach attempt
-  - Data corruption
-  - Unrecoverable crash
-- **Action**: 
-  - Generate crash dump
-  - Alert administrators
-  - Attempt graceful shutdown
-- **Notification**: Immediate
-
-## Retry Strategy
-
-### Exponential Backoff
-
-```python
-delay = base_delay * (2 ** attempt_number)
-
-# Example:
-# Attempt 1: 1 second
-# Attempt 2: 2 seconds
-# Attempt 3: 4 seconds
-# Attempt 4: 8 seconds
+```javascript
+try {
+  const response = await fetch('https://api.example.com/data');
+  errorHandler.recordServiceSuccess('api-example');
+} catch (error) {
+  await errorHandler.handleApiError(error, {
+    service: 'api-example',
+    endpoint: '/data',
+    method: 'GET'
+  });
+}
 ```
 
-### Maximum Retries
-- **Default**: 3 attempts
-- **Configurable**: Via `MAX_RETRIES` environment variable
-- **Circuit Breaker**: Opens after 5 failures in 5 minutes
+### 4. Database Errors
 
-### Jitter
-Random jitter added to prevent thundering herd:
-```python
-actual_delay = delay * (0.5 + random.random() * 0.5)
+Handle database connection and query errors:
+
+```javascript
+try {
+  await database.query('SELECT * FROM users');
+} catch (error) {
+  await errorHandler.handleDatabaseError(error, {
+    operation: 'query',
+    table: 'users'
+  });
+}
 ```
+
+### 5. File System Errors
+
+Handle file operations:
+
+```javascript
+try {
+  await fs.readFile('/path/to/file');
+} catch (error) {
+  await errorHandler.handleFileSystemError(error, {
+    operation: 'read',
+    path: '/path/to/file'
+  });
+}
+```
+
+## Retry Logic
+
+Use the built-in retry mechanism for operations that may fail temporarily:
+
+```javascript
+const result = await errorHandler.withRetry(
+  async () => {
+    return await unreliableOperation();
+  },
+  {
+    maxRetries: 5,
+    retryDelay: 2000,
+    context: { operation: 'unreliable-op' },
+    onRetry: async (error, attempt) => {
+      console.log(`Retry attempt ${attempt}: ${error.message}`);
+    }
+  }
+);
+```
+
+**Features:**
+- Exponential backoff (delay doubles with each retry)
+- Customizable retry count and delay
+- Optional callback on each retry
+- Context tracking for debugging
 
 ## Circuit Breaker Pattern
 
-### States
+The circuit breaker prevents cascading failures when external services are down.
 
-1. **CLOSED** (Normal Operation)
-   - All requests processed
-   - Failures tracked
+**States:**
+- **Closed**: Normal operation, requests pass through
+- **Open**: Too many failures, requests fail fast
+- **Half-Open**: Testing if service recovered
 
-2. **OPEN** (Failing)
-   - Requests immediately fail
-   - No actual calls made
-   - Prevents cascade failures
+```javascript
+// Check if circuit is open
+if (errorHandler.isCircuitOpen('external-service')) {
+  throw new Error('Service temporarily unavailable');
+}
 
-3. **HALF-OPEN** (Testing)
-   - Limited requests allowed
-   - If successful: → CLOSED
-   - If failed: → OPEN
-
-### Configuration
-
-```python
-# Circuit opens after:
-threshold_failures = 5
-threshold_window = 300  # seconds (5 minutes)
-
-# Circuit attempts to close after:
-cooldown_period = 300  # seconds
+try {
+  await callExternalService();
+  errorHandler.recordServiceSuccess('external-service');
+} catch (error) {
+  await errorHandler.handleApiError(error, {
+    service: 'external-service'
+  });
+}
 ```
 
-## Error Handling Patterns
+**Configuration:**
+- `circuitBreakerThreshold`: Number of failures before opening (default: 5)
+- Circuit auto-resets to half-open after 60 seconds
 
-### 1. Try-Catch with Logging
+## Error Statistics
 
-```python
-try:
-    result = risky_operation()
-except Exception as e:
-    error_handler.handle_error(
-        e,
-        context={'operation': 'risky_operation'}
-    )
-    # Optionally re-raise or return default
+Track error metrics:
+
+```javascript
+const stats = errorHandler.getStats();
+console.log(stats);
+// {
+//   totalErrors: 42,
+//   uncaughtExceptions: 0,
+//   unhandledRejections: 5,
+//   apiErrors: 30,
+//   databaseErrors: 7,
+//   recoveredErrors: 25,
+//   fatalErrors: 0
+// }
 ```
 
-### 2. Retry Wrapper
+## Event Listeners
 
-```python
-result = error_handler.retry_with_backoff(
-    function=api_call,
-    max_retries=3,
-    arg1='value'
-)
+Subscribe to error events:
+
+```javascript
+errorHandler.on('apiError', ({ error, context }) => {
+  console.error('API Error:', error.message);
+  // Send to monitoring service
+});
+
+errorHandler.on('circuitBreakerOpened', ({ serviceName, failures }) => {
+  console.warn(`Circuit breaker opened for ${serviceName}`);
+  // Alert operations team
+});
+
+errorHandler.on('errorLogged', (logEntry) => {
+  // Send to external logging service
+});
 ```
 
-### 3. Graceful Degradation
+**Available Events:**
+- `initialized` - ErrorHandler initialized
+- `uncaughtException` - Uncaught exception occurred
+- `unhandledRejection` - Unhandled promise rejection
+- `apiError` - API error occurred
+- `databaseError` - Database error occurred
+- `fileSystemError` - File system error occurred
+- `configError` - Configuration error occurred
+- `error` - Generic error occurred
+- `circuitBreakerOpened` - Circuit breaker opened for a service
+- `circuitBreakerClosed` - Circuit breaker closed for a service
+- `errorLogged` - Error logged to file
 
-```python
-try:
-    return premium_feature()
-except Exception as e:
-    error_handler.handle_error(e)
-    return basic_feature()  # Fallback
+## Best Practices
+
+### 1. Always Initialize Early
+
+Initialize the ErrorHandler as early as possible in your application:
+
+```javascript
+import ErrorHandler from './core/ErrorHandler.js';
+
+const errorHandler = new ErrorHandler();
+errorHandler.initialize();
+
+// Now start the rest of your app
 ```
 
-### 4. Fail-Fast
+### 2. Use Specific Error Handlers
 
-```python
-if not critical_dependency_available():
-    raise FatalError("Cannot operate without dependency")
+Use the appropriate error handler for each error type:
+
+```javascript
+// ❌ Don't
+try {
+  await database.query();
+} catch (error) {
+  console.error(error);
+}
+
+// ✅ Do
+try {
+  await database.query();
+} catch (error) {
+  await errorHandler.handleDatabaseError(error, {
+    operation: 'query',
+    table: 'users'
+  });
+}
 ```
 
-## Crash Recovery
+### 3. Provide Context
 
-### Automatic Recovery Steps
+Always provide context when handling errors:
 
-1. **Detect Crash**
-   - Process exit monitoring
-   - Health check failure
-   - Watchdog timeout
+```javascript
+await errorHandler.handleApiError(error, {
+  service: 'stripe',
+  endpoint: '/charges',
+  method: 'POST',
+  userId: user.id,
+  amount: charge.amount
+});
+```
 
-2. **Assess Situation**
-   - Check circuit breaker status
-   - Count recent crashes
-   - Evaluate recovery strategy
+### 4. Use Retry for Transient Failures
 
-3. **Attempt Recovery**
-   - Restore from checkpoint (if available)
-   - Restart process
-   - Verify health after restart
+Use retry logic for operations that may fail temporarily:
 
-4. **If Recovery Fails**
-   - Open circuit breaker
-   - Alert administrators
-   - Log detailed crash information
+```javascript
+// Network requests
+// Database connections
+// File locks
+// External API calls
+```
 
-### Crash Dump Contents
+### 5. Don't Retry for Permanent Failures
+
+Don't retry operations that will never succeed:
+
+```javascript
+// Authentication failures
+// Validation errors
+// Authorization errors
+// Resource not found errors
+```
+
+### 6. Monitor Circuit Breakers
+
+Watch for circuit breaker events and investigate when they open:
+
+```javascript
+errorHandler.on('circuitBreakerOpened', ({ serviceName, failures }) => {
+  // Alert team
+  // Check service health
+  // Review logs
+});
+```
+
+## Error Log Format
+
+Errors are logged in JSON format:
 
 ```json
 {
-  "timestamp": "2024-01-15T10:30:45Z",
-  "process_name": "trading_bot",
-  "error_type": "SegmentationFault",
-  "error_message": "...",
-  "traceback": "...",
-  "system_state": {
-    "cpu_percent": 45.2,
-    "memory_mb": 512,
-    "disk_percent": 65
+  "timestamp": "2025-12-13T21:30:47.256Z",
+  "type": "API_ERROR",
+  "message": "Request timeout",
+  "stack": "Error: Request timeout\n    at ...",
+  "context": {
+    "service": "stripe",
+    "endpoint": "/charges",
+    "method": "POST"
   },
-  "process_state": {
-    "uptime": 3600,
-    "restart_count": 2
+  "stats": {
+    "totalErrors": 42,
+    "apiErrors": 30,
+    ...
   }
 }
 ```
 
-## Freeze Detection
+## Integration with Other Systems
 
-### Detection Methods
+### With FeatureManager
 
-1. **Watchdog Timer**
-   - Process must reset timer periodically
-   - If not reset within timeout → frozen
-
-2. **Heartbeat Monitoring**
-   - Process sends heartbeat every N seconds
-   - No heartbeat → potential freeze
-
-3. **Resource Monitoring**
-   - High CPU + no progress = infinite loop
-   - No CPU + no response = deadlock
-
-### Recovery Actions
-
-**Soft Freeze** (60s threshold):
-- Log warning
-- Monitor for improvement
-- Collect diagnostics
-
-**Hard Freeze** (300s threshold):
-- Force terminate process
-- Generate freeze report
-- Restart via crash handler
-
-**Deadlock** (repeated freezes):
-- Thread dump (if supported)
-- Force kill
-- Implement deadlock prevention
-
-## Error Logging
-
-### Log Format
-
-```json
-{
-  "timestamp": "2024-01-15T10:30:45.123Z",
-  "level": "ERROR",
-  "logger": "trading_bot",
-  "message": "API call failed",
-  "error_type": "ConnectionError",
-  "error_category": "network",
-  "severity": "recoverable",
-  "context": {
-    "endpoint": "/api/trades",
-    "attempt": 2,
-    "max_retries": 3
-  },
-  "traceback": "..."
-}
+```javascript
+featureManager.on('featureError', async ({ name, error }) => {
+  await errorHandler.handleError('FEATURE_ERROR', error, {
+    feature: name
+  });
+});
 ```
 
-### Log Locations
+### With HealthMonitor
 
-- **Main Log**: `.unified-system/logs/unifiedsystem.log`
-- **Error Log**: `.unified-system/logs/unifiedsystem_errors.log`
-- **Crash Dumps**: `.unified-system/crash-dumps/`
-
-### Log Rotation
-
-- **Max Size**: 10 MB per file
-- **Backups**: 5 files retained
-- **Compression**: Automatic for old files
-
-## Monitoring & Alerts
-
-### Error Rate Monitoring
-
-```python
-# Track error rate
-errors_per_minute = errors_last_minute / 60
-
-# Alert if threshold exceeded
-if errors_per_minute > 10:
-    send_alert("High error rate detected")
+```javascript
+healthMonitor.on('unhealthy', async (metrics) => {
+  await errorHandler.handleError('HEALTH_CHECK_FAILED', 
+    new Error('System unhealthy'), 
+    { metrics }
+  );
+});
 ```
 
-### Alert Thresholds
+## Shutdown
 
-- **Warning**: 5 errors/minute
-- **Critical**: 10 errors/minute
-- **Emergency**: 50 errors/minute or any fatal error
+Always shutdown gracefully:
 
-### Alert Channels
-
-1. **Logs**: Always logged
-2. **Metrics**: Exposed for Prometheus
-3. **Email**: Fatal errors only (if configured)
-4. **Slack/Discord**: Critical+ (if configured)
-
-## Best Practices
-
-### 1. Always Categorize Errors
-```python
-# Good
-error_handler.handle_error(
-    exception,
-    context={'service': 'api', 'endpoint': '/users'}
-)
-
-# Bad
-print(f"Error: {exception}")
+```javascript
+await errorHandler.shutdown();
 ```
 
-### 2. Provide Context
-```python
-# Include relevant context
-context = {
-    'user_id': user_id,
-    'operation': 'create_order',
-    'input_data': sanitize(input_data)
-}
-```
-
-### 3. Don't Swallow Exceptions
-```python
-# Good
-try:
-    risky_operation()
-except Exception as e:
-    error_handler.handle_error(e)
-    raise  # Re-raise if caller needs to know
-
-# Bad
-try:
-    risky_operation()
-except:
-    pass  # Silent failure
-```
-
-### 4. Use Appropriate Severity
-```python
-# Fatal for security issues
-if not authenticate(user):
-    raise SecurityError("Authentication failed")
-
-# Recoverable for transient failures
-if api_timeout():
-    raise RecoverableError("API timeout")
-```
-
-### 5. Implement Timeouts
-```python
-# Always set timeouts
-response = requests.get(url, timeout=30)
-
-# For async operations
-result = await asyncio.wait_for(
-    async_operation(),
-    timeout=60.0
-)
-```
-
-## Testing Error Handling
-
-### Unit Tests
-
-```python
-def test_retry_mechanism():
-    call_count = [0]
-    
-    def failing_function():
-        call_count[0] += 1
-        if call_count[0] < 3:
-            raise ValueError("Temporary failure")
-        return "success"
-    
-    result = error_handler.retry_with_backoff(
-        failing_function,
-        max_retries=3
-    )
-    
-    assert result == "success"
-    assert call_count[0] == 3
-```
-
-### Integration Tests
-
-```python
-def test_crash_recovery():
-    # Simulate crash
-    process_manager.crash_process("test_service")
-    
-    # Wait for recovery
-    time.sleep(5)
-    
-    # Verify recovered
-    status = process_manager.get_status("test_service")
-    assert status == ProcessState.RUNNING
-```
-
-### Chaos Testing
-
-```python
-def test_network_partition():
-    # Simulate network failure
-    block_network()
-    
-    try:
-        # System should handle gracefully
-        result = make_api_call()
-        assert result is None  # Returns None instead of crashing
-    finally:
-        restore_network()
-```
+This ensures:
+- Pending log writes complete
+- Event listeners are cleaned up
+- Resources are released
 
 ## Troubleshooting
 
-### High Error Rate
+### Errors Not Being Logged
 
-1. Check error logs for patterns
-2. Review recent deployments/changes
-3. Verify external service status
-4. Check resource utilization
-5. Examine circuit breaker states
-
-### Process Keeps Crashing
-
-1. Review crash dumps
-2. Check resource limits
-3. Verify dependencies available
-4. Look for memory leaks
-5. Check for infinite retry loops
-
-### Frozen Processes
-
-1. Check freeze detection logs
-2. Review CPU/memory usage
-3. Look for deadlock indicators
-4. Check external service response times
-5. Verify timeout configurations
+1. Check that ErrorHandler is initialized
+2. Verify logPath is writable
+3. Check logErrors config is true
 
 ### Circuit Breaker Always Open
 
-1. Identify root cause of failures
-2. Fix underlying issue
-3. Reset circuit breaker manually:
-   ```python
-   crash_handler.circuit_open.pop(service_name)
-   ```
-4. Monitor for stability
+1. Check service is actually available
+2. Review circuitBreakerThreshold setting
+3. Monitor service success/failure ratio
+4. Circuit resets to half-open after 60s
 
-## Configuration Reference
+### High Error Rates
 
-### Environment Variables
+1. Check error statistics with `getStats()`
+2. Review error logs for patterns
+3. Check external service health
+4. Review retry configurations
 
-```bash
-# Error handling
-MAX_RETRIES=3
-RETRY_BACKOFF_BASE=2.0
-CIRCUIT_BREAKER_THRESHOLD=5
-CIRCUIT_BREAKER_TIMEOUT=300
+## Example: Complete Integration
 
-# Monitoring
-HEALTH_CHECK_INTERVAL=60
-FREEZE_SOFT_THRESHOLD=60
-FREEZE_HARD_THRESHOLD=300
+```javascript
+import ErrorHandler from './core/ErrorHandler.js';
+import config from '../config/error-handling.json' assert { type: 'json' };
 
-# Logging
-LOG_LEVEL=INFO
-LOG_MAX_BYTES=10485760
-LOG_BACKUP_COUNT=5
+// Initialize
+const errorHandler = new ErrorHandler(config.errorHandler);
+errorHandler.initialize();
+
+// Use in application
+class APIClient {
+  constructor() {
+    this.errorHandler = errorHandler;
+  }
+
+  async fetchData(endpoint) {
+    return await this.errorHandler.withRetry(
+      async () => {
+        if (this.errorHandler.isCircuitOpen('api')) {
+          throw new Error('API circuit breaker open');
+        }
+
+        try {
+          const response = await fetch(endpoint);
+          this.errorHandler.recordServiceSuccess('api');
+          return response;
+        } catch (error) {
+          await this.errorHandler.handleApiError(error, {
+            service: 'api',
+            endpoint
+          });
+          throw error;
+        }
+      },
+      {
+        maxRetries: 3,
+        retryDelay: 1000,
+        context: { endpoint }
+      }
+    );
+  }
+}
+
+// On shutdown
+process.on('SIGTERM', async () => {
+  await errorHandler.shutdown();
+  process.exit(0);
+});
 ```
-
-### Programmatic Configuration
-
-```python
-error_handler = ErrorHandler(
-    max_retries=3,
-    retry_delay=1.0,
-    exponential_backoff=True,
-    crash_dump_dir=".unified-system/crash-dumps"
-)
-```
-
-## Additional Resources
-
-- [Architecture Documentation](ARCHITECTURE.md)
-- [Monitoring Guide](MONITORING.md)
-- [Troubleshooting Guide](TROUBLESHOOTING.md)

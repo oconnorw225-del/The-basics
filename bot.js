@@ -5,15 +5,36 @@
  * Multi-functional AI bot with trading, freelance, and task processing
  * Cherry-picked enhancements for better autonomy
  * SECURITY HARDENED - All vulnerabilities fixed
+ * INTEGRATED WITH ERROR HANDLING SYSTEM
  */
 
 import { createServer } from 'http'
 import { readFile } from 'fs/promises'
 import { spawn } from 'child_process'
 import { RateLimiter, sanitizeInput, validateTask, safeErrorResponse } from './security/input_validator.js'
+import ErrorHandler from './src/core/ErrorHandler.js'
+import ShutdownHandler from './src/core/ShutdownHandler.js'
 
 const PORT = process.env.BOT_PORT || 9000
 const isDevelopment = process.env.NODE_ENV === 'development'
+
+// Initialize error handling system
+const errorHandler = new ErrorHandler({
+  logErrors: true,
+  logPath: './logs/bot-errors.log',
+  notifyOnError: true,
+  maxRetries: 3,
+  retryDelay: 1000,
+  circuitBreakerThreshold: 5
+})
+errorHandler.initialize()
+
+// Initialize shutdown handler
+const shutdownHandler = new ShutdownHandler({
+  gracePeriod: 30000,
+  forceShutdownDelay: 5000
+})
+shutdownHandler.initialize()
 
 // Initialize rate limiter
 const rateLimiter = new RateLimiter(60, 60000) // 60 requests per minute
@@ -117,26 +138,35 @@ function startFreelanceOrchestrator() {
 }
 
 /**
- * Process AI task
+ * Process AI task with error handling
  */
 async function processAITask(task) {
   console.log(`🤖 Processing AI task: ${task.type}`)
   
-  // Simulate task processing
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  
-  botState.ai.tasksProcessed++
-  console.log(`✅ Task completed: ${task.type}`)
-  
-  return {
-    success: true,
-    result: `Processed ${task.type}`,
-    timestamp: new Date().toISOString()
-  }
+  return await errorHandler.withRetry(
+    async () => {
+      // Simulate task processing
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      botState.ai.tasksProcessed++
+      console.log(`✅ Task completed: ${task.type}`)
+      
+      return {
+        success: true,
+        result: `Processed ${task.type}`,
+        timestamp: new Date().toISOString()
+      }
+    },
+    {
+      maxRetries: 2,
+      retryDelay: 500,
+      context: { taskType: task.type }
+    }
+  )
 }
 
 /**
- * Process task queue
+ * Process task queue with error handling
  */
 async function processTaskQueue() {
   if (!botConfig.aiEnabled || taskQueue.length === 0) {
@@ -149,7 +179,10 @@ async function processTaskQueue() {
   try {
     await processAITask(task)
   } catch (error) {
-    console.error(`❌ Task failed: ${error.message}`)
+    await errorHandler.handleError('TASK_PROCESSING_FAILED', error, {
+      taskType: task.type,
+      queueSize: taskQueue.length
+    })
   }
   
   // Process next task
@@ -351,30 +384,43 @@ server.listen(PORT, () => {
   setInterval(updateHealthMetrics, botConfig.healthCheckInterval)
 })
 
-// Graceful shutdown
-process.on('SIGTERM', shutdown)
-process.on('SIGINT', shutdown)
-
-function shutdown() {
-  console.log('🛑 Bot shutting down...')
-  
-  // Stop freelance orchestrator
+// Graceful shutdown with integrated shutdown handler
+shutdownHandler.registerHook('freelance-process', async () => {
   if (freelanceProcess) {
     console.log('🛑 Stopping freelance orchestrator...')
-    freelanceProcess.kill('SIGTERM') // Graceful termination
+    freelanceProcess.kill('SIGTERM')
     
-    // Give it time to cleanup
-    setTimeout(() => {
-      if (!freelanceProcess.killed) {
-        console.log('⚠️ Force killing freelance process')
-        freelanceProcess.kill('SIGKILL')
-      }
-    }, 5000)
+    // Wait for graceful shutdown
+    await new Promise(resolve => {
+      const timeout = setTimeout(() => {
+        if (!freelanceProcess.killed) {
+          console.log('⚠️ Force killing freelance process')
+          freelanceProcess.kill('SIGKILL')
+        }
+        resolve()
+      }, 5000)
+      
+      freelanceProcess.on('exit', () => {
+        clearTimeout(timeout)
+        resolve()
+      })
+    })
   }
-  
-  server.close(() => {
-    console.log('✅ Bot stopped gracefully')
-    // SECURITY FIX: Let Node.js exit naturally after cleanup
-    // Removed process.exit(0) to allow pending operations to complete
+}, 100)
+
+shutdownHandler.registerHook('http-server', async () => {
+  console.log('🛑 Closing HTTP server...')
+  await new Promise(resolve => {
+    server.close(() => {
+      console.log('✅ HTTP server closed')
+      resolve()
+    })
   })
-}
+}, 90)
+
+shutdownHandler.registerHook('error-handler', async () => {
+  await errorHandler.shutdown()
+}, 80)
+
+process.on('SIGTERM', () => shutdownHandler.initiateShutdown('SIGTERM'))
+process.on('SIGINT', () => shutdownHandler.initiateShutdown('SIGINT'))

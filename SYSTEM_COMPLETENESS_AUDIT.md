@@ -21,7 +21,7 @@ This document provides a comprehensive audit of the Chimera Auto-Pilot system, i
 - ✅ Cloud server integration and deployment
 - ✅ FastAPI dashboard with health endpoints
 - ✅ Multiple operating modes (Full Auto, Code Only, Trading Only, Interactive, Review)
-- ✅ Command-line argument support (--auto, --review, --code-only, --trading-only, --setup, --railway)
+- ✅ Command-line argument support (--auto, --review, --code-only, --trading-only, --setup)
 
 **System Configuration (SystemConfig)**
 - ✅ 32 configuration fields covering all aspects
@@ -29,7 +29,6 @@ This document provides a comprehensive audit of the Chimera Auto-Pilot system, i
 - ✅ Trading and API configuration
 - ✅ Wallet management
 - ✅ Dashboard settings
-- ✅ Railway deployment
 - ✅ Cloud server integration
 - ✅ Safety controls (kill switch, risk limits, approval system)
 
@@ -92,10 +91,11 @@ This document provides a comprehensive audit of the Chimera Auto-Pilot system, i
 - ✅ SSH-based deployment
 - ✅ Support for AWS, GCP, Azure, DigitalOcean, any VPS
 
-**Railway Deployment**
-- ✅ Procfile configured
-- ✅ railway.json configuration
+**AWS Deployment**
+- ✅ GitHub Actions workflows configured
+- ✅ Terraform infrastructure as code
 - ✅ Auto-deployment on git push
+- ✅ Complete deployment documentation
 
 **Docker Support**
 - ✅ Dockerfile present

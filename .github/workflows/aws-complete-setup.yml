@@ -1,5 +1,27 @@
 name: 🚀 AWS Complete Setup & Deployment
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# AWS CREDENTIALS CONFIGURATION
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#
+# This workflow requires AWS credentials to be configured as repository secrets:
+#
+#   Required Secrets:
+#     - AWS_ACCESS_KEY_ID: Your AWS access key ID
+#     - AWS_SECRET_ACCESS_KEY: Your AWS secret access key
+#
+# How to configure:
+#   1. Go to repository Settings → Secrets and variables → Actions
+#   2. Add both secrets with your AWS credentials
+#
+# Important Notes:
+#   - All jobs explicitly inherit secrets using 'secrets: inherit'
+#   - Each job validates credentials are present before use
+#   - GitHub automatically masks secret values in logs for security
+#   - Secrets are isolated from environment variables to prevent confusion
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 on:
   workflow_dispatch:
     inputs:
@@ -28,7 +50,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  PROJECT_NAME: chimera
+  PROJECT_NAME: the-basics
   TERRAFORM_VERSION: '1.6.0'
 
 jobs:
@@ -37,38 +59,51 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Explicitly inherit secrets from workflow to prevent confusion with env vars
+    secrets: inherit
     outputs:
       aws_account_id: ${{ steps.get-account.outputs.account_id }}
+      aws_configured: ${{ steps.check-aws.outputs.aws_configured }}
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check required secrets
+      - name: Check AWS credentials availability
+        id: check-aws
         run: |
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "🔍 Validating Prerequisites"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
-          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
-            echo "❌ ERROR: AWS_ACCESS_KEY_ID secret not configured"
+          # Debug output - GitHub automatically masks secret values
+          echo "Checking secret availability..."
+          echo "AWS_ACCESS_KEY_ID is set: $([ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && echo 'YES' || echo 'NO')"
+          echo "AWS_SECRET_ACCESS_KEY is set: $([ -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && echo 'YES' || echo 'NO')"
+          echo ""
+          
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "aws_configured=false" >> $GITHUB_OUTPUT
+            echo "⚠️  AWS credentials are not configured"
             echo ""
-            echo "Please configure AWS secrets in repository settings:"
-            echo "Settings → Secrets and variables → Actions → New repository secret"
-            exit 1
+            echo "ℹ️  This repository is designed for AWS deployment only."
+            echo "   AWS credentials are required to run this workflow."
+            echo ""
+            echo "To configure AWS credentials:"
+            echo "  1. Go to Settings → Secrets and variables → Actions"
+            echo "  2. Add AWS_ACCESS_KEY_ID secret"
+            echo "  3. Add AWS_SECRET_ACCESS_KEY secret"
+            echo ""
+            echo "Without AWS credentials, this workflow will be skipped."
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            exit 0
           fi
           
-          if [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
-            echo "❌ ERROR: AWS_SECRET_ACCESS_KEY secret not configured"
-            echo ""
-            echo "Please configure AWS secrets in repository settings:"
-            echo "Settings → Secrets and variables → Actions → New repository secret"
-            exit 1
-          fi
-          
-          echo "✅ Required secrets are configured"
+          echo "aws_configured=true" >> $GITHUB_OUTPUT
+          echo "✅ AWS credentials are configured and available"
 
       - name: Configure AWS credentials
+        if: steps.check-aws.outputs.aws_configured == 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -76,6 +111,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Verify AWS access
+        if: steps.check-aws.outputs.aws_configured == 'true'
         id: get-account
         run: |
           set -euo pipefail
@@ -103,6 +139,7 @@ jobs:
           echo "account_id=$ACCOUNT_ID" >> $GITHUB_OUTPUT
 
       - name: Validate Terraform files
+        if: steps.check-aws.outputs.aws_configured == 'true'
         run: |
           echo "Checking Terraform configuration files..."
           
@@ -124,6 +161,7 @@ jobs:
           echo "✅ Terraform files validated"
 
       - name: Validate Dockerfile
+        if: steps.check-aws.outputs.aws_configured == 'true'
         run: |
           echo "Checking Dockerfile..."
           
@@ -135,6 +173,7 @@ jobs:
           echo "✅ Dockerfile found"
 
       - name: Display deployment plan
+        if: steps.check-aws.outputs.aws_configured == 'true'
         run: |
           echo ""
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -178,10 +217,12 @@ jobs:
   setup-infrastructure:
     name: 🏗️ Setup AWS Infrastructure
     needs: validate-prerequisites
-    if: ${{ github.event.inputs.setup_type == 'full' || github.event.inputs.setup_type == 'infrastructure-only' }}
+    if: ${{ needs.validate-prerequisites.outputs.aws_configured == 'true' && (github.event.inputs.setup_type == 'full' || github.event.inputs.setup_type == 'infrastructure-only') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Explicitly inherit secrets to ensure AWS credentials are available
+    secrets: inherit
     outputs:
       load_balancer_dns: ${{ steps.tf-outputs.outputs.load_balancer_dns }}
       ecr_repository_url: ${{ steps.tf-outputs.outputs.ecr_repository_url }}
@@ -192,6 +233,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Validate AWS secrets availability
+        run: |
+          echo "🔍 Validating AWS credentials in setup-infrastructure job..."
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "❌ ERROR: AWS credentials not available in this job"
+            echo "This should not happen - credentials were validated in previous job"
+            exit 1
+          fi
+          echo "✅ AWS credentials are available"
+          # Debug output - GitHub automatically masks secret values
+          echo "AWS_ACCESS_KEY_ID is set: $([ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && echo 'YES' || echo 'NO')"
+          echo "AWS_SECRET_ACCESS_KEY is set: $([ -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && echo 'YES' || echo 'NO')"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -213,7 +267,7 @@ jobs:
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "🔧 Initializing Terraform"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          terraform init
+          terraform init -input=false
           echo "✅ Terraform initialized"
 
       - name: Terraform Validate
@@ -244,6 +298,7 @@ jobs:
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
           terraform plan \
+            -input=false \
             -var="environment=${{ github.event.inputs.environment }}" \
             -var="aws_region=${{ env.AWS_REGION }}" \
             -var="project_name=${{ env.PROJECT_NAME }}" \
@@ -259,7 +314,7 @@ jobs:
           echo "🚀 Applying Infrastructure Changes"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
-          terraform apply -auto-approve tfplan
+          terraform apply -input=false tfplan
           
           echo "✅ Infrastructure created successfully"
 
@@ -305,17 +360,33 @@ jobs:
     if: |
       always() &&
       needs.validate-prerequisites.result == 'success' &&
+      needs.validate-prerequisites.outputs.aws_configured == 'true' &&
       (needs.setup-infrastructure.result == 'success' || needs.setup-infrastructure.result == 'skipped') &&
       (github.event.inputs.setup_type == 'full' || github.event.inputs.setup_type == 'deploy-only')
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Explicitly inherit secrets to ensure AWS credentials are available
+    secrets: inherit
     outputs:
       image_tag: ${{ steps.meta.outputs.image_tag }}
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Validate AWS secrets availability
+        run: |
+          echo "🔍 Validating AWS credentials in deploy-application job..."
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "❌ ERROR: AWS credentials not available in this job"
+            echo "This should not happen - credentials were validated in previous job"
+            exit 1
+          fi
+          echo "✅ AWS credentials are available"
+          # Debug output - GitHub automatically masks secret values
+          echo "AWS_ACCESS_KEY_ID is set: $([ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && echo 'YES' || echo 'NO')"
+          echo "AWS_SECRET_ACCESS_KEY is set: $([ -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && echo 'YES' || echo 'NO')"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -443,16 +514,32 @@ jobs:
 
   health-check:
     name: 🏥 Health Check Verification
-    needs: [setup-infrastructure, deploy-application]
+    needs: [validate-prerequisites, setup-infrastructure, deploy-application]
     if: |
       always() &&
+      needs.validate-prerequisites.outputs.aws_configured == 'true' &&
       (needs.setup-infrastructure.result == 'success' || needs.setup-infrastructure.result == 'skipped') &&
       needs.deploy-application.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Explicitly inherit secrets to ensure AWS credentials are available
+    secrets: inherit
     
     steps:
+      - name: Validate AWS secrets availability
+        run: |
+          echo "🔍 Validating AWS credentials in health-check job..."
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "❌ ERROR: AWS credentials not available in this job"
+            echo "This should not happen - credentials were validated in previous job"
+            exit 1
+          fi
+          echo "✅ AWS credentials are available"
+          # Debug output - GitHub automatically masks secret values
+          echo "AWS_ACCESS_KEY_ID is set: $([ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && echo 'YES' || echo 'NO')"
+          echo "AWS_SECRET_ACCESS_KEY is set: $([ -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && echo 'YES' || echo 'NO')"
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -514,9 +601,10 @@ jobs:
 
   cost-estimation:
     name: 💰 Cost Estimation
-    needs: [setup-infrastructure]
+    needs: [validate-prerequisites, setup-infrastructure]
     if: |
       always() &&
+      needs.validate-prerequisites.outputs.aws_configured == 'true' &&
       needs.setup-infrastructure.result == 'success'
     runs-on: ubuntu-latest
     permissions:
@@ -544,7 +632,7 @@ jobs:
           echo "  • Use smaller CPU/memory: -\$5-10/month"
           echo "  • Remove NAT Gateway (less secure): -\$32/month"
           echo ""
-          echo "Monitor costs: AWS Cost Explorer → Filter by Project=chimera"
+          echo "Monitor costs: AWS Cost Explorer → Filter by Project=the-basics"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
   deployment-summary:
@@ -560,7 +648,7 @@ jobs:
         run: |
           echo ""
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "🎉 Chimera AWS Deployment Summary"
+          echo "🎉 The-basics AWS Deployment Summary"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo ""
           echo "📋 Job Status:"
@@ -609,18 +697,34 @@ jobs:
 
   auto-destroy:
     name: 🗑️ Auto-Destroy Resources
-    needs: [setup-infrastructure, deploy-application, health-check]
+    needs: [validate-prerequisites, setup-infrastructure, deploy-application, health-check]
     if: |
       always() &&
       github.event.inputs.auto_destroy == 'true' &&
+      needs.validate-prerequisites.outputs.aws_configured == 'true' &&
       needs.setup-infrastructure.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Explicitly inherit secrets to ensure AWS credentials are available
+    secrets: inherit
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Validate AWS secrets availability
+        run: |
+          echo "🔍 Validating AWS credentials in auto-destroy job..."
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "❌ ERROR: AWS credentials not available in this job"
+            echo "This should not happen - credentials were validated in previous job"
+            exit 1
+          fi
+          echo "✅ AWS credentials are available"
+          # Debug output - GitHub automatically masks secret values
+          echo "AWS_ACCESS_KEY_ID is set: $([ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && echo 'YES' || echo 'NO')"
+          echo "AWS_SECRET_ACCESS_KEY is set: $([ -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && echo 'YES' || echo 'NO')"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -646,13 +750,14 @@ jobs:
 
       - name: Terraform Init
         working-directory: ./aws/terraform
-        run: terraform init
+        run: terraform init -input=false
 
       - name: Terraform Destroy
         working-directory: ./aws/terraform
         run: |
           echo "Destroying all infrastructure..."
           terraform destroy \
+            -input=false \
             -var="environment=${{ github.event.inputs.environment }}" \
             -var="aws_region=${{ env.AWS_REGION }}" \
             -var="project_name=${{ env.PROJECT_NAME }}" \
