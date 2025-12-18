@@ -66,3 +66,19 @@ htmlcov/
 .vercel/
 .netlify/
 .render/
+
+
+# Wallet System (NEVER COMMIT THESE)
+data/wallets/
+*.wallet.json
+*.key
+*.enc
+.encryption_key
+
+# Knowledge Network
+data/knowledge/shared_memory.json
+data/knowledge/learning_history/
+
+# Environment files with sensitive data
+wallets.env
+manual_wallets.json
