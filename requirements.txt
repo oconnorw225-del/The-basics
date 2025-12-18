@@ -16,6 +16,9 @@ aiofiles==23.2.1
 numpy==1.26.3
 pandas==2.1.4
 
+# System monitoring and management
+psutil==5.9.8
+
 # Optional: For advanced features
 # requests==2.31.0
 # websockets==12.0
