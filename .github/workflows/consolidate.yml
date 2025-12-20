@@ -1,45 +1,82 @@
-name: Consolidate Best Parts
+name: 🧬 Chimera Smart Consolidation & Audit
 
 on:
   workflow_dispatch:
+    inputs:
+      chimera_version:
+        description: 'Chimera version to use'
+        required: true
+        default: '8.0'
+        type: choice
+        options:
+          - '4.0'
+          - '5.0'
+          - '6.0'
+          - '7.0'
+          - '8.0'
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
 
 jobs:
   consolidate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
     steps:
-      - name: Checkout the-basics repository
+      - name: 🧬 Checkout the-basics repository
         uses: actions/checkout@v4
-
-      - name: Clone source repositories
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: 📦 Install Python dependencies
         run: |
-          mkdir source
-          git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine
-          git clone https://github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb
-          git clone https://github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader
-          git clone https://github.com/oconnorw225-del/repository-web-app.git source/repository-web-app
-          git clone https://github.com/oconnorw225-del/The-new-ones.git source/The-new-ones
-
-      - name: Archive backups
+          python -m pip install --upgrade pip
+          pip install psutil aiohttp pydantic
+      
+      - name: 🔍 Run Chimera security audit
         run: |
-          mkdir backups
-          tar czf backups/ndax-quantum-engine.tar.gz -C source ndax-quantum-engine
-          tar czf backups/quantum-engine-dashb.tar.gz -C source quantum-engine-dashb
-          tar czf backups/shadowforge-ai-trader.tar.gz -C source shadowforge-ai-trader
-          tar czf backups/repository-web-app.tar.gz -C source repository-web-app
-          tar czf backups/The-new-ones.tar.gz -C source The-new-ones
-
-      - name: Setup directory structure
+          python3 automation/audit.py
+        continue-on-error: true
+      
+      - name: 🧬 Run Chimera-powered consolidation
         run: |
-          mkdir -p api backend frontend workflows docs automation tests
-
-      - name: Run consolidation script
+          chmod +x automation/chimera_consolidate.sh
+          bash automation/chimera_consolidate.sh
+        env:
+          CHIMERA_VERSION: ${{ github.event.inputs.chimera_version || '8.0' }}
+      
+      - name: 📊 Upload analysis artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: consolidation-reports
+          path: |
+            audit_report.json
+            chimera_analysis.json
+            CHIMERA_CONSOLIDATION_REPORT.md
+      
+      - name: 💾 Create backup archive
         run: |
-          bash automation/consolidate.sh
-
-      - name: Commit consolidated code
+          tar czf consolidation-backup-$(date +%Y%m%d-%H%M%S).tar.gz backups/
+      
+      - name: 📤 Upload backups
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-backups
+          path: consolidation-backup-*.tar.gz
+          retention-days: 90
+      
+      - name: 🤖 Commit consolidated code
         run: |
-          git config --global user.email "ci-bot@example.com"
-          git config --global user.name "CI Bot"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "Chimera Bot [bot]"
           git add .
-          git diff --staged --quiet || git commit -m "Automated consolidation of best parts"
+          git diff --staged --quiet || git commit -m "🧬 Automated Chimera consolidation [skip ci]"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
