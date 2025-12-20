@@ -1,0 +1,2052 @@
+{
+  "scan_timestamp": "2025-12-20T16:53:02.429206",
+  "chimera_version": "8.0",
+  "scanner_version": "2.0",
+  "files_scanned": 157,
+  "keyword_hits": [
+    {
+      "file": "IMPLEMENTATION_COMPLETE.md",
+      "keyword": "wallet",
+      "count": 9
+    },
+    {
+      "file": "IMPLEMENTATION_COMPLETE.md",
+      "keyword": "address",
+      "count": 3
+    },
+    {
+      "file": "IMPLEMENTATION_COMPLETE.md",
+      "keyword": "secret",
+      "count": 4
+    },
+    {
+      "file": "IMPLEMENTATION_COMPLETE.md",
+      "keyword": "credential",
+      "count": 5
+    },
+    {
+      "file": "SYSTEM_COMPLETENESS_AUDIT.md",
+      "keyword": "web3",
+      "count": 3
+    },
+    {
+      "file": "SYSTEM_COMPLETENESS_AUDIT.md",
+      "keyword": "wallet",
+      "count": 3
+    },
+    {
+      "file": "SYSTEM_COMPLETENESS_AUDIT.md",
+      "keyword": "alchemy",
+      "count": 2
+    },
+    {
+      "file": "SYSTEM_COMPLETENESS_AUDIT.md",
+      "keyword": "address",
+      "count": 1
+    },
+    {
+      "file": "SYSTEM_COMPLETENESS_AUDIT.md",
+      "keyword": "api_key",
+      "count": 3
+    },
+    {
+      "file": "SYSTEM_COMPLETENESS_AUDIT.md",
+      "keyword": "secret",
+      "count": 6
+    },
+    {
+      "file": "SYSTEM_COMPLETENESS_AUDIT.md",
+      "keyword": "auth",
+      "count": 8
+    },
+    {
+      "file": "SYSTEM_COMPLETENESS_AUDIT.md",
+      "keyword": "credential",
+      "count": 3
+    },
+    {
+      "file": "README_AUTO_INSTALL.md",
+      "keyword": "api_key",
+      "count": 2
+    },
+    {
+      "file": "README_AUTO_INSTALL.md",
+      "keyword": "secret",
+      "count": 2
+    },
+    {
+      "file": "README_AUTO_INSTALL.md",
+      "keyword": "password",
+      "count": 1
+    },
+    {
+      "file": "README_AUTO_INSTALL.md",
+      "keyword": "credential",
+      "count": 3
+    },
+    {
+      "file": "CONSOLIDATION_SUMMARY.md",
+      "keyword": "token",
+      "count": 2
+    },
+    {
+      "file": "CONSOLIDATION_SUMMARY.md",
+      "keyword": "auth",
+      "count": 2
+    },
+    {
+      "file": "QUICK_START.md",
+      "keyword": "wallet",
+      "count": 7
+    },
+    {
+      "file": "QUICK_START.md",
+      "keyword": "address",
+      "count": 6
+    },
+    {
+      "file": "QUICK_START.md",
+      "keyword": "api_key",
+      "count": 3
+    },
+    {
+      "file": "QUICK_START.md",
+      "keyword": "secret",
+      "count": 3
+    },
+    {
+      "file": "QUICK_START.md",
+      "keyword": "credential",
+      "count": 11
+    },
+    {
+      "file": "SECURITY_REVIEW.md",
+      "keyword": "secret",
+      "count": 2
+    },
+    {
+      "file": "SECURITY_REVIEW.md",
+      "keyword": "credential",
+      "count": 2
+    },
+    {
+      "file": "CONSOLIDATION_VERIFICATION.md",
+      "keyword": "secret",
+      "count": 1
+    },
+    {
+      "file": "BRANCH_DELETION_GUIDE.md",
+      "keyword": "token",
+      "count": 4
+    },
+    {
+      "file": "BRANCH_DELETION_GUIDE.md",
+      "keyword": "auth",
+      "count": 2
+    },
+    {
+      "file": "SECURITY_AUDIT_REPORT.md",
+      "keyword": "address",
+      "count": 2
+    },
+    {
+      "file": "SECURITY_AUDIT_REPORT.md",
+      "keyword": "api_key",
+      "count": 2
+    },
+    {
+      "file": "SECURITY_AUDIT_REPORT.md",
+      "keyword": "secret",
+      "count": 5
+    },
+    {
+      "file": "SECURITY_AUDIT_REPORT.md",
+      "keyword": "token",
+      "count": 4
+    },
+    {
+      "file": "SECURITY_AUDIT_REPORT.md",
+      "keyword": "auth",
+      "count": 5
+    },
+    {
+      "file": "SECURITY_AUDIT_REPORT.md",
+      "keyword": "password",
+      "count": 20
+    },
+    {
+      "file": "SECURITY_AUDIT_REPORT.md",
+      "keyword": "credential",
+      "count": 2
+    },
+    {
+      "file": "CLOUD_DEPLOYMENT_GUIDE.md",
+      "keyword": "private",
+      "count": 1
+    },
+    {
+      "file": "CLOUD_DEPLOYMENT_GUIDE.md",
+      "keyword": "address",
+      "count": 1
+    },
+    {
+      "file": "CLOUD_DEPLOYMENT_GUIDE.md",
+      "keyword": "password",
+      "count": 1
+    },
+    {
+      "file": "IMPLEMENTATION_SUMMARY.md",
+      "keyword": "stripe",
+      "count": 1
+    },
+    {
+      "file": "IMPLEMENTATION_SUMMARY.md",
+      "keyword": "api_key",
+      "count": 1
+    },
+    {
+      "file": "IMPLEMENTATION_SUMMARY.md",
+      "keyword": "auth",
+      "count": 3
+    },
+    {
+      "file": "IMPLEMENTATION_SUMMARY.md",
+      "keyword": "password",
+      "count": 5
+    },
+    {
+      "file": "IMPLEMENTATION_SUMMARY.md",
+      "keyword": "credential",
+      "count": 1
+    },
+    {
+      "file": "SYSTEM_ARCHITECTURE.md",
+      "keyword": "secret",
+      "count": 1
+    },
+    {
+      "file": "SETUP-INSTRUCTIONS.md",
+      "keyword": "api_key",
+      "count": 3
+    },
+    {
+      "file": "SETUP-INSTRUCTIONS.md",
+      "keyword": "secret",
+      "count": 4
+    },
+    {
+      "file": "SETUP-INSTRUCTIONS.md",
+      "keyword": "credential",
+      "count": 2
+    },
+    {
+      "file": "FREELANCE_ENHANCEMENTS.md",
+      "keyword": "api_key",
+      "count": 3
+    },
+    {
+      "file": "FREELANCE_ENHANCEMENTS.md",
+      "keyword": "auth",
+      "count": 2
+    },
+    {
+      "file": "DEPLOYMENT.md",
+      "keyword": "secret",
+      "count": 9
+    },
+    {
+      "file": "DEPLOYMENT.md",
+      "keyword": "password",
+      "count": 3
+    },
+    {
+      "file": "CRITICAL_GAPS_FILLED.md",
+      "keyword": "password",
+      "count": 1
+    },
+    {
+      "file": "SECURITY_SUMMARY.md",
+      "keyword": "secret",
+      "count": 4
+    },
+    {
+      "file": "SECURITY_SUMMARY.md",
+      "keyword": "auth",
+      "count": 1
+    },
+    {
+      "file": "bot.js",
+      "keyword": "address",
+      "count": 1
+    },
+    {
+      "file": "install_complete_system.py",
+      "keyword": "solana",
+      "count": 5
+    },
+    {
+      "file": "install_complete_system.py",
+      "keyword": "wallet",
+      "count": 194
+    },
+    {
+      "file": "install_complete_system.py",
+      "keyword": "private",
+      "count": 19
+    },
+    {
+      "file": "install_complete_system.py",
+      "keyword": "seed",
+      "count": 13
+    },
+    {
+      "file": "install_complete_system.py",
+      "keyword": "mnemonic",
+      "count": 9
+    },
+    {
+      "file": "install_complete_system.py",
+      "keyword": "address",
+      "count": 42
+    },
+    {
+      "file": "install_complete_system.py",
+      "keyword": "secret",
+      "count": 3
+    },
+    {
+      "file": "install_complete_system.py",
+      "keyword": "password",
+      "count": 8
+    },
+    {
+      "file": "unified_system.py",
+      "keyword": "wallet",
+      "count": 53
+    },
+    {
+      "file": "unified_system.py",
+      "keyword": "address",
+      "count": 11
+    },
+    {
+      "file": "unified_system.py",
+      "keyword": "api_key",
+      "count": 6
+    },
+    {
+      "file": "unified_system.py",
+      "keyword": "secret",
+      "count": 40
+    },
+    {
+      "file": "unified_system.py",
+      "keyword": "token",
+      "count": 8
+    },
+    {
+      "file": "unified_system.py",
+      "keyword": "auth",
+      "count": 1
+    },
+    {
+      "file": "unified_system.py",
+      "keyword": "credential",
+      "count": 16
+    },
+    {
+      "file": "demo_chimera.py",
+      "keyword": "wallet",
+      "count": 2
+    },
+    {
+      "file": "demo_chimera.py",
+      "keyword": "rpc",
+      "count": 4
+    },
+    {
+      "file": "BRANCH_MERGE_PLAN.md",
+      "keyword": "token",
+      "count": 2
+    },
+    {
+      "file": "BRANCH_MERGE_PLAN.md",
+      "keyword": "auth",
+      "count": 2
+    },
+    {
+      "file": "package.json",
+      "keyword": "auth",
+      "count": 1
+    },
+    {
+      "file": "DASHBOARD_IMPLEMENTATION_SUMMARY.md",
+      "keyword": "secret",
+      "count": 1
+    },
+    {
+      "file": "DASHBOARD_IMPLEMENTATION_SUMMARY.md",
+      "keyword": "auth",
+      "count": 5
+    },
+    {
+      "file": "DASHBOARD_IMPLEMENTATION_SUMMARY.md",
+      "keyword": "credential",
+      "count": 4
+    },
+    {
+      "file": "CLOUD_QUICK_START.md",
+      "keyword": "private",
+      "count": 1
+    },
+    {
+      "file": "CLOUD_QUICK_START.md",
+      "keyword": "auth",
+      "count": 1
+    },
+    {
+      "file": "CLOUD_QUICK_START.md",
+      "keyword": "password",
+      "count": 1
+    },
+    {
+      "file": "CLOUD_QUICK_START.md",
+      "keyword": "credential",
+      "count": 1
+    },
+    {
+      "file": "DASHBOARD_QUICKSTART.md",
+      "keyword": "auth",
+      "count": 2
+    },
+    {
+      "file": "DASHBOARD_QUICKSTART.md",
+      "keyword": "credential",
+      "count": 2
+    },
+    {
+      "file": "IMPLEMENTATION_COMPLETE_V3.md",
+      "keyword": "address",
+      "count": 1
+    },
+    {
+      "file": "IMPLEMENTATION_COMPLETE_V2.md",
+      "keyword": "secret",
+      "count": 1
+    },
+    {
+      "file": "SECURITY.md",
+      "keyword": "secret",
+      "count": 2
+    },
+    {
+      "file": "SECURITY.md",
+      "keyword": "auth",
+      "count": 1
+    },
+    {
+      "file": "SECURITY.md",
+      "keyword": "credential",
+      "count": 1
+    },
+    {
+      "file": "CONSOLIDATION_COMPLETE.md",
+      "keyword": "address",
+      "count": 2
+    },
+    {
+      "file": "CONSOLIDATION_COMPLETE.md",
+      "keyword": "secret",
+      "count": 1
+    },
+    {
+      "file": "aws/README.md",
+      "keyword": "secret",
+      "count": 14
+    },
+    {
+      "file": "aws/README.md",
+      "keyword": "credential",
+      "count": 3
+    },
+    {
+      "file": "aws/README_AWS_DEPLOYMENT.md",
+      "keyword": "private",
+      "count": 1
+    },
+    {
+      "file": "aws/README_AWS_DEPLOYMENT.md",
+      "keyword": "secret",
+      "count": 12
+    },
+    {
+      "file": "aws/README_AWS_DEPLOYMENT.md",
+      "keyword": "credential",
+      "count": 2
+    },
+    {
+      "file": "aws/iam-policy.json",
+      "keyword": "address",
+      "count": 4
+    },
+    {
+      "file": "aws/iam-policy.json",
+      "keyword": "auth",
+      "count": 2
+    },
+    {
+      "file": "aws/QUICKSTART.md",
+      "keyword": "secret",
+      "count": 10
+    },
+    {
+      "file": "aws/QUICKSTART.md",
+      "keyword": "credential",
+      "count": 2
+    },
+    {
+      "file": ".github/workflows/README.md",
+      "keyword": "private",
+      "count": 2
+    },
+    {
+      "file": ".github/workflows/README.md",
+      "keyword": "secret",
+      "count": 12
+    },
+    {
+      "file": ".github/workflows/README.md",
+      "keyword": "token",
+      "count": 3
+    },
+    {
+      "file": ".github/workflows/README.md",
+      "keyword": "credential",
+      "count": 11
+    },
+    {
+      "file": ".github/workflows/aws-complete-setup.yml",
+      "keyword": "private",
+      "count": 1
+    },
+    {
+      "file": ".github/workflows/aws-complete-setup.yml",
+      "keyword": "secret",
+      "count": 89
+    },
+    {
+      "file": ".github/workflows/aws-complete-setup.yml",
+      "keyword": "credential",
+      "count": 40
+    },
+    {
+      "file": ".github/workflows/CLEANUP_STALE_BRANCHES_README.md",
+      "keyword": "token",
+      "count": 3
+    },
+    {
+      "file": ".github/workflows/CLEANUP_STALE_BRANCHES_README.md",
+      "keyword": "auth",
+      "count": 1
+    },
+    {
+      "file": "chimera_core/database/db_manager.py",
+      "keyword": "password",
+      "count": 14
+    },
+    {
+      "file": "freelance_engine/platform_connectors.py",
+      "keyword": "api_key",
+      "count": 18
+    },
+    {
+      "file": "freelance_engine/platform_connectors.py",
+      "keyword": "auth",
+      "count": 8
+    },
+    {
+      "file": "freelance_engine/payment_handler.py",
+      "keyword": "wallet",
+      "count": 16
+    },
+    {
+      "file": "freelance_engine/payment_handler.py",
+      "keyword": "address",
+      "count": 5
+    },
+    {
+      "file": "freelance_engine/payment_handler.py",
+      "keyword": "credential",
+      "count": 1
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "web3",
+      "count": 1
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "ethers",
+      "count": 1
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "solana",
+      "count": 2
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "stripe",
+      "count": 2
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "paypal",
+      "count": 1
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "wallet",
+      "count": 15
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "rpc",
+      "count": 1
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "infura",
+      "count": 1
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "alchemy",
+      "count": 1
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "private",
+      "count": 4
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "seed",
+      "count": 2
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "mnemonic",
+      "count": 4
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "address",
+      "count": 10
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "api_key",
+      "count": 2
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "secret",
+      "count": 1
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "token",
+      "count": 2
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "auth",
+      "count": 1
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "password",
+      "count": 3
+    },
+    {
+      "file": "automation/audit.py",
+      "keyword": "credential",
+      "count": 1
+    },
+    {
+      "file": "automation/repo_analyzer.py",
+      "keyword": "web3",
+      "count": 2
+    },
+    {
+      "file": "automation/repo_analyzer.py",
+      "keyword": "ethers",
+      "count": 1
+    },
+    {
+      "file": "backend/server.py",
+      "keyword": "credential",
+      "count": 9
+    },
+    {
+      "file": "backend/chimera_v5.py",
+      "keyword": "solana",
+      "count": 5
+    },
+    {
+      "file": "backend/chimera_v5.py",
+      "keyword": "wallet",
+      "count": 2
+    },
+    {
+      "file": "backend/chimera_v5.py",
+      "keyword": "rpc",
+      "count": 2
+    },
+    {
+      "file": "backend/chimera_v5.py",
+      "keyword": "address",
+      "count": 1
+    },
+    {
+      "file": "backend/chimera_v5.py",
+      "keyword": "token",
+      "count": 6
+    },
+    {
+      "file": "backend/infrastructure_upgrades.py",
+      "keyword": "wallet",
+      "count": 1
+    },
+    {
+      "file": "backend/chimera_v8.py",
+      "keyword": "wallet",
+      "count": 2
+    },
+    {
+      "file": "backend/chimera_v8.py",
+      "keyword": "seed",
+      "count": 1
+    },
+    {
+      "file": "backend/intelligence_upgrades.py",
+      "keyword": "wallet",
+      "count": 10
+    },
+    {
+      "file": "backend/intelligence_upgrades.py",
+      "keyword": "address",
+      "count": 4
+    },
+    {
+      "file": "docs/ERROR_HANDLING.md",
+      "keyword": "stripe",
+      "count": 2
+    },
+    {
+      "file": "docs/ERROR_HANDLING.md",
+      "keyword": "auth",
+      "count": 2
+    },
+    {
+      "file": "docs/SYSTEM_SUMMARY.md",
+      "keyword": "wallet",
+      "count": 1
+    },
+    {
+      "file": "docs/SYSTEM_SUMMARY.md",
+      "keyword": "address",
+      "count": 1
+    },
+    {
+      "file": "docs/COPILOT_BRANCHES_FAQ.md",
+      "keyword": "token",
+      "count": 1
+    },
+    {
+      "file": "docs/FEATURE_MANAGEMENT.md",
+      "keyword": "auth",
+      "count": 3
+    },
+    {
+      "file": "docs/BRANCH_CLEANUP.md",
+      "keyword": "token",
+      "count": 2
+    },
+    {
+      "file": "docs/BRANCH_CLEANUP.md",
+      "keyword": "auth",
+      "count": 1
+    },
+    {
+      "file": "docs/WALLET_SYSTEM.md",
+      "keyword": "wallet",
+      "count": 21
+    },
+    {
+      "file": "docs/WALLET_SYSTEM.md",
+      "keyword": "private",
+      "count": 2
+    },
+    {
+      "file": "docs/WALLET_SYSTEM.md",
+      "keyword": "address",
+      "count": 6
+    },
+    {
+      "file": "security/input_validator.js",
+      "keyword": "secret",
+      "count": 1
+    },
+    {
+      "file": "security/input_validator.js",
+      "keyword": "password",
+      "count": 1
+    },
+    {
+      "file": "security/safe_file_ops.py",
+      "keyword": "secret",
+      "count": 1
+    },
+    {
+      "file": "security/safe_file_ops.py",
+      "keyword": "password",
+      "count": 1
+    },
+    {
+      "file": "core/wallet_system/assignments.json",
+      "keyword": "wallet",
+      "count": 12
+    },
+    {
+      "file": "core/wallet_system/assignments.json",
+      "keyword": "private",
+      "count": 3
+    },
+    {
+      "file": "core/wallet_system/assignments.json",
+      "keyword": "address",
+      "count": 6
+    },
+    {
+      "file": "core/wallet_system/generator.py",
+      "keyword": "solana",
+      "count": 3
+    },
+    {
+      "file": "core/wallet_system/generator.py",
+      "keyword": "wallet",
+      "count": 54
+    },
+    {
+      "file": "core/wallet_system/generator.py",
+      "keyword": "private",
+      "count": 12
+    },
+    {
+      "file": "core/wallet_system/generator.py",
+      "keyword": "seed",
+      "count": 13
+    },
+    {
+      "file": "core/wallet_system/generator.py",
+      "keyword": "mnemonic",
+      "count": 9
+    },
+    {
+      "file": "core/wallet_system/generator.py",
+      "keyword": "address",
+      "count": 19
+    },
+    {
+      "file": "core/wallet_system/generator.py",
+      "keyword": "secret",
+      "count": 2
+    },
+    {
+      "file": "core/wallet_system/generator.py",
+      "keyword": "password",
+      "count": 8
+    },
+    {
+      "file": "core/wallet_system/manager.py",
+      "keyword": "solana",
+      "count": 1
+    },
+    {
+      "file": "core/wallet_system/manager.py",
+      "keyword": "wallet",
+      "count": 29
+    },
+    {
+      "file": "core/wallet_system/manager.py",
+      "keyword": "address",
+      "count": 8
+    },
+    {
+      "file": "core/wallet_system/__init__.py",
+      "keyword": "wallet",
+      "count": 1
+    },
+    {
+      "file": "tests/test_wallet_system.py",
+      "keyword": "solana",
+      "count": 1
+    },
+    {
+      "file": "tests/test_wallet_system.py",
+      "keyword": "wallet",
+      "count": 14
+    },
+    {
+      "file": "tests/test_wallet_system.py",
+      "keyword": "address",
+      "count": 1
+    },
+    {
+      "file": "frontend/README.md",
+      "keyword": "token",
+      "count": 2
+    },
+    {
+      "file": "frontend/README.md",
+      "keyword": "auth",
+      "count": 3
+    },
+    {
+      "file": "frontend/README.md",
+      "keyword": "credential",
+      "count": 5
+    },
+    {
+      "file": "frontend/src/types/index.ts",
+      "keyword": "auth",
+      "count": 1
+    },
+    {
+      "file": "frontend/src/services/auth.ts",
+      "keyword": "private",
+      "count": 1
+    },
+    {
+      "file": "frontend/src/services/auth.ts",
+      "keyword": "token",
+      "count": 4
+    },
+    {
+      "file": "frontend/src/services/auth.ts",
+      "keyword": "auth",
+      "count": 11
+    },
+    {
+      "file": "frontend/src/services/auth.ts",
+      "keyword": "password",
+      "count": 2
+    },
+    {
+      "file": "frontend/src/services/auth.ts",
+      "keyword": "credential",
+      "count": 1
+    },
+    {
+      "file": "frontend/src/services/api.ts",
+      "keyword": "private",
+      "count": 1
+    },
+    {
+      "file": "frontend/src/services/api.ts",
+      "keyword": "token",
+      "count": 5
+    },
+    {
+      "file": "frontend/src/services/api.ts",
+      "keyword": "auth",
+      "count": 3
+    },
+    {
+      "file": "frontend/src/services/api.ts",
+      "keyword": "credential",
+      "count": 4
+    },
+    {
+      "file": "frontend/src/services/websocket.ts",
+      "keyword": "private",
+      "count": 5
+    },
+    {
+      "file": "frontend/src/components/ConfigurationPanel.tsx",
+      "keyword": "credential",
+      "count": 8
+    },
+    {
+      "file": "src/utils/validators.js",
+      "keyword": "address",
+      "count": 1
+    }
+  ],
+  "wallet_addresses": [],
+  "sensitive_data": [
+    {
+      "type": "api_key",
+      "file": "QUICK_START.md",
+      "count": 1,
+      "severity": "HIGH"
+    },
+    {
+      "type": "password",
+      "file": "SECURITY_AUDIT_REPORT.md",
+      "count": 5,
+      "severity": "HIGH"
+    },
+    {
+      "type": "password",
+      "file": "IMPLEMENTATION_SUMMARY.md",
+      "count": 4,
+      "severity": "HIGH"
+    },
+    {
+      "type": "password",
+      "file": "DEPLOYMENT.md",
+      "count": 1,
+      "severity": "HIGH"
+    },
+    {
+      "type": "password",
+      "file": "CRITICAL_GAPS_FILLED.md",
+      "count": 1,
+      "severity": "HIGH"
+    },
+    {
+      "type": "password",
+      "file": "install_complete_system.py",
+      "count": 2,
+      "severity": "HIGH"
+    },
+    {
+      "type": "password",
+      "file": "chimera_core/database/db_manager.py",
+      "count": 4,
+      "severity": "HIGH"
+    },
+    {
+      "type": "password",
+      "file": "core/wallet_system/generator.py",
+      "count": 2,
+      "severity": "HIGH"
+    },
+    {
+      "type": "password",
+      "file": "frontend/src/services/auth.ts",
+      "count": 1,
+      "severity": "HIGH"
+    }
+  ],
+  "dependencies": {
+    "python": {
+      "file": "requirements.txt",
+      "packages": [
+        "fastapi==0.109.1",
+        "uvicorn[standard]==0.27.0",
+        "pydantic==2.5.3",
+        "python-dotenv==1.0.0",
+        "httpx==0.26.0",
+        "aiofiles==23.2.1",
+        "numpy==1.26.3",
+        "pandas==2.1.4"
+      ]
+    },
+    "npm": {
+      "file": "frontend/package.json",
+      "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "axios": "^1.13.2",
+        "socket.io-client": "^4.8.1",
+        "lucide-react": "^0.561.0",
+        "recharts": "^3.5.1"
+      },
+      "devDependencies": {
+        "@types/react": "^18.2.43",
+        "@types/react-dom": "^18.2.17",
+        "@types/node": "^25.0.2",
+        "@vitejs/plugin-react": "^4.2.1",
+        "typescript": "^5.9.3",
+        "vite": "^7.2.7",
+        "tailwindcss": "^3.4.0",
+        "postcss": "^8.4.32",
+        "autoprefixer": "^10.4.16"
+      }
+    }
+  },
+  "code_quality": [
+    {
+      "type": "hardcoded_ip",
+      "file": "server.js",
+      "count": 1,
+      "severity": "HIGH"
+    },
+    {
+      "type": "console_log",
+      "file": "server.js",
+      "count": 3,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "SECURITY_AUDIT_REPORT.md",
+      "count": 2,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "hardcoded_ip",
+      "file": "CLOUD_DEPLOYMENT_GUIDE.md",
+      "count": 3,
+      "severity": "HIGH"
+    },
+    {
+      "type": "hardcoded_ip",
+      "file": "DEPLOYMENT.md",
+      "count": 1,
+      "severity": "HIGH"
+    },
+    {
+      "type": "console_log",
+      "file": "bot.js",
+      "count": 20,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "hardcoded_ip",
+      "file": "unified_system.py",
+      "count": 2,
+      "severity": "HIGH"
+    },
+    {
+      "type": "hardcoded_ip",
+      "file": "CLOUD_QUICK_START.md",
+      "count": 2,
+      "severity": "HIGH"
+    },
+    {
+      "type": "console_log",
+      "file": "demo-trading-model.js",
+      "count": 11,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "sql_query",
+      "file": ".github/workflows/CLEANUP_STALE_BRANCHES_README.md",
+      "count": 1,
+      "severity": "HIGH"
+    },
+    {
+      "type": "sql_query",
+      "file": "chimera_core/database/db_manager.py",
+      "count": 3,
+      "severity": "HIGH"
+    },
+    {
+      "type": "todo",
+      "file": "freelance_engine/platform_connectors.py",
+      "count": 3,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "hardcoded_ip",
+      "file": "backend/server.py",
+      "count": 1,
+      "severity": "HIGH"
+    },
+    {
+      "type": "console_log",
+      "file": "docs/ERROR_HANDLING.md",
+      "count": 2,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "sql_query",
+      "file": "docs/ERROR_HANDLING.md",
+      "count": 1,
+      "severity": "HIGH"
+    },
+    {
+      "type": "console_log",
+      "file": "docs/SYSTEM_MONITORING.md",
+      "count": 14,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "docs/FEATURE_MANAGEMENT.md",
+      "count": 14,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "docs/GETTING_STARTED.md",
+      "count": 10,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "tests/test-trading-model.js",
+      "count": 14,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "tests/test-core-systems.js",
+      "count": 32,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "frontend/src/App.tsx",
+      "count": 1,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "frontend/src/services/websocket.ts",
+      "count": 3,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "src/core/ShutdownHandler.js",
+      "count": 21,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "src/core/ProcessLinker.js",
+      "count": 20,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "src/core/ErrorHandler.js",
+      "count": 6,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "src/core/HealthMonitor.js",
+      "count": 13,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "src/core/index.js",
+      "count": 36,
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "console_log",
+      "file": "src/core/FeatureManager.js",
+      "count": 27,
+      "severity": "MEDIUM"
+    }
+  ],
+  "file_stats": {
+    "TASK_COMPLETION_SUMMARY.md": {
+      "size": 5952,
+      "lines": 175,
+      "hash": "34b5cdb29f417ed36f11c203728edd2f"
+    },
+    "IMPLEMENTATION_COMPLETE.md": {
+      "size": 5693,
+      "lines": 250,
+      "hash": "e5ac7cbf1f48491781d2bf3d79354879"
+    },
+    "CHANGELOG.md": {
+      "size": 2324,
+      "lines": 84,
+      "hash": "1d6ef3eecae4f284385ff472fbf36547"
+    },
+    "SYSTEM_COMPLETENESS_AUDIT.md": {
+      "size": 15447,
+      "lines": 557,
+      "hash": "8862075e0cb19447672bcecfeb31f96b"
+    },
+    "README_AUTO_INSTALL.md": {
+      "size": 8952,
+      "lines": 454,
+      "hash": "ac11f32043dde7c50b851a6560fb22e0"
+    },
+    "requirements.txt": {
+      "size": 425,
+      "lines": 24,
+      "hash": "c7b3dc89bf3b05794d3c81c7ba4e041c"
+    },
+    "CONSOLIDATION_SUMMARY.md": {
+      "size": 3448,
+      "lines": 124,
+      "hash": "9f9ef1eb2ac16ae9efbf4d1cba959ce2"
+    },
+    "QUICK_START.md": {
+      "size": 7215,
+      "lines": 338,
+      "hash": "b8ddd917696b22fb6d2250c8ce21396f"
+    },
+    "server.js": {
+      "size": 1258,
+      "lines": 45,
+      "hash": "944b911439f59b85da79e6bbe1db0f0d"
+    },
+    "tailwind.config.js": {
+      "size": 1717,
+      "lines": 77,
+      "hash": "1130320379e56d248b607c259753f639"
+    },
+    "SECURITY_REVIEW.md": {
+      "size": 1596,
+      "lines": 45,
+      "hash": "cc4ed4e5585398ad57b6ecc7384864ef"
+    },
+    "CONSOLIDATION_VERIFICATION.md": {
+      "size": 9097,
+      "lines": 262,
+      "hash": "97a84c84b356973e312b8c46c21c9b33"
+    },
+    "BRANCH_DELETION_GUIDE.md": {
+      "size": 5040,
+      "lines": 160,
+      "hash": "ce7eaad9454c7d3ef2d2577cf524f9d8"
+    },
+    "SECURITY_AUDIT_REPORT.md": {
+      "size": 13188,
+      "lines": 521,
+      "hash": "af0e86d2177dc52822e021a6fd05566e"
+    },
+    "CLOUD_DEPLOYMENT_GUIDE.md": {
+      "size": 9484,
+      "lines": 403,
+      "hash": "fbc727272bd13c100a1a6508d27b14c8"
+    },
+    "IMPLEMENTATION_SUMMARY.md": {
+      "size": 11221,
+      "lines": 400,
+      "hash": "1f0f21587320e2f70836d70aaa8c69db"
+    },
+    "SYSTEM_ARCHITECTURE.md": {
+      "size": 13338,
+      "lines": 399,
+      "hash": "e18c9919a6b5b0dae8406908cad861eb"
+    },
+    "SETUP-INSTRUCTIONS.md": {
+      "size": 5108,
+      "lines": 313,
+      "hash": "bace396b3fd22cea4b9c480d0d3fd438"
+    },
+    "vite.config.js": {
+      "size": 890,
+      "lines": 39,
+      "hash": "2981da8a3e4004505f09273e01e5df46"
+    },
+    "POST_MERGE_CHECKLIST.md": {
+      "size": 3623,
+      "lines": 154,
+      "hash": "b7a5e33af5508ba8d11c65c3aedd7c8a"
+    },
+    "FREELANCE_ENHANCEMENTS.md": {
+      "size": 12324,
+      "lines": 451,
+      "hash": "9559f9d35eb19ba8790262c72bd0f8b3"
+    },
+    "DEPLOYMENT.md": {
+      "size": 11722,
+      "lines": 563,
+      "hash": "16a8d55675bbab96d34c68a7661b4d67"
+    },
+    "CRITICAL_GAPS_FILLED.md": {
+      "size": 10370,
+      "lines": 392,
+      "hash": "9ec911f78f1e3bbca01068ac7824307a"
+    },
+    "SECURITY_SUMMARY.md": {
+      "size": 4998,
+      "lines": 146,
+      "hash": "94277d839ea05ae1742a9e9303fd7ce0"
+    },
+    "README.md": {
+      "size": 678,
+      "lines": 26,
+      "hash": "ed1c6d2dff128161b6890c65daf1fb03"
+    },
+    "bot.js": {
+      "size": 11659,
+      "lines": 427,
+      "hash": "6012caaa102bd41a10c56999618e869e"
+    },
+    ".prettierrc.json": {
+      "size": 154,
+      "lines": 10,
+      "hash": "5e284f6fd46ac94faccf34cb32cbe188"
+    },
+    "install_complete_system.py": {
+      "size": 25315,
+      "lines": 836,
+      "hash": "838ea01d1ebcc816526eadffb0f2205a"
+    },
+    "unified_system.py": {
+      "size": 34261,
+      "lines": 882,
+      "hash": "16c206808921c8a45d076821e50cadc8"
+    },
+    "demo_chimera.py": {
+      "size": 7895,
+      "lines": 241,
+      "hash": "3101429b6d16f97e2202c9cee4651827"
+    },
+    "BRANCH_MERGE_PLAN.md": {
+      "size": 2380,
+      "lines": 61,
+      "hash": "c1327d318f8aed83bfe21b8fce92d3fd"
+    },
+    "package.json": {
+      "size": 1658,
+      "lines": 61,
+      "hash": "3f1e00ec52c1fa80927d89a694bde027"
+    },
+    ".eslintrc.json": {
+      "size": 776,
+      "lines": 37,
+      "hash": "a739e40935ba28a906186f6b1559a8e3"
+    },
+    "DASHBOARD_IMPLEMENTATION_SUMMARY.md": {
+      "size": 11255,
+      "lines": 354,
+      "hash": "397e8a01f54a7b0c5dfbbdc4b75286a5"
+    },
+    "CLOUD_QUICK_START.md": {
+      "size": 3652,
+      "lines": 148,
+      "hash": "71cde9636b859c7525468e97fb3c71c0"
+    },
+    "demo-trading-model.js": {
+      "size": 1384,
+      "lines": 37,
+      "hash": "c34a8220fb82affde64fe6e0da2e479c"
+    },
+    "requirements_chimera.txt": {
+      "size": 1055,
+      "lines": 42,
+      "hash": "26039ecd1aee9cecdb81085f5bb7d8de"
+    },
+    "DASHBOARD_QUICKSTART.md": {
+      "size": 6134,
+      "lines": 223,
+      "hash": "3e94d722395305e3d8b51a942891c6de"
+    },
+    "IMPLEMENTATION_COMPLETE_V3.md": {
+      "size": 8443,
+      "lines": 291,
+      "hash": "efb4e0db3a94db8e486668dd7d78d67f"
+    },
+    "IMPLEMENTATION_COMPLETE_V2.md": {
+      "size": 9498,
+      "lines": 391,
+      "hash": "dca5669fc113603d5b8fe5319919f9cf"
+    },
+    "postcss.config.js": {
+      "size": 91,
+      "lines": 7,
+      "hash": "c1ee9ce6a4fe04105dbf8e619390df5e"
+    },
+    "SECURITY.md": {
+      "size": 2544,
+      "lines": 113,
+      "hash": "c4763c2e1b2b24d474638b5c8c793185"
+    },
+    "CONSOLIDATION_COMPLETE.md": {
+      "size": 11012,
+      "lines": 339,
+      "hash": "848fbea144464dee7ce92b8b690ad1b6"
+    },
+    "api/trading_solvency_api.py": {
+      "size": 7757,
+      "lines": 262,
+      "hash": "6915de9c5be39e700f3cc482dc801d69"
+    },
+    "archive/README.md": {
+      "size": 1477,
+      "lines": 34,
+      "hash": "1e36ea7df97b2f086c3fa2752959b7fc"
+    },
+    "aws/cost-calculator.py": {
+      "size": 11829,
+      "lines": 352,
+      "hash": "f366b6673615332cc2f4b436aeb6dce0"
+    },
+    "aws/README.md": {
+      "size": 9357,
+      "lines": 312,
+      "hash": "ba3097ab6cdf5ac13ba97c768640ffeb"
+    },
+    "aws/README_AWS_DEPLOYMENT.md": {
+      "size": 11962,
+      "lines": 458,
+      "hash": "20ab2cdaeffa0c6befd3e9257d776576"
+    },
+    "aws/iam-policy.json": {
+      "size": 3184,
+      "lines": 130,
+      "hash": "3966c96ca9b307be211d23597c71857b"
+    },
+    "aws/QUICKSTART.md": {
+      "size": 8130,
+      "lines": 371,
+      "hash": "387cf478b7ddc54c25ad2845f2f92842"
+    },
+    "scripts/README.md": {
+      "size": 228,
+      "lines": 11,
+      "hash": "41da4fe67bbf2c6e65d81fb3935fdf99"
+    },
+    ".github/workflows/ci.yml": {
+      "size": 1337,
+      "lines": 43,
+      "hash": "afef47123c9896ee3ca1af25c5922f79"
+    },
+    ".github/workflows/README.md": {
+      "size": 4291,
+      "lines": 118,
+      "hash": "d84d3a6c98d8fc7e7d34450d71243711"
+    },
+    ".github/workflows/consolidate.yml": {
+      "size": 1790,
+      "lines": 46,
+      "hash": "a93d91331bad70017fc95254f75f49ec"
+    },
+    ".github/workflows/aws-complete-setup.yml": {
+      "size": 34584,
+      "lines": 767,
+      "hash": "d9807d2225bbf55c8c3e2e3dfa911b6e"
+    },
+    ".github/workflows/CLEANUP_STALE_BRANCHES_README.md": {
+      "size": 7030,
+      "lines": 250,
+      "hash": "f03e2016167a9621e0cbc04d6c4be6a4"
+    },
+    ".github/agents/my-agent.agent.md": {
+      "size": 383,
+      "lines": 14,
+      "hash": "8330331fa62ab655fec0d02e1045ddc0"
+    },
+    "chimera_core/__init__.py": {
+      "size": 122,
+      "lines": 5,
+      "hash": "463058300fc62b416eb57d10d8ec5526"
+    },
+    "chimera_core/intelligence/adaptive_learning.py": {
+      "size": 7928,
+      "lines": 208,
+      "hash": "f3fa45a89bc3fc4845a8b99ce9a171ef"
+    },
+    "chimera_core/intelligence/__init__.py": {
+      "size": 153,
+      "lines": 5,
+      "hash": "ce4dcc1f22624322fd3b7a68ad0caba3"
+    },
+    "chimera_core/monitoring_enhanced/observability.py": {
+      "size": 8626,
+      "lines": 246,
+      "hash": "840d2e2fc010e155eee68dcf3facff01"
+    },
+    "chimera_core/monitoring_enhanced/__init__.py": {
+      "size": 119,
+      "lines": 5,
+      "hash": "7933209826c246c29b274c9b25abe6ab"
+    },
+    "chimera_core/database/db_manager.py": {
+      "size": 17449,
+      "lines": 465,
+      "hash": "ba83a9810977d891c18de9a1c3b1629d"
+    },
+    "chimera_core/database/__init__.py": {
+      "size": 142,
+      "lines": 5,
+      "hash": "8bc7db082cad8b426d2b8b1eeffd7d31"
+    },
+    "testing/README.md": {
+      "size": 226,
+      "lines": 12,
+      "hash": "a43d5d494301c705e079217accc165ef"
+    },
+    "freelance_engine/orchestrator.py": {
+      "size": 19352,
+      "lines": 500,
+      "hash": "b69b30597cd309076720dc8304af64ef"
+    },
+    "freelance_engine/automated_bidder.py": {
+      "size": 14902,
+      "lines": 388,
+      "hash": "717843ee515532686cc789cd69bc9ce9"
+    },
+    "freelance_engine/job_prospector.py": {
+      "size": 14125,
+      "lines": 410,
+      "hash": "b21e71bfd741efa756a79737818da7a7"
+    },
+    "freelance_engine/platform_connectors.py": {
+      "size": 15194,
+      "lines": 499,
+      "hash": "49df41c04460e0da47b516a09d885066"
+    },
+    "freelance_engine/internal_coding_agent.py": {
+      "size": 14652,
+      "lines": 398,
+      "hash": "c7447f258ce9fb11111fd30be1f660aa"
+    },
+    "freelance_engine/payment_handler.py": {
+      "size": 12584,
+      "lines": 365,
+      "hash": "4154122235d18a53841fdf5449cee6fc"
+    },
+    "automation/audit.py": {
+      "size": 9877,
+      "lines": 247,
+      "hash": "ef113ed97c829495ec142267526384fc"
+    },
+    "automation/repo_analyzer.py": {
+      "size": 7703,
+      "lines": 209,
+      "hash": "095a390581ee7f6200b67b51ccf923fc"
+    },
+    "backend/server.py": {
+      "size": 14624,
+      "lines": 474,
+      "hash": "7b10774871e2c095f083df78e1e316e9"
+    },
+    "backend/chimera_master.py": {
+      "size": 14882,
+      "lines": 381,
+      "hash": "86e83bfeb224363128954946236e0450"
+    },
+    "backend/chimera_v5.py": {
+      "size": 13949,
+      "lines": 409,
+      "hash": "3519fbc54831f10bd275b0b2c9a7fc53"
+    },
+    "backend/solvency_monitor.py": {
+      "size": 9184,
+      "lines": 249,
+      "hash": "ebda60b16e56b7b170d2712c0f194290"
+    },
+    "backend/infrastructure_upgrades.py": {
+      "size": 17389,
+      "lines": 495,
+      "hash": "5302ea65852eefd07e0b2967b2829ef5"
+    },
+    "backend/chimera_v8.py": {
+      "size": 25895,
+      "lines": 692,
+      "hash": "430dddddd203880b85882d18d896ef3c"
+    },
+    "backend/core_philosophy.py": {
+      "size": 2073,
+      "lines": 44,
+      "hash": "aa936f6a7e528818da51f5e5513bc7fb"
+    },
+    "backend/treasury_upgrades.py": {
+      "size": 14429,
+      "lines": 438,
+      "hash": "3e44746f307c3fc13eebc74cc1ca92a1"
+    },
+    "backend/autonomous_trading.py": {
+      "size": 5872,
+      "lines": 170,
+      "hash": "62e471f3163a8819a5a36dbdea91ae59"
+    },
+    "backend/chimera_v6.py": {
+      "size": 16215,
+      "lines": 461,
+      "hash": "66766cf67a3008db0c332bd2a889f1ba"
+    },
+    "backend/chimera_v7.py": {
+      "size": 18127,
+      "lines": 484,
+      "hash": "b126b3dfb1743bd2b30d7c0b2d98e6f8"
+    },
+    "backend/intelligence_upgrades.py": {
+      "size": 17639,
+      "lines": 454,
+      "hash": "964a3ff8764f9f241154d7f45d9bea7c"
+    },
+    "docs/AUTONOMOUS_SOLVENCY.md": {
+      "size": 5509,
+      "lines": 184,
+      "hash": "b27f2c2c2c4130f99e8725bfb2d292de"
+    },
+    "docs/ERROR_HANDLING.md": {
+      "size": 8979,
+      "lines": 426,
+      "hash": "42ea521b9c0e84d56896bbb96ddf39e7"
+    },
+    "docs/AI_KNOWLEDGE_NETWORK.md": {
+      "size": 1668,
+      "lines": 74,
+      "hash": "b1419891e5c7e8a286872191f225d1e3"
+    },
+    "docs/SYSTEM_SUMMARY.md": {
+      "size": 8428,
+      "lines": 234,
+      "hash": "4c5546c2e7f678d3821e824dbd6edf96"
+    },
+    "docs/SYSTEM_MONITORING.md": {
+      "size": 12908,
+      "lines": 565,
+      "hash": "6606f627fdb0dcf1a42297bf8c97cac8"
+    },
+    "docs/COPILOT_BRANCHES_FAQ.md": {
+      "size": 2120,
+      "lines": 63,
+      "hash": "ff85ad2d1ccc1f3eba9fc9298aca23f8"
+    },
+    "docs/FEATURE_MANAGEMENT.md": {
+      "size": 13360,
+      "lines": 608,
+      "hash": "3af4f49f7dee73908fe71171995c6152"
+    },
+    "docs/BRANCH_CLEANUP.md": {
+      "size": 5753,
+      "lines": 170,
+      "hash": "e2a8928e32f6bf19b6422575b7e98bad"
+    },
+    "docs/GETTING_STARTED.md": {
+      "size": 12108,
+      "lines": 483,
+      "hash": "ebdd9037fda3d51bc9eff5cee44b9c6d"
+    },
+    "docs/WALLET_SYSTEM.md": {
+      "size": 1054,
+      "lines": 61,
+      "hash": "6aabbd498bdba0ba9e6e87f19cd53b07"
+    },
+    "security/input_validator.js": {
+      "size": 5854,
+      "lines": 229,
+      "hash": "01a1f8dbcd0a908b694f2562f9b0c7b7"
+    },
+    "security/safe_file_ops.py": {
+      "size": 10602,
+      "lines": 351,
+      "hash": "7a45a024203c10c114382eff09ed41b2"
+    },
+    "core/knowledge_network/sync_engine.py": {
+      "size": 2126,
+      "lines": 66,
+      "hash": "67efbffbb9830a2dc57e2feb351e59ea"
+    },
+    "core/knowledge_network/__init__.py": {
+      "size": 30,
+      "lines": 1,
+      "hash": "4f40b9f528967e2f4a62414363bc0c27"
+    },
+    "core/knowledge_network/knowledge_base.py": {
+      "size": 3400,
+      "lines": 100,
+      "hash": "0752a862583b7cff4e4e57982c249ffb"
+    },
+    "core/wallet_system/assignments.json": {
+      "size": 1229,
+      "lines": 28,
+      "hash": "f81f3429a75680319be3d42a0e3649e5"
+    },
+    "core/wallet_system/generator.py": {
+      "size": 5800,
+      "lines": 151,
+      "hash": "20efe41953e4205bd07ac88f6f60e888"
+    },
+    "core/wallet_system/manager.py": {
+      "size": 1403,
+      "lines": 48,
+      "hash": "880df8878510e9b9c1a872d216e8a15f"
+    },
+    "core/wallet_system/__init__.py": {
+      "size": 26,
+      "lines": 1,
+      "hash": "b470bb8078b266787e599901e21cefef"
+    },
+    "paid-ai-bot/README.md": {
+      "size": 230,
+      "lines": 12,
+      "hash": "e4f7cf5cac8ef11d6a1b87f38cd25f5b"
+    },
+    "tests/test_autonomous_trading.py": {
+      "size": 5200,
+      "lines": 150,
+      "hash": "431645dada9b08b772e5b2734d88423c"
+    },
+    "tests/test_knowledge_network.py": {
+      "size": 736,
+      "lines": 30,
+      "hash": "52e701607d32f523a3652991d87ad629"
+    },
+    "tests/test_wallet_system.py": {
+      "size": 592,
+      "lines": 25,
+      "hash": "e67580d4e45e180703789d0aa0936102"
+    },
+    "tests/test-trading-model.js": {
+      "size": 4255,
+      "lines": 145,
+      "hash": "df350878ee9e4e5bf3699e9b4e2e8d56"
+    },
+    "tests/test-core-systems.js": {
+      "size": 6077,
+      "lines": 243,
+      "hash": "2c7cbe1271053ce8eeb1ccbbb5b8d700"
+    },
+    "tests/__init__.py": {
+      "size": 0,
+      "lines": 1,
+      "hash": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "tests/test_solvency_monitor.py": {
+      "size": 6941,
+      "lines": 192,
+      "hash": "87595f1761749dce243d69f0685052dc"
+    },
+    "config/error-handling.json": {
+      "size": 1342,
+      "lines": 65,
+      "hash": "4590061bd6c473dac4831d6e894a957a"
+    },
+    "frontend/tsconfig.node.json": {
+      "size": 213,
+      "lines": 11,
+      "hash": "767b2e9abe6452170cdc399ca052cfbc"
+    },
+    "frontend/README.md": {
+      "size": 8323,
+      "lines": 256,
+      "hash": "a306d5fc42fbeb6f1e6c5dda6b71d95a"
+    },
+    "frontend/package.json": {
+      "size": 746,
+      "lines": 31,
+      "hash": "5ca15e54de2b30f5aa3bfbc3ee32ee39"
+    },
+    "frontend/vite.config.ts": {
+      "size": 696,
+      "lines": 32,
+      "hash": "003c0668cb48cd2d1fbc797ee57df59a"
+    },
+    "frontend/tsconfig.json": {
+      "size": 823,
+      "lines": 35,
+      "hash": "d6f83e08adb95e77a2944a102a123bef"
+    },
+    "frontend/src/main.tsx": {
+      "size": 247,
+      "lines": 11,
+      "hash": "a1fa03b4aaa3abbce9a8fc408ccbfe6c"
+    },
+    "frontend/src/App.tsx": {
+      "size": 3789,
+      "lines": 114,
+      "hash": "730d46fba09a8f1f713354a230d80c86"
+    },
+    "frontend/src/types/index.ts": {
+      "size": 1853,
+      "lines": 99,
+      "hash": "457ec8441a1edfcc50530ac0cdf3d9e7"
+    },
+    "frontend/src/services/auth.ts": {
+      "size": 1733,
+      "lines": 71,
+      "hash": "a013e19fde621319202f9e94aee44ce9"
+    },
+    "frontend/src/services/api.ts": {
+      "size": 6005,
+      "lines": 219,
+      "hash": "e7764c51036c0ae7037f2cebb37cf869"
+    },
+    "frontend/src/services/websocket.ts": {
+      "size": 2421,
+      "lines": 97,
+      "hash": "e2ead2ddf1da5afdd5a74a7308ad8237"
+    },
+    "frontend/src/components/SystemManagementPanel.tsx": {
+      "size": 3888,
+      "lines": 119,
+      "hash": "e59753694f97977fda4aa37f0b212042"
+    },
+    "frontend/src/components/ConfigurationPanel.tsx": {
+      "size": 3889,
+      "lines": 120,
+      "hash": "360b40f1a672349f8c1bf7939aa76dd3"
+    },
+    "frontend/src/components/TradingControlPanel.tsx": {
+      "size": 4090,
+      "lines": 122,
+      "hash": "504454b23976f2721853f598315357c0"
+    },
+    "frontend/src/components/SystemStatusPanel.tsx": {
+      "size": 4961,
+      "lines": 133,
+      "hash": "4f27920982cc661d9a2a2f1bfbbfc654"
+    },
+    "frontend/src/components/MonitoringPanel.tsx": {
+      "size": 3100,
+      "lines": 96,
+      "hash": "dd3843b853b7959b8fd57f2a80c28b7e"
+    },
+    "frontend/src/components/AWSControlPanel.tsx": {
+      "size": 3901,
+      "lines": 122,
+      "hash": "0efe9b22cbccd2d0c6e349a1cc8888e4"
+    },
+    "frontend/src/components/AIControlPanel.tsx": {
+      "size": 3978,
+      "lines": 121,
+      "hash": "6b98f588e95ee2dcd0bdc30fea0bead8"
+    },
+    "frontend/src/components/ui/Badge.tsx": {
+      "size": 1210,
+      "lines": 28,
+      "hash": "7c08b25e3692c66bfd0962da69e464ee"
+    },
+    "frontend/src/components/ui/Alert.tsx": {
+      "size": 1935,
+      "lines": 60,
+      "hash": "e26af17a58b4cfca718541ad91a2b258"
+    },
+    "frontend/src/components/ui/Button.tsx": {
+      "size": 1487,
+      "lines": 45,
+      "hash": "bd455459e800b78f40791e188f504ce6"
+    },
+    "frontend/src/components/ui/Card.tsx": {
+      "size": 790,
+      "lines": 27,
+      "hash": "fa0e36f80dd2777a7bd2c308155660a2"
+    },
+    "src/App.jsx": {
+      "size": 1289,
+      "lines": 47,
+      "hash": "674d956c3f866ddcb5555c50439ead4c"
+    },
+    "src/index.js": {
+      "size": 77,
+      "lines": 3,
+      "hash": "fdff84cfd29fedf11ddf379fb330a0ca"
+    },
+    "src/main.jsx": {
+      "size": 237,
+      "lines": 11,
+      "hash": "e7fcb619c89e86c5ddaefccc98f21908"
+    },
+    "src/models/trade.py": {
+      "size": 1932,
+      "lines": 76,
+      "hash": "45e6a5538b20d9f5a506640bed1b96d5"
+    },
+    "src/models/TradingModel.js": {
+      "size": 1424,
+      "lines": 55,
+      "hash": "c2da284d76fdbea8a77ae99ae6cb31c8"
+    },
+    "src/utils/validators.js": {
+      "size": 809,
+      "lines": 39,
+      "hash": "3863ae10753494e0117b86692e494697"
+    },
+    "src/utils/formatters.js": {
+      "size": 2706,
+      "lines": 114,
+      "hash": "8fbc7e56d24d06481dff31c14030f84d"
+    },
+    "src/services/api.js": {
+      "size": 1055,
+      "lines": 43,
+      "hash": "0426b39f44b65e8fbc880141c62c355c"
+    },
+    "src/components/Dashboard.jsx": {
+      "size": 1920,
+      "lines": 67,
+      "hash": "93fb3d693d6bd21d6adb7121c720510a"
+    },
+    "src/routes/README.md": {
+      "size": 225,
+      "lines": 12,
+      "hash": "4200407bada1a40acf1f9c0bafc050ec"
+    },
+    "src/autonomous/AutonomousTrading.jsx": {
+      "size": 2573,
+      "lines": 80,
+      "hash": "8892af3cfde5fa23eca6aab5c04c8c51"
+    },
+    "src/quantum/QuantumEngine.jsx": {
+      "size": 1966,
+      "lines": 63,
+      "hash": "dc9d61e2a293d73fe87c0543493c74f9"
+    },
+    "src/quantum/strategy.py": {
+      "size": 3117,
+      "lines": 93,
+      "hash": "e58c56d8b21d4bb4fb0638d77f2638d1"
+    },
+    "src/core/ShutdownHandler.js": {
+      "size": 7199,
+      "lines": 303,
+      "hash": "30728b61b971eb92f8aad05d5dff97ed"
+    },
+    "src/core/ProcessLinker.js": {
+      "size": 10324,
+      "lines": 434,
+      "hash": "364e177071f9ad70c2ba851476e00d03"
+    },
+    "src/core/ErrorHandler.js": {
+      "size": 9483,
+      "lines": 403,
+      "hash": "a585d145d8aaf2c5bca61e58b007faf0"
+    },
+    "src/core/HealthMonitor.js": {
+      "size": 11018,
+      "lines": 449,
+      "hash": "136e355a48ad220c9ad30311f2cdecee"
+    },
+    "src/core/index.js": {
+      "size": 8352,
+      "lines": 331,
+      "hash": "6b86e637f75e68ae1c7954860fcf4891"
+    },
+    "src/core/FeatureManager.js": {
+      "size": 11492,
+      "lines": 502,
+      "hash": "07842e82c85851436604e83cc671a1b6"
+    },
+    "src/freelance/README.md": {
+      "size": 223,
+      "lines": 12,
+      "hash": "4affad13b785f0ed872c77baeee97a33"
+    },
+    "src/shared/constants.js": {
+      "size": 757,
+      "lines": 44,
+      "hash": "4fd03b4b4366b42cd2ce57a13c5e70ac"
+    },
+    "src/mobile/README.md": {
+      "size": 246,
+      "lines": 12,
+      "hash": "e5658fb31cae379146c05bdfc558017d"
+    }
+  },
+  "summary": {
+    "total_files": 157,
+    "files_with_keywords": 67,
+    "wallet_addresses_found": 0,
+    "unique_wallet_files": 0,
+    "sensitive_data_files": 9,
+    "critical_issues": 0,
+    "high_issues": 9,
+    "code_quality_issues": 28,
+    "dependencies_found": 2,
+    "risk_level": "HIGH",
+    "total_lines_scanned": 32656
+  }
+}
