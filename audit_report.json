@@ -1,8 +1,8 @@
 {
-  "scan_timestamp": "2025-12-20T16:53:02.429206",
+  "scan_timestamp": "2025-12-20T16:58:23.237358",
   "chimera_version": "8.0",
   "scanner_version": "2.0",
-  "files_scanned": 157,
+  "files_scanned": 159,
   "keyword_hits": [
     {
       "file": "IMPLEMENTATION_COMPLETE.md",
@@ -275,6 +275,26 @@
       "count": 1
     },
     {
+      "file": "README.md",
+      "keyword": "wallet",
+      "count": 1
+    },
+    {
+      "file": "README.md",
+      "keyword": "private",
+      "count": 1
+    },
+    {
+      "file": "README.md",
+      "keyword": "mnemonic",
+      "count": 1
+    },
+    {
+      "file": "README.md",
+      "keyword": "address",
+      "count": 1
+    },
+    {
       "file": "bot.js",
       "keyword": "address",
       "count": 1
@@ -523,6 +543,16 @@
       "file": ".github/workflows/README.md",
       "keyword": "credential",
       "count": 11
+    },
+    {
+      "file": ".github/workflows/consolidate.yml",
+      "keyword": "secret",
+      "count": 2
+    },
+    {
+      "file": ".github/workflows/consolidate.yml",
+      "keyword": "token",
+      "count": 4
     },
     {
       "file": ".github/workflows/aws-complete-setup.yml",
@@ -1371,9 +1401,9 @@
       "hash": "94277d839ea05ae1742a9e9303fd7ce0"
     },
     "README.md": {
-      "size": 678,
-      "lines": 26,
-      "hash": "ed1c6d2dff128161b6890c65daf1fb03"
+      "size": 4810,
+      "lines": 168,
+      "hash": "bbedbe242c913e279fd689f7156d0cb2"
     },
     "bot.js": {
       "size": 11659,
@@ -1431,9 +1461,9 @@
       "hash": "c34a8220fb82affde64fe6e0da2e479c"
     },
     "requirements_chimera.txt": {
-      "size": 1055,
-      "lines": 42,
-      "hash": "26039ecd1aee9cecdb81085f5bb7d8de"
+      "size": 623,
+      "lines": 34,
+      "hash": "24c7d6630b6646661953cfee105a0ab5"
     },
     "DASHBOARD_QUICKSTART.md": {
       "size": 6134,
@@ -1510,15 +1540,20 @@
       "lines": 43,
       "hash": "afef47123c9896ee3ca1af25c5922f79"
     },
+    ".github/workflows/security-audit.yml": {
+      "size": 2577,
+      "lines": 75,
+      "hash": "68cf1a1b09685020bd688802478bd0a3"
+    },
     ".github/workflows/README.md": {
       "size": 4291,
       "lines": 118,
       "hash": "d84d3a6c98d8fc7e7d34450d71243711"
     },
     ".github/workflows/consolidate.yml": {
-      "size": 1790,
-      "lines": 46,
-      "hash": "a93d91331bad70017fc95254f75f49ec"
+      "size": 2362,
+      "lines": 83,
+      "hash": "41d30465d9821cdde99db1a44ba8a4fb"
     },
     ".github/workflows/aws-complete-setup.yml": {
       "size": 34584,
@@ -1669,6 +1704,11 @@
       "size": 18127,
       "lines": 484,
       "hash": "b126b3dfb1743bd2b30d7c0b2d98e6f8"
+    },
+    "backend/chimera_v4.py": {
+      "size": 13357,
+      "lines": 415,
+      "hash": "35a59bd0cca00967432566ff392fa17b"
     },
     "backend/intelligence_upgrades.py": {
       "size": 17639,
@@ -2037,8 +2077,8 @@
     }
   },
   "summary": {
-    "total_files": 157,
-    "files_with_keywords": 67,
+    "total_files": 159,
+    "files_with_keywords": 69,
     "wallet_addresses_found": 0,
     "unique_wallet_files": 0,
     "sensitive_data_files": 9,
@@ -2047,6 +2087,6 @@
     "code_quality_issues": 28,
     "dependencies_found": 2,
     "risk_level": "HIGH",
-    "total_lines_scanned": 32656
+    "total_lines_scanned": 33317
   }
 }

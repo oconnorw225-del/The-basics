@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-20T16:56:43.382830",
+  "timestamp": "2025-12-20T16:58:23.621268",
   "repo_path": ".",
   "structure": {
     ".github": {
@@ -13,12 +13,14 @@
       "terraform": {}
     },
     "backend": {},
+    "blockchain": {},
     "chimera_core": {
       "database": {},
       "intelligence": {},
       "monitoring_enhanced": {}
     },
     "config": {},
+    "configs": {},
     "core": {
       "knowledge_network": {},
       "wallet_system": {}
@@ -35,6 +37,7 @@
         "types": {}
       }
     },
+    "legacy": {},
     "paid-ai-bot": {},
     "scripts": {},
     "security": {},
@@ -106,12 +109,13 @@
     ".jsx": 5
   },
   "total_files": 205,
-  "total_lines": 40082,
+  "total_lines": 40122,
   "directories": [
     "api",
     "archive",
     "aws",
     "aws/terraform",
+    "blockchain",
     "scripts",
     ".github",
     ".github/workflows",
@@ -120,6 +124,7 @@
     "chimera_core/intelligence",
     "chimera_core/monitoring_enhanced",
     "chimera_core/database",
+    "legacy",
     "testing",
     "freelance_engine",
     "automation",
@@ -151,6 +156,7 @@
     "src/freelance",
     "src/shared",
     "src/mobile",
-    "src/styles"
+    "src/styles",
+    "configs"
   ]
 }
