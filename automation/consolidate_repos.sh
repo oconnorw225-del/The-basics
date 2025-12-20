@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ################################################################################
-# 🧬 CHIMERA-POWERED CONSOLIDATION SCRIPT
-# Intelligent repository consolidation using Project Chimera V8.0
+# REPOSITORY CONSOLIDATION SCRIPT
+# Intelligent repository consolidation and backup system
 ################################################################################
 
 set -e
@@ -17,10 +17,9 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-CHIMERA_VERSION="${CHIMERA_VERSION:-8.0}"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 BACKUP_DIR="backups/consolidation_${TIMESTAMP}"
-REPORT_FILE="CHIMERA_CONSOLIDATION_REPORT.md"
+REPORT_FILE="CONSOLIDATION_REPORT.md"
 
 # Source repositories
 REPOS=(
@@ -38,8 +37,8 @@ REPOS=(
 print_banner() {
     echo -e "${PURPLE}"
     echo "╔════════════════════════════════════════════════════════════════╗"
-    echo "║     🧬 PROJECT CHIMERA CONSOLIDATION SYSTEM V${CHIMERA_VERSION}          ║"
-    echo "║              Transcendent Intelligence Mode                    ║"
+    echo "║          REPOSITORY CONSOLIDATION SYSTEM                      ║"
+    echo "║              Automated Data Consolidation                     ║"
     echo "╚════════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
 }
@@ -60,16 +59,12 @@ log_error() {
     echo -e "${RED}[✗]${NC} $1"
 }
 
-log_chimera() {
-    echo -e "${PURPLE}[🧬 CHIMERA]${NC} $1"
-}
-
 ################################################################################
 # Main Functions
 ################################################################################
 
 initialize_environment() {
-    log_chimera "Initializing Chimera V${CHIMERA_VERSION} environment..."
+    log_info "Initializing consolidation environment..."
     
     # Create necessary directories
     mkdir -p "${BACKUP_DIR}"
@@ -86,7 +81,7 @@ initialize_environment() {
 }
 
 run_security_audit() {
-    log_chimera "Running Chimera-powered security audit..."
+    log_info "Running security audit..."
     
     if [ -f "automation/audit.py" ]; then
         python3 automation/audit.py || log_warning "Security audit encountered issues"
@@ -97,7 +92,7 @@ run_security_audit() {
 }
 
 run_repository_analysis() {
-    log_chimera "Analyzing repository structure..."
+    log_info "Analyzing repository structure..."
     
     if [ -f "automation/repo_analyzer.py" ]; then
         python3 automation/repo_analyzer.py || log_warning "Analysis encountered issues"
@@ -130,7 +125,7 @@ clone_source_repositories() {
 }
 
 create_backups() {
-    log_chimera "Creating timestamped backups..."
+    log_info "Creating timestamped backups..."
     
     if [ -d "source" ]; then
         for repo_dir in source/*; do
@@ -148,7 +143,7 @@ create_backups() {
 }
 
 consolidate_by_type() {
-    log_chimera "Consolidating code by type and function..."
+    log_info "Consolidating code by type and function..."
     
     # Consolidate Python backend
     log_info "Consolidating backend Python files..."
@@ -186,18 +181,17 @@ consolidate_by_type() {
 }
 
 generate_consolidation_report() {
-    log_chimera "Generating consolidation report..."
+    log_info "Generating consolidation report..."
     
     cat > "$REPORT_FILE" << EOF
-# 🧬 Chimera Consolidation Report
+# Repository Consolidation Report
 
 **Generated**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")  
-**Chimera Version**: ${CHIMERA_VERSION}  
 **Session ID**: ${TIMESTAMP}
 
 ## Summary
 
-This consolidation was performed by Project Chimera V${CHIMERA_VERSION} - Transcendent Intelligence System.
+This consolidation merged multiple source repositories into a unified structure.
 
 ### Source Repositories Processed
 EOF
@@ -210,7 +204,7 @@ EOF
 
 ### Directory Structure Created
 - \`api/\` - Consolidated API endpoints
-- \`backend/\` - Backend logic and Chimera core
+- \`backend/\` - Backend logic
 - \`frontend/\` - UI components and dashboards
 - \`blockchain/\` - Smart contracts and Web3 code
 - \`docs/\` - Combined documentation
@@ -223,35 +217,33 @@ Backups stored in: \`${BACKUP_DIR}\`
 
 ### Reports Generated
 - \`audit_report.json\` - Security audit results
-- \`chimera_analysis.json\` - Repository analysis
+- \`analysis.json\` - Repository analysis
 - \`${REPORT_FILE}\` - This consolidation report
 
 ## Next Steps
 
 1. Review \`audit_report.json\` for security issues
-2. Check \`chimera_analysis.json\` for structure insights
+2. Check \`analysis.json\` for structure insights
 3. Verify consolidated code in respective directories
 4. Run tests: \`python -m pytest tests/\`
 5. Update dependencies if needed
 
-## Chimera Status
+## Status
 
 ✅ Consolidation Complete  
 ✅ Security Audit Complete  
 ✅ Backups Created  
 ✅ Reports Generated
 
-**Project Chimera V${CHIMERA_VERSION} - Operational**
-
 ---
-*Powered by Chimera Transcendent Intelligence*
+*Repository Consolidation System*
 EOF
 
     log_success "Report generated → ${REPORT_FILE}"
 }
 
 cleanup_temp_files() {
-    log_chimera "Cleaning up temporary files..."
+    log_info "Cleaning up temporary files..."
     
     # Remove empty directories
     find . -type d -empty -delete 2>/dev/null || true
@@ -270,7 +262,7 @@ cleanup_temp_files() {
 main() {
     print_banner
     
-    log_chimera "Starting consolidation process..."
+    log_info "Starting consolidation process..."
     echo ""
     
     initialize_environment
@@ -283,14 +275,12 @@ main() {
     cleanup_temp_files
     
     echo ""
-    log_success "🧬 Chimera consolidation complete!"
+    log_success "✓ Consolidation complete!"
     echo ""
     log_info "Review the following files:"
     echo "  • ${REPORT_FILE}"
     echo "  • audit_report.json"
-    echo "  • chimera_analysis.json"
-    echo ""
-    log_chimera "Transcendent intelligence has guided your consolidation. ✨"
+    echo "  • analysis.json"
     echo ""
 }
 
