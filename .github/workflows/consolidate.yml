@@ -1,19 +1,7 @@
-name: 🧬 Chimera Smart Consolidation & Audit
+name: Repository Consolidation & Security Audit
 
 on:
   workflow_dispatch:
-    inputs:
-      chimera_version:
-        description: 'Chimera version to use'
-        required: true
-        default: '8.0'
-        type: choice
-        options:
-          - '4.0'
-          - '5.0'
-          - '6.0'
-          - '7.0'
-          - '8.0'
   schedule:
     - cron: '0 0 * * 0'  # Weekly on Sunday
 
@@ -24,59 +12,57 @@ jobs:
       contents: write
     
     steps:
-      - name: 🧬 Checkout the-basics repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: 🐍 Set up Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
       
-      - name: 📦 Install Python dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install psutil aiohttp pydantic
       
-      - name: 🔍 Run Chimera security audit
+      - name: Run security audit
         run: |
           python3 automation/audit.py
         continue-on-error: true
       
-      - name: 🧬 Run Chimera-powered consolidation
+      - name: Run repository consolidation
         run: |
-          chmod +x automation/chimera_consolidate.sh
-          bash automation/chimera_consolidate.sh
-        env:
-          CHIMERA_VERSION: ${{ github.event.inputs.chimera_version || '8.0' }}
+          chmod +x automation/consolidate_repos.sh
+          bash automation/consolidate_repos.sh
       
-      - name: 📊 Upload analysis artifacts
+      - name: Upload analysis artifacts
         uses: actions/upload-artifact@v4
         with:
           name: consolidation-reports
           path: |
             audit_report.json
-            chimera_analysis.json
-            CHIMERA_CONSOLIDATION_REPORT.md
+            analysis.json
+            CONSOLIDATION_REPORT.md
       
-      - name: 💾 Create backup archive
+      - name: Create backup archive
         run: |
           tar czf consolidation-backup-$(date +%Y%m%d-%H%M%S).tar.gz backups/
       
-      - name: 📤 Upload backups
+      - name: Upload backups
         uses: actions/upload-artifact@v4
         with:
           name: repository-backups
           path: consolidation-backup-*.tar.gz
           retention-days: 90
       
-      - name: 🤖 Commit consolidated code
+      - name: Commit consolidated code
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "Chimera Bot [bot]"
+          git config --global user.name "Consolidation Bot [bot]"
           git add .
-          git diff --staged --quiet || git commit -m "🧬 Automated Chimera consolidation [skip ci]"
+          git diff --staged --quiet || git commit -m "Automated repository consolidation [skip ci]"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

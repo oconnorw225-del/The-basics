@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Advanced Security & Code Quality Audit Tool
-Integrated with Chimera Intelligence V8.0
+Repository security scanner and code quality analyzer
 """
 
 import os
@@ -13,13 +13,12 @@ from pathlib import Path
 from collections import defaultdict
 
 class CodeAuditor:
-    """Enhanced security auditor with Chimera intelligence"""
+    """Security auditor for repository scanning"""
     
     def __init__(self, root_dir="."):
         self.root_dir = root_dir
         self.results = {
             "scan_timestamp": datetime.utcnow().isoformat(),
-            "chimera_version": "8.0",
             "scanner_version": "2.0",
             "files_scanned": 0,
             "keyword_hits": [],
@@ -66,9 +65,9 @@ class CodeAuditor:
         }
 
     def scan_directory(self):
-        """Recursively scan directory with Chimera intelligence"""
-        print("🧬 Chimera V8.0 Scanner Activated...")
-        print("   Transcendent Analysis Mode: ENABLED\n")
+        """Recursively scan directory for security issues"""
+        print("🔍 Security Scanner Activated...")
+        print("   Scanning repository for security issues...\n")
         
         for root, dirs, files in os.walk(self.root_dir):
             dirs[:] = [d for d in dirs if d not in self.exclude_dirs]
@@ -216,7 +215,7 @@ class CodeAuditor:
         """Print human-readable summary"""
         summary = self.results["summary"]
         print("\n" + "="*60)
-        print("🔍 CHIMERA V8.0 SECURITY AUDIT REPORT")
+        print("🔍 SECURITY AUDIT REPORT")
         print("="*60)
         print(f"📁 Files Scanned: {summary['total_files']}")
         print(f"📝 Total Lines: {summary['total_lines_scanned']:,}")
@@ -235,7 +234,7 @@ class CodeAuditor:
 
 def main():
     auditor = CodeAuditor()
-    print("🔍 Starting Chimera-powered comprehensive audit...")
+    print("🔍 Starting comprehensive security audit...")
     auditor.scan_directory()
     auditor.generate_summary()
     auditor.save_report()

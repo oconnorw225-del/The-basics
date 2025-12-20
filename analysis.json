@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-20T16:58:23.621268",
+  "timestamp": "2025-12-20T18:27:08.310344",
   "repo_path": ".",
   "structure": {
     ".github": {
@@ -13,14 +13,12 @@
       "terraform": {}
     },
     "backend": {},
-    "blockchain": {},
     "chimera_core": {
       "database": {},
       "intelligence": {},
       "monitoring_enhanced": {}
     },
     "config": {},
-    "configs": {},
     "core": {
       "knowledge_network": {},
       "wallet_system": {}
@@ -37,7 +35,6 @@
         "types": {}
       }
     },
-    "legacy": {},
     "paid-ai-bot": {},
     "scripts": {},
     "security": {},
@@ -56,7 +53,8 @@
       "utils": {}
     },
     "testing": {},
-    "tests": {}
+    "tests": {},
+    "workflows": {}
   },
   "frameworks": [
     "Angular",
@@ -78,11 +76,11 @@
     "Web3"
   ],
   "languages": {
-    "Markdown": 53,
+    "Markdown": 55,
     "JavaScript": 21,
     "Shell": 14,
     "HTML": 3,
-    "JSON": 10,
+    "JSON": 11,
     "Python": 47,
     "YAML": 4,
     "TypeScript": 5,
@@ -91,13 +89,13 @@
     "JavaScript (React)": 5
   },
   "file_types": {
-    ".md": 53,
+    ".md": 55,
     "": 9,
     ".txt": 2,
     ".js": 21,
     ".sh": 14,
     ".html": 3,
-    ".json": 10,
+    ".json": 11,
     ".py": 47,
     ".example": 1,
     ".tf": 4,
@@ -108,14 +106,13 @@
     ".css": 6,
     ".jsx": 5
   },
-  "total_files": 205,
-  "total_lines": 40122,
+  "total_files": 208,
+  "total_lines": 41204,
   "directories": [
     "api",
     "archive",
     "aws",
     "aws/terraform",
-    "blockchain",
     "scripts",
     ".github",
     ".github/workflows",
@@ -124,9 +121,9 @@
     "chimera_core/intelligence",
     "chimera_core/monitoring_enhanced",
     "chimera_core/database",
-    "legacy",
     "testing",
     "freelance_engine",
+    "workflows",
     "automation",
     "backend",
     "docs",
@@ -156,7 +153,6 @@
     "src/freelance",
     "src/shared",
     "src/mobile",
-    "src/styles",
-    "configs"
+    "src/styles"
   ]
 }

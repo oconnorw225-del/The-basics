@@ -167,7 +167,7 @@ class RepositoryAnalyzer:
         
         self.analysis["structure"] = structure
 
-    def save_report(self, output_file="chimera_analysis.json"):
+    def save_report(self, output_file="analysis.json"):
         """Save analysis report"""
         with open(output_file, "w") as f:
             json.dump(self.analysis, f, indent=2)
@@ -201,7 +201,7 @@ def main():
     analyzer.analyze()
     analyzer.save_report()
     analyzer.print_summary()
-    print("✅ Analysis saved to chimera_analysis.json\n")
+    print("✅ Analysis saved to analysis.json\n")
 
 
 if __name__ == "__main__":
