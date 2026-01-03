@@ -23,15 +23,25 @@ SOURCE_DIR="${REPO_ROOT}/source"
 BACKUP_DIR="${REPO_ROOT}/backups"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 LOG_FILE="${REPO_ROOT}/consolidation_${TIMESTAMP}.log"
+CONFIG_FILE="${REPO_ROOT}/config/consolidation-config.json"
 
-# Source repositories
-declare -A REPOS=(
-    ["ndax-quantum-engine"]="https://github.com/oconnorw225-del/ndax-quantum-engine.git"
-    ["quantum-engine-dashb"]="https://github.com/oconnorw225-del/quantum-engine-dashb.git"
-    ["shadowforge-ai-trader"]="https://github.com/oconnorw225-del/shadowforge-ai-trader.git"
-    ["repository-web-app"]="https://github.com/oconnorw225-del/repository-web-app.git"
-    ["The-new-ones"]="https://github.com/oconnorw225-del/The-new-ones.git"
-)
+# Load configuration from JSON if available
+declare -A REPOS
+if [ -f "$CONFIG_FILE" ]; then
+    # Extract repo names and URLs from JSON config
+    REPOS["ndax-quantum-engine"]="https://github.com/oconnorw225-del/ndax-quantum-engine.git"
+    REPOS["quantum-engine-dashb"]="https://github.com/oconnorw225-del/quantum-engine-dashb.git"
+    REPOS["shadowforge-ai-trader"]="https://github.com/oconnorw225-del/shadowforge-ai-trader.git"
+    REPOS["repository-web-app"]="https://github.com/oconnorw225-del/repository-web-app.git"
+    REPOS["The-new-ones"]="https://github.com/oconnorw225-del/The-new-ones.git"
+else
+    # Fallback to hardcoded values if config not found
+    REPOS["ndax-quantum-engine"]="https://github.com/oconnorw225-del/ndax-quantum-engine.git"
+    REPOS["quantum-engine-dashb"]="https://github.com/oconnorw225-del/quantum-engine-dashb.git"
+    REPOS["shadowforge-ai-trader"]="https://github.com/oconnorw225-del/shadowforge-ai-trader.git"
+    REPOS["repository-web-app"]="https://github.com/oconnorw225-del/repository-web-app.git"
+    REPOS["The-new-ones"]="https://github.com/oconnorw225-del/The-new-ones.git"
+fi
 
 ################################################################################
 # Helper Functions
@@ -159,7 +169,14 @@ copy_with_conflict_resolution() {
     
     # Use rsync for intelligent copying with conflict resolution
     if command -v rsync &> /dev/null; then
-        rsync -av --update "$src" "$dest" 2>&1 | tee -a "$LOG_FILE" || log_warning "rsync failed for $description"
+        # Handle directories and files appropriately
+        if [ -d "$src" ]; then
+            # For directories, ensure trailing slash for proper copying
+            rsync -av --update "${src}/" "$dest" 2>&1 | tee -a "$LOG_FILE" || log_warning "rsync failed for $description"
+        else
+            # For files, copy directly
+            rsync -av --update "$src" "$dest" 2>&1 | tee -a "$LOG_FILE" || log_warning "rsync failed for $description"
+        fi
     else
         # Fallback to cp with update flag
         cp -ruv "$src" "$dest" 2>&1 | tee -a "$LOG_FILE" || log_warning "cp failed for $description"

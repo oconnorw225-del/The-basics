@@ -271,23 +271,18 @@ setup_git_hooks() {
 #!/bin/bash
 # Pre-commit hook to prevent committing sensitive files
 
-FORBIDDEN_FILES=(
-    ".env"
-    ".env.local"
-    ".env.production"
-    "*.key"
-    "*.pem"
-    "*_secret_*"
-    "*api_key*"
-)
-
-for pattern in "${FORBIDDEN_FILES[@]}"; do
-    if git diff --cached --name-only | grep -E "$pattern"; then
-        echo "Error: Attempting to commit sensitive file matching: $pattern"
-        echo "Please remove these files from the commit."
-        exit 1
-    fi
+# Check for forbidden file patterns
+for file in $(git diff --cached --name-only); do
+    case "$file" in
+        .env|.env.local|.env.production|*.key|*.pem|*_secret_*|*api_key*)
+            echo "Error: Attempting to commit sensitive file: $file"
+            echo "Please remove this file from the commit."
+            exit 1
+            ;;
+    esac
 done
+
+exit 0
 EOF
         chmod +x "$pre_commit_hook"
         log_success "Git pre-commit hook installed"

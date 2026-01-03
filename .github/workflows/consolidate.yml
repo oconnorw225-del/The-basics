@@ -109,12 +109,14 @@ jobs:
       - name: Generate consolidation summary
         run: |
           echo "Generating consolidation summary..."
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S UTC')
+          RUN_NUMBER="${{ github.run_number }}"
           
-          cat > CONSOLIDATION_SUMMARY.md << 'EOF'
+          cat > CONSOLIDATION_SUMMARY.md << EOF
           # Consolidation Summary
           
-          **Date:** $(date '+%Y-%m-%d %H:%M:%S UTC')
-          **Workflow Run:** ${{ github.run_number }}
+          **Date:** ${TIMESTAMP}
+          **Workflow Run:** ${RUN_NUMBER}
           
           ## Source Repositories Consolidated
           
@@ -126,16 +128,16 @@ jobs:
           
           ## Consolidation Status
           
-          - Backups created in `backups/` directory
+          - Backups created in \`backups/\` directory
           - Files consolidated to appropriate locations
           - Security audit completed
           - Repository analysis completed
           
           ## Generated Reports
           
-          - `CONSOLIDATION_REPORT.md` - Detailed consolidation report
-          - `audit_report.json` - Security audit results
-          - `analysis.json` - Repository analysis
+          - \`CONSOLIDATION_REPORT.md\` - Detailed consolidation report
+          - \`audit_report.json\` - Security audit results
+          - \`analysis.json\` - Repository analysis
           
           ## Next Steps
           
