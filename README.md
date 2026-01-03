@@ -25,24 +25,30 @@ This repository consolidates the best parts from 5 source repositories using **P
 
 ## 🚀 Quick Start
 
-### Option 1: Automated GitHub Actions
+### Option 1: Automated GitHub Actions (Recommended)
 1. Go to **Actions** tab
-2. Select **"Chimera Smart Consolidation & Audit"**
+2. Select **"Repository Consolidation & Security Audit"**
 3. Click **"Run workflow"**
-4. Select Chimera version (default: 8.0)
-5. Review artifacts after completion
+4. Wait for completion (includes cloning, backup, and consolidation)
+5. Review artifacts and consolidation report
 
-### Option 2: Manual Consolidation
+### Option 2: Local Setup and Consolidation
 ```bash
 # Clone this repository
 git clone https://github.com/oconnorw225-del/the-basics.git
 cd the-basics
 
-# Run Chimera-powered consolidation
-bash automation/chimera_consolidate.sh
+# Run setup to check dependencies
+bash scripts/setup.sh
+
+# Run consolidation
+bash automation/consolidate.sh
+
+# Verify consolidation
+bash scripts/verify.sh
 
 # Review results
-cat CHIMERA_CONSOLIDATION_REPORT.md
+cat CONSOLIDATION_REPORT.md
 cat audit_report.json
 ```
 
@@ -56,6 +62,37 @@ python3 -c "from backend.chimera_master import create_chimera_master; \
             chimera = create_chimera_master('8.0'); \
             print(chimera.get_feature_matrix())"
 ```
+
+## 🔄 Consolidation System
+
+This repository includes an intelligent consolidation system that automatically merges content from 5 source repositories:
+
+### How It Works
+
+1. **Cloning**: All source repositories are cloned into `source/` directory
+2. **Backup**: Timestamped tar.gz backups are created in `backups/`
+3. **Consolidation**: Files are intelligently copied to appropriate locations
+4. **Reporting**: Detailed reports are generated for review
+
+### Manual Consolidation
+
+```bash
+# Full consolidation with backups
+bash automation/consolidate.sh
+
+# Verify repository structure
+bash scripts/verify.sh
+```
+
+### Configuration
+
+Edit `config/consolidation-config.json` to customize:
+- Source repository mappings
+- File path destinations
+- Conflict resolution strategy
+- Exclusion patterns
+
+See `automation/README.md` for detailed documentation.
 
 ## 📁 Repository Structure
 
@@ -85,6 +122,14 @@ This system includes comprehensive security auditing:
 **Always review `audit_report.json` before deploying!**
 
 ## 📊 Features
+
+### Intelligent Consolidation System
+- 🎯 **Smart Merging**: Automatically consolidates 5 source repositories
+- 💾 **Automatic Backups**: Creates timestamped tar.gz archives before consolidation
+- 📝 **Detailed Reporting**: Generates comprehensive consolidation reports
+- 🔄 **Conflict Resolution**: Uses "newer wins" strategy for file conflicts
+- 📂 **Organized Structure**: Maps files to appropriate destinations
+- ⚡ **Efficient Copying**: Uses rsync for intelligent file operations
 
 ### Smart Analysis
 - 📊 Repository analysis with framework detection

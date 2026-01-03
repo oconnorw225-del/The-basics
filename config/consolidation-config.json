@@ -1,0 +1,80 @@
+{
+  "sourceRepos": [
+    {
+      "name": "ndax-quantum-engine",
+      "owner": "oconnorw225-del",
+      "url": "https://github.com/oconnorw225-del/ndax-quantum-engine.git",
+      "paths": {
+        "src": "api/",
+        "bot.js": "backend/bot.js",
+        "docs": "docs/ndax/",
+        "tests": "tests/ndax/"
+      }
+    },
+    {
+      "name": "quantum-engine-dashb",
+      "owner": "oconnorw225-del",
+      "url": "https://github.com/oconnorw225-del/quantum-engine-dashb.git",
+      "paths": {
+        "src": "frontend/dashboard/",
+        "docs": "docs/dashboard/",
+        ".github/workflows": ".github/workflows/"
+      }
+    },
+    {
+      "name": "shadowforge-ai-trader",
+      "owner": "oconnorw225-del",
+      "url": "https://github.com/oconnorw225-del/shadowforge-ai-trader.git",
+      "paths": {
+        "backend": "backend/",
+        "chimera_core": "backend/chimera/",
+        "src": "backend/strategy/",
+        "tests": "tests/shadowforge/",
+        "docs": "docs/shadowforge/"
+      }
+    },
+    {
+      "name": "repository-web-app",
+      "owner": "oconnorw225-del",
+      "url": "https://github.com/oconnorw225-del/repository-web-app.git",
+      "paths": {
+        "src": "frontend/web-app/",
+        "backend": "backend/api/",
+        "docs": "docs/web-app/",
+        ".github/workflows": ".github/workflows/"
+      }
+    },
+    {
+      "name": "The-new-ones",
+      "owner": "oconnorw225-del",
+      "url": "https://github.com/oconnorw225-del/The-new-ones.git",
+      "paths": {
+        "config": "config/recovered/",
+        "scripts": "scripts/recovery/",
+        ".env.example": "config/.env.example.recovered",
+        "docs": "docs/recovery/"
+      }
+    }
+  ],
+  "backupFormat": "tar.gz",
+  "conflictResolution": "newer",
+  "excludePatterns": [
+    "node_modules",
+    "__pycache__",
+    ".git",
+    "*.log",
+    ".env",
+    ".DS_Store",
+    "Thumbs.db",
+    "venv",
+    "env",
+    "dist",
+    "build"
+  ],
+  "options": {
+    "createBackups": true,
+    "preserveTimestamps": true,
+    "verboseLogging": true,
+    "dryRun": false
+  }
+}
