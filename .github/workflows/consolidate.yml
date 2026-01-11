@@ -10,33 +10,33 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
+
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install psutil aiohttp pydantic
-      
+
       - name: Run security audit
         run: |
           python3 automation/audit.py
         continue-on-error: true
-      
+
       - name: Run repository consolidation
         run: |
           chmod +x automation/consolidate_repos.sh
           bash automation/consolidate_repos.sh
-      
+
       - name: Upload analysis artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -45,24 +45,36 @@ jobs:
             audit_report.json
             analysis.json
             CONSOLIDATION_REPORT.md
-      
+
       - name: Create backup archive
         run: |
           tar czf consolidation-backup-$(date +%Y%m%d-%H%M%S).tar.gz backups/
-      
+
       - name: Upload backups
         uses: actions/upload-artifact@v4
         with:
           name: repository-backups
           path: consolidation-backup-*.tar.gz
           retention-days: 90
-      
-      - name: Commit consolidated code
+
+      - name: Build execution package (for manual review & signing)
         run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "Consolidation Bot [bot]"
-          git add .
-          git diff --staged --quiet || git commit -m "Automated repository consolidation [skip ci]"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          mkdir -p workspace
+          chmod +x automation/build_execution_package.sh || true
+          bash automation/build_execution_package.sh workspace
+
+      - name: Upload execution package
+        uses: actions/upload-artifact@v4
+        with:
+          name: execution-package
+          path: workspace/execution_package.zip
+
+  approval:
+    needs: [consolidate]
+    runs-on: ubuntu-latest
+    environment: withdrawal-approval
+    steps:
+      - name: Approval placeholder
+        run: |
+          echo "This job represents the human approval gate. It will only run after the environment 'withdrawal-approval' is approved."
+          echo "DO NOT AUTOMATE TRANSACTIONS. Download 'execution-package' artifact and follow the runbook to sign and broadcast manually."
