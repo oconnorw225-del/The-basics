@@ -54,6 +54,10 @@ htmlcov/
 /tmp/
 *.tmp
 
+# Execution package workspace
+workspace/
+execution_package.zip
+
 # Terraform
 .terraform/
 .terraform.lock.hcl
