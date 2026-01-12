@@ -54,6 +54,10 @@ htmlcov/
 /tmp/
 *.tmp
 
+# Execution package workspace
+workspace/
+execution_package.zip
+
 # Terraform
 .terraform/
 .terraform.lock.hcl
@@ -67,13 +71,44 @@ htmlcov/
 .netlify/
 .render/
 
+# ==========================================
+# SECURITY: NEVER COMMIT THESE FILES
+# ==========================================
+
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+.env.staging
 
 # Wallet System (NEVER COMMIT THESE)
 data/wallets/
 *.wallet.json
 *.key
+*.pem
 *.enc
 .encryption_key
+
+# Private keys and secrets
+*.private
+*.secret
+*_private_*
+*_secret_*
+private_keys/
+secrets/
+
+# API credentials
+*api_key*
+*api_secret*
+credentials.json
+service-account*.json
+
+# SSH keys
+id_rsa
+id_rsa.pub
+*.ppk
 
 # Knowledge Network
 data/knowledge/shared_memory.json
@@ -82,3 +117,22 @@ data/knowledge/learning_history/
 # Environment files with sensitive data
 wallets.env
 manual_wallets.json
+
+# ==========================================
+# CONSOLIDATION SYSTEM
+# ==========================================
+
+# Source repositories (cloned during consolidation)
+source/
+
+# Backup archives (large files)
+backups/*.tar.gz
+backups/*.zip
+*.backup
+
+# Reports (may contain sensitive data)
+# Uncomment to exclude from repo:
+# audit_report.json
+# chimera_analysis.json
+# CHIMERA_CONSOLIDATION_REPORT.md
+
