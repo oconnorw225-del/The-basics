@@ -25,17 +25,27 @@ TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 LOG_FILE="${REPO_ROOT}/consolidation_${TIMESTAMP}.log"
 CONFIG_FILE="${REPO_ROOT}/config/consolidation-config.json"
 
-# Load configuration from JSON if available
+# Load configuration from JSON if available, otherwise use hardcoded defaults
 declare -A REPOS
-if [ -f "$CONFIG_FILE" ]; then
-    # Extract repo names and URLs from JSON config
-    REPOS["ndax-quantum-engine"]="https://github.com/oconnorw225-del/ndax-quantum-engine.git"
-    REPOS["quantum-engine-dashb"]="https://github.com/oconnorw225-del/quantum-engine-dashb.git"
-    REPOS["shadowforge-ai-trader"]="https://github.com/oconnorw225-del/shadowforge-ai-trader.git"
-    REPOS["repository-web-app"]="https://github.com/oconnorw225-del/repository-web-app.git"
-    REPOS["The-new-ones"]="https://github.com/oconnorw225-del/The-new-ones.git"
-else
-    # Fallback to hardcoded values if config not found
+
+# Attempt to load repo names and URLs from JSON config when jq and the file are available
+if [ -f "$CONFIG_FILE" ] && command -v jq >/dev/null 2>&1; then
+    # Expected JSON structure:
+    # {
+    #   "repositories": [
+    #     { "name": "ndax-quantum-engine", "url": "https://github.com/..." },
+    #     ...
+    #   ]
+    # }
+    while IFS=" " read -r name url; do
+        if [ -n "$name" ] && [ -n "$url" ]; then
+            REPOS["$name"]="$url"
+        fi
+    done < <(jq -r '.repositories[]? | "\(.name) \(.url)"' "$CONFIG_FILE" 2>/dev/null || echo "")
+fi
+
+# Fallback to hardcoded values if no repositories were loaded from config
+if [ ${#REPOS[@]} -eq 0 ]; then
     REPOS["ndax-quantum-engine"]="https://github.com/oconnorw225-del/ndax-quantum-engine.git"
     REPOS["quantum-engine-dashb"]="https://github.com/oconnorw225-del/quantum-engine-dashb.git"
     REPOS["shadowforge-ai-trader"]="https://github.com/oconnorw225-del/shadowforge-ai-trader.git"
