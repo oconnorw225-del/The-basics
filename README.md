@@ -7,6 +7,7 @@
 This repository consolidates the best parts from 5 source repositories using **Project Chimera** - an advanced AI trading system with transcendent intelligence.
 
 ### Source Repositories
+
 - [ndax-quantum-engine](https://github.com/oconnorw225-del/ndax-quantum-engine) - Trading bot core
 - [quantum-engine-dashb](https://github.com/oconnorw225-del/quantum-engine-dashb) - Dashboard UI
 - [shadowforge-ai-trader](https://github.com/oconnorw225-del/shadowforge-ai-trader) - AI trading with Chimera
@@ -25,28 +26,37 @@ This repository consolidates the best parts from 5 source repositories using **P
 
 ## 🚀 Quick Start
 
-### Option 1: Automated GitHub Actions
-1. Go to **Actions** tab
-2. Select **"Chimera Smart Consolidation & Audit"**
-3. Click **"Run workflow"**
-4. Select Chimera version (default: 8.0)
-5. Review artifacts after completion
+### Option 1: Automated GitHub Actions (Recommended)
 
-### Option 2: Manual Consolidation
+1. Go to **Actions** tab
+2. Select **"Repository Consolidation & Security Audit"**
+3. Click **"Run workflow"**
+4. Wait for completion (includes cloning, backup, and consolidation)
+5. Review artifacts and consolidation report
+
+### Option 2: Local Setup and Consolidation
+
 ```bash
 # Clone this repository
 git clone https://github.com/oconnorw225-del/the-basics.git
 cd the-basics
 
-# Run Chimera-powered consolidation
-bash automation/chimera_consolidate.sh
+# Run setup to check dependencies
+bash scripts/setup.sh
+
+# Run consolidation
+bash automation/consolidate.sh
+
+# Verify consolidation
+bash scripts/verify.sh
 
 # Review results
-cat CHIMERA_CONSOLIDATION_REPORT.md
+cat CONSOLIDATION_REPORT.md
 cat audit_report.json
 ```
 
 ### Option 3: Test Chimera Intelligence
+
 ```bash
 # Run Chimera demonstration
 python3 demo_chimera.py
@@ -56,6 +66,38 @@ python3 -c "from backend.chimera_master import create_chimera_master; \
             chimera = create_chimera_master('8.0'); \
             print(chimera.get_feature_matrix())"
 ```
+
+## 🔄 Consolidation System
+
+This repository includes an intelligent consolidation system that automatically merges content from 5 source repositories:
+
+### How It Works
+
+1. **Cloning**: All source repositories are cloned into `source/` directory
+2. **Backup**: Timestamped tar.gz backups are created in `backups/`
+3. **Consolidation**: Files are intelligently copied to appropriate locations
+4. **Reporting**: Detailed reports are generated for review
+
+### Manual Consolidation
+
+```bash
+# Full consolidation with backups
+bash automation/consolidate.sh
+
+# Verify repository structure
+bash scripts/verify.sh
+```
+
+### Configuration
+
+Edit `config/consolidation-config.json` to customize:
+
+- Source repository mappings
+- File path destinations
+- Conflict resolution strategy
+- Exclusion patterns
+
+See `automation/README.md` for detailed documentation.
 
 ## 📁 Repository Structure
 
@@ -77,6 +119,7 @@ the-basics/
 ## 🔐 Security
 
 This system includes comprehensive security auditing:
+
 - 🔍 Scans for sensitive data (API keys, private keys, mnemonics)
 - 💰 Detects cryptocurrency wallet addresses
 - 🐛 Identifies code quality issues
@@ -86,19 +129,31 @@ This system includes comprehensive security auditing:
 
 ## 📊 Features
 
+### Intelligent Consolidation System
+
+- 🎯 **Smart Merging**: Automatically consolidates 5 source repositories
+- 💾 **Automatic Backups**: Creates timestamped tar.gz archives before consolidation
+- 📝 **Detailed Reporting**: Generates comprehensive consolidation reports
+- 🔄 **Conflict Resolution**: Uses "newer wins" strategy for file conflicts
+- 📂 **Organized Structure**: Maps files to appropriate destinations
+- ⚡ **Efficient Copying**: Uses rsync for intelligent file operations
+
 ### Smart Analysis
+
 - 📊 Repository analysis with framework detection
 - 🔐 Security audit with pattern matching
 - 🐛 Code quality assessment
 - 📦 Dependency mapping
 
 ### Automated Consolidation
+
 - 🎯 Intelligent merging by type and function
 - 💾 Automatic backup creation
 - 📝 Detailed reporting
 - ⚡ Optimized for large codebases
 
 ### Chimera Intelligence
+
 - 🧠 Adaptive learning AI
 - 📈 Market prediction
 - 🔄 Self-optimization
@@ -107,6 +162,7 @@ This system includes comprehensive security auditing:
 ## 📝 Generated Reports
 
 After consolidation:
+
 1. **`audit_report.json`** - Security audit results
 2. **`chimera_analysis.json`** - Repository analysis
 3. **`CHIMERA_CONSOLIDATION_REPORT.md`** - Human-readable summary
@@ -130,12 +186,14 @@ bash automation/smart_consolidate.sh
 ## 📦 Dependencies
 
 ### Python
+
 ```bash
 pip install -r requirements.txt
 pip install -r requirements_chimera.txt
 ```
 
 ### Node.js
+
 ```bash
 npm install
 ```
@@ -143,6 +201,7 @@ npm install
 ## 🤝 Contributing
 
 This is an automated consolidation repo. To contribute:
+
 1. Make changes to source repositories
 2. Re-run consolidation workflow
 3. Review and merge results
