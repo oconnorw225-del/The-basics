@@ -11,37 +11,41 @@ The `automation/` directory contains scripts for intelligent repository consolid
 **Purpose**: Consolidates 5 source repositories into the unified `the-basics` codebase.
 
 **What it does**:
+
 1. Clones all source repositories into `source/` directory
 2. Creates timestamped tar.gz backups in `backups/`
 3. Intelligently copies files to appropriate destinations
 4. Generates consolidation report
 
 **Usage**:
+
 ```bash
 bash automation/consolidate.sh
 ```
 
 **Source Repository Mapping**:
 
-| Source Repository | Destination | Content |
-|------------------|-------------|---------|
-| `ndax-quantum-engine` | `api/ndax/` | Trading API, bot.js |
-| `quantum-engine-dashb` | `frontend/dashboard/` | React/TypeScript dashboard |
-| `shadowforge-ai-trader` | `backend/`, `backend/chimera/` | AI trading system, Chimera core |
-| `repository-web-app` | `frontend/web-app/`, `backend/api/` | Full-stack web application |
-| `The-new-ones` | `config/recovered/`, `scripts/recovery/` | Recovery configurations |
+| Source Repository       | Destination                              | Content                         |
+| ----------------------- | ---------------------------------------- | ------------------------------- |
+| `ndax-quantum-engine`   | `api/ndax/`                              | Trading API, bot.js             |
+| `quantum-engine-dashb`  | `frontend/dashboard/`                    | React/TypeScript dashboard      |
+| `shadowforge-ai-trader` | `backend/`, `backend/chimera/`           | AI trading system, Chimera core |
+| `repository-web-app`    | `frontend/web-app/`, `backend/api/`      | Full-stack web application      |
+| `The-new-ones`          | `config/recovered/`, `scripts/recovery/` | Recovery configurations         |
 
 ### audit.py
 
 **Purpose**: Security audit and sensitive data detection.
 
 **Features**:
+
 - Scans for API keys, private keys, secrets
 - Detects cryptocurrency wallet addresses
 - Identifies code quality issues
 - Generates `audit_report.json`
 
 **Usage**:
+
 ```bash
 python3 automation/audit.py
 ```
@@ -51,12 +55,14 @@ python3 automation/audit.py
 **Purpose**: Analyzes repository structure and dependencies.
 
 **Features**:
+
 - Detects frameworks and languages
 - Maps directory structure
 - Identifies dependencies
 - Generates `analysis.json`
 
 **Usage**:
+
 ```bash
 python3 automation/repo_analyzer.py
 ```
@@ -66,6 +72,7 @@ python3 automation/repo_analyzer.py
 **Purpose**: Legacy consolidation script with enhanced features.
 
 **Features**:
+
 - Colored output and progress indicators
 - Backup creation
 - Error handling
@@ -76,6 +83,7 @@ python3 automation/repo_analyzer.py
 **Purpose**: Interactive consolidation with user prompts.
 
 **Features**:
+
 - Interactive mode for selective consolidation
 - Conflict detection and resolution
 - Rollback capability
@@ -119,6 +127,7 @@ The consolidation system uses the **"newer wins"** strategy:
 - Logs all conflicts for review
 
 **Implementation**:
+
 - Primary: `rsync -av --update` (preserves newer files)
 - Fallback: `cp -ru` (update mode)
 
@@ -127,6 +136,7 @@ The consolidation system uses the **"newer wins"** strategy:
 To add a new source repository to consolidation:
 
 1. **Update config file**: `config/consolidation-config.json`
+
 ```json
 {
   "name": "new-repo-name",
@@ -139,19 +149,20 @@ To add a new source repository to consolidation:
 ```
 
 2. **Update consolidate.sh**: Add new consolidation function
+
 ```bash
 consolidate_new_repo() {
     log_step "Consolidating new-repo-name..."
     local repo_path="${SOURCE_DIR}/new-repo-name"
-    
+
     if [ ! -d "$repo_path" ]; then
         log_warning "Repository new-repo-name not found"
         return
     fi
-    
+
     # Copy logic here
     copy_with_conflict_resolution "$repo_path/src/" "${REPO_ROOT}/destination/" "Description"
-    
+
     log_success "new-repo-name consolidated"
 }
 ```
@@ -199,7 +210,9 @@ the-basics/
 ## Backup Management
 
 ### Backup Location
+
 All backups are stored in `backups/` directory with timestamp format:
+
 ```
 backups/
 ├── ndax-quantum-engine_20260103_120000.tar.gz
@@ -212,6 +225,7 @@ backups/
 ### Restoring from Backup
 
 To restore a specific repository from backup:
+
 ```bash
 # Extract backup
 tar -xzf backups/ndax-quantum-engine_20260103_120000.tar.gz -C /tmp/
@@ -234,6 +248,7 @@ cp -r /tmp/ndax-quantum-engine/src/* api/ndax/
 ### Issue: Repository clone fails
 
 **Solution**:
+
 ```bash
 # Check network connectivity
 ping github.com
@@ -247,6 +262,7 @@ git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git
 ### Issue: rsync not available
 
 **Solution**: Script automatically falls back to `cp -ru`. To install rsync:
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install rsync
@@ -258,6 +274,7 @@ brew install rsync
 ### Issue: Permission denied during copy
 
 **Solution**:
+
 ```bash
 # Make script executable
 chmod +x automation/consolidate.sh
@@ -271,6 +288,7 @@ ls -la automation/
 ### Issue: Out of disk space
 
 **Solution**:
+
 ```bash
 # Check disk space
 df -h
@@ -313,16 +331,19 @@ See `.github/workflows/consolidate.yml` for workflow configuration.
 ## Maintenance
 
 ### Weekly Tasks
+
 - Run consolidation to pull latest changes
 - Review audit reports
 - Clean up old backups
 
 ### Monthly Tasks
+
 - Update source repository list if needed
 - Review and optimize consolidation mappings
 - Update documentation
 
 ### Quarterly Tasks
+
 - Full security audit
 - Review and update conflict resolution strategy
 - Optimize directory structure
@@ -330,6 +351,7 @@ See `.github/workflows/consolidate.yml` for workflow configuration.
 ## Support
 
 For issues or questions:
+
 1. Check the troubleshooting section above
 2. Review consolidation logs
 3. Consult main README.md
@@ -337,5 +359,5 @@ For issues or questions:
 
 ---
 
-*Last updated: 2026-01-03*  
-*Powered by Project Chimera V8.0*
+_Last updated: 2026-01-03_  
+_Powered by Project Chimera V8.0_

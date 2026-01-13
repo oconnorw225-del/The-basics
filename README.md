@@ -7,6 +7,7 @@
 This repository consolidates the best parts from 5 source repositories using **Project Chimera** - an advanced AI trading system with transcendent intelligence.
 
 ### Source Repositories
+
 - [ndax-quantum-engine](https://github.com/oconnorw225-del/ndax-quantum-engine) - Trading bot core
 - [quantum-engine-dashb](https://github.com/oconnorw225-del/quantum-engine-dashb) - Dashboard UI
 - [shadowforge-ai-trader](https://github.com/oconnorw225-del/shadowforge-ai-trader) - AI trading with Chimera
@@ -26,6 +27,7 @@ This repository consolidates the best parts from 5 source repositories using **P
 ## 🚀 Quick Start
 
 ### Option 1: Automated GitHub Actions (Recommended)
+
 1. Go to **Actions** tab
 2. Select **"Repository Consolidation & Security Audit"**
 3. Click **"Run workflow"**
@@ -33,6 +35,7 @@ This repository consolidates the best parts from 5 source repositories using **P
 5. Review artifacts and consolidation report
 
 ### Option 2: Local Setup and Consolidation
+
 ```bash
 # Clone this repository
 git clone https://github.com/oconnorw225-del/the-basics.git
@@ -53,6 +56,7 @@ cat audit_report.json
 ```
 
 ### Option 3: Test Chimera Intelligence
+
 ```bash
 # Run Chimera demonstration
 python3 demo_chimera.py
@@ -87,6 +91,7 @@ bash scripts/verify.sh
 ### Configuration
 
 Edit `config/consolidation-config.json` to customize:
+
 - Source repository mappings
 - File path destinations
 - Conflict resolution strategy
@@ -114,6 +119,7 @@ the-basics/
 ## 🔐 Security
 
 This system includes comprehensive security auditing:
+
 - 🔍 Scans for sensitive data (API keys, private keys, mnemonics)
 - 💰 Detects cryptocurrency wallet addresses
 - 🐛 Identifies code quality issues
@@ -124,6 +130,7 @@ This system includes comprehensive security auditing:
 ## 📊 Features
 
 ### Intelligent Consolidation System
+
 - 🎯 **Smart Merging**: Automatically consolidates 5 source repositories
 - 💾 **Automatic Backups**: Creates timestamped tar.gz archives before consolidation
 - 📝 **Detailed Reporting**: Generates comprehensive consolidation reports
@@ -132,18 +139,21 @@ This system includes comprehensive security auditing:
 - ⚡ **Efficient Copying**: Uses rsync for intelligent file operations
 
 ### Smart Analysis
+
 - 📊 Repository analysis with framework detection
 - 🔐 Security audit with pattern matching
 - 🐛 Code quality assessment
 - 📦 Dependency mapping
 
 ### Automated Consolidation
+
 - 🎯 Intelligent merging by type and function
 - 💾 Automatic backup creation
 - 📝 Detailed reporting
 - ⚡ Optimized for large codebases
 
 ### Chimera Intelligence
+
 - 🧠 Adaptive learning AI
 - 📈 Market prediction
 - 🔄 Self-optimization
@@ -152,6 +162,7 @@ This system includes comprehensive security auditing:
 ## 📝 Generated Reports
 
 After consolidation:
+
 1. **`audit_report.json`** - Security audit results
 2. **`chimera_analysis.json`** - Repository analysis
 3. **`CHIMERA_CONSOLIDATION_REPORT.md`** - Human-readable summary
@@ -175,12 +186,14 @@ bash automation/smart_consolidate.sh
 ## 📦 Dependencies
 
 ### Python
+
 ```bash
 pip install -r requirements.txt
 pip install -r requirements_chimera.txt
 ```
 
 ### Node.js
+
 ```bash
 npm install
 ```
@@ -188,6 +201,7 @@ npm install
 ## 🤝 Contributing
 
 This is an automated consolidation repo. To contribute:
+
 1. Make changes to source repositories
 2. Re-run consolidation workflow
 3. Review and merge results
