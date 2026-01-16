@@ -1,80 +1,54 @@
-name: Repository Consolidation & Security Audit
+name: Consolidate Best Parts
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * 0'  # Weekly on Sunday
 
 jobs:
   consolidate:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout repository
+      - name: Checkout the-basics repository
         uses: actions/checkout@v4
+
+      - name: Clone source repositories
+        run: |
+          mkdir source
+          git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine
+          git clone https://github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb
+          git clone https://github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader
+          git clone https://github.com/oconnorw225-del/repository-web-app.git source/repository-web-app
+          git clone https://github.com/oconnorw225-del/The-new-ones.git source/The-new-ones
+
+      - name: Create and Upload Backups
+        run: |
+          mkdir backups
+          tar czf backups/ndax-quantum-engine.tar.gz -C source ndax-quantum-engine
+          tar czf backups/quantum-engine-dashb.tar.gz -C source quantum-engine-dashb
+          tar czf backups/shadowforge-ai-trader.tar.gz -C source shadowforge-ai-trader
+          tar czf backups/repository-web-app.tar.gz -C source repository-web-app
+          tar czf backups/The-new-ones.tar.gz -C source The-new-ones
+      
+      - name: Upload backups as artifact
+        uses: actions/upload-artifact@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          name: source-code-backups
+          path: backups/
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Install Python dependencies
+      - name: Setup directory structure
         run: |
-          python -m pip install --upgrade pip
-          pip install psutil aiohttp pydantic
+          mkdir -p api backend frontend workflows docs automation tests
 
-      - name: Run security audit
+      - name: Run consolidation script
         run: |
-          python3 automation/audit.py
-        continue-on-error: true
+          bash automation/consolidate.sh
 
-      - name: Run repository consolidation
+      - name: Commit consolidated code
         run: |
-          chmod +x automation/consolidate_repos.sh
-          bash automation/consolidate_repos.sh
+          # The backups directory should not be committed to the repo
+          rm -rf backups/
 
-      - name: Upload analysis artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: consolidation-reports
-          path: |
-            audit_report.json
-            analysis.json
-            CONSOLIDATION_REPORT.md
-
-      - name: Create backup archive
-        run: |
-          tar czf consolidation-backup-$(date +%Y%m%d-%H%M%S).tar.gz backups/
-
-      - name: Upload backups
-        uses: actions/upload-artifact@v4
-        with:
-          name: repository-backups
-          path: consolidation-backup-*.tar.gz
-          retention-days: 90
-
-      - name: Build execution package (for manual review & signing)
-        run: |
-          mkdir -p workspace
-          chmod +x automation/build_execution_package.sh || true
-          bash automation/build_execution_package.sh workspace
-
-      - name: Upload execution package
-        uses: actions/upload-artifact@v4
-        with:
-          name: execution-package
-          path: workspace/execution_package.zip
-
-  approval:
-    needs: [consolidate]
-    runs-on: ubuntu-latest
-    environment: withdrawal-approval
-    steps:
-      - name: Approval placeholder
-        run: |
-          echo "This job represents the human approval gate. It will only run after the environment 'withdrawal-approval' is approved."
-          echo "DO NOT AUTOMATE TRANSACTIONS. Download 'execution-package' artifact and follow the runbook to sign and broadcast manually."
+          git config --global user.email "ci-bot@example.com"
+          git config --global user.name "CI Bot"
+          git add .
+          git diff --staged --quiet || git commit -m "Automated consolidation of best parts"
+          git push
