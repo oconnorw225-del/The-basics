@@ -6,9 +6,13 @@ on:
 jobs:
   consolidate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout the-basics repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Clone source repositories
         run: |
@@ -25,8 +29,8 @@ jobs:
           tar czf backups/ndax-quantum-engine.tar.gz -C source ndax-quantum-engine
           tar czf backups/quantum-engine-dashb.tar.gz -C source quantum-engine-dashb
           tar czf backups/shadowforge-ai-trader.tar.gz -C source shadowforge-ai-trader
-          tar czf backups/repository-web-app.tar.gz -C source/repository-web-app
-          tar czf backups/The-new-ones.tar.gz -C source/The-new-ones
+          tar czf backups/repository-web-app.tar.gz -C source repository-web-app
+          tar czf backups/The-new-ones.tar.gz -C source The-new-ones
 
       - name: Setup directory structure
         run: |
