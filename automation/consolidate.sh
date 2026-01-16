@@ -198,10 +198,10 @@ copy_with_conflict_resolution() {
         # Handle directories and files appropriately
         if [ -d "$src" ]; then
             # For directories, ensure trailing slash for proper copying
-            rsync -av --update "${src}/" "$dest" 2>&1 | tee -a "$LOG_FILE" || log_warning "rsync failed for $description"
+            rsync -av --update --checksum "${src}/" "$dest" 2>&1 | tee -a "$LOG_FILE" || log_warning "rsync failed for $description"
         else
             # For files, copy directly
-            rsync -av --update "$src" "$dest" 2>&1 | tee -a "$LOG_FILE" || log_warning "rsync failed for $description"
+            rsync -av --update --checksum "$src" "$dest" 2>&1 | tee -a "$LOG_FILE" || log_warning "rsync failed for $description"
         fi
     else
         # Fallback to cp with update flag
