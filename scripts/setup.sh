@@ -272,7 +272,7 @@ setup_git_hooks() {
 # Pre-commit hook to prevent committing sensitive files
 
 # Check for forbidden file patterns
-for file in $(git diff --cached --name-only); do
+git diff --cached --name-only -z | while IFS= read -r -d '' file; do
     case "$file" in
         .env|.env.local|.env.production|*.key|*.pem|*_secret_*|*api_key*)
             echo "Error: Attempting to commit sensitive file: $file"
