@@ -123,7 +123,23 @@ clone_repositories() {
         if [ -d "$repo_path" ]; then
             log_info "Repository $repo_name already exists, pulling latest changes..."
             cd "$repo_path"
-            git pull origin main 2>/dev/null || git pull origin master 2>/dev/null || log_warning "Could not pull latest changes for $repo_name"
+            # Ensure working tree is clean before updating
+            if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
+                log_warning "Repository $repo_name has uncommitted changes; skipping update to avoid conflicts"
+            else
+                # Fetch latest refs and hard reset to remote main/master for deterministic state
+                if git fetch origin 2>>"$LOG_FILE"; then
+                    if git rev-parse --verify origin/main >/dev/null 2>&1; then
+                        git reset --hard origin/main 2>>"$LOG_FILE" || log_warning "Failed to reset $repo_name to origin/main"
+                    elif git rev-parse --verify origin/master >/dev/null 2>&1; then
+                        git reset --hard origin/master 2>>"$LOG_FILE" || log_warning "Failed to reset $repo_name to origin/master"
+                    else
+                        log_warning "No origin/main or origin/master branch found for $repo_name"
+                    fi
+                else
+                    log_warning "Could not fetch latest changes for $repo_name"
+                fi
+            fi
             cd "${SOURCE_DIR}"
         else
             log_info "Cloning $repo_name..."
