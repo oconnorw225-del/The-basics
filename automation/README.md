@@ -120,16 +120,17 @@ python3 automation/repo_analyzer.py
 ## Conflict Resolution Strategy
 
 The consolidation system uses the **"newer wins"** strategy:
+The consolidation system uses a **"source wins if same or newer"** strategy based on file modification times:
 
 - When files exist in both source and destination
 - Compares modification timestamps
-- Keeps the newer file
-- Logs all conflicts for review
+- If the source file is newer **or has the same timestamp**, it is copied over the destination
+- If the destination file is strictly newer than the source, the destination file is kept
+- Logs all such conflicts and overwrite decisions for review
 
-**Implementation**:
-
-- Primary: `rsync -av --update` (preserves newer files)
-- Fallback: `cp -ru` (update mode)
+**Implementation details**:
+- Primary: `rsync -av --update` (skips files that are newer on the destination; copies when source is newer or same age)
+- Fallback: `cp -ru` (similar "update" semantics: destination-newer files are preserved, equal-timestamp files may still be overwritten)
 
 ## Adding New Source Repositories
 
