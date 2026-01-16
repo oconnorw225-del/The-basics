@@ -125,9 +125,8 @@ manual_wallets.json
 # Source repositories (cloned during consolidation)
 source/
 
-# Backup archives (large files)
-backups/*.tar.gz
-backups/*.zip
+# Backup archives (large files) - stored as workflow artifacts
+backups/
 *.backup
 
 # Reports (may contain sensitive data)
