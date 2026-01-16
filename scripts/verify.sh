@@ -106,7 +106,10 @@ check_file_not_empty() {
     local description="$2"
     
     if [ -f "$path" ]; then
-        local size=$(wc -l < "$path" 2>/dev/null || echo "0")
+        local size
+        if ! size=$(wc -l < "$path" 2>/dev/null); then
+            size=0
+        fi
         if [ "$size" -gt 0 ]; then
             log_success "$description is valid ($size lines)"
             return 0
