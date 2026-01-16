@@ -205,5 +205,17 @@ jobs:
         if: always()
         run: |
           echo "Cleaning up temporary files..."
+          # Remove consolidated source directories
           rm -rf source/
+          
+          # Remove generated backup archives
+          rm -rf backups/
+          
+          # Remove generated reports and analysis artifacts
+          rm -f CONSOLIDATION_REPORT.md
+          rm -f CONSOLIDATION_SUMMARY.md
+          rm -f audit_report.json
+          rm -f analysis.json
+          rm -f consolidation_*.log
+          
           echo "✓ Cleanup completed"
