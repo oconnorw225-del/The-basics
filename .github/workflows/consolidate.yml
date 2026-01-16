@@ -193,9 +193,7 @@ jobs:
           - repository-web-app
           - The-new-ones
           
-          Generated backups and reports.
-          
-          [skip ci]"
+          Generated backups and reports."
             
             git push
             echo "✓ Changes committed and pushed"
