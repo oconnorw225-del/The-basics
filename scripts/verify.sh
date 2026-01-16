@@ -241,11 +241,16 @@ verify_security() {
     echo ""
     
     # Check that .env is not tracked
-    if git ls-files --error-unmatch .env &>/dev/null; then
-        log_error ".env file is tracked by git (SECURITY RISK!)"
+    if git -C "${REPO_ROOT}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        if git -C "${REPO_ROOT}" ls-files --error-unmatch .env >/dev/null 2>&1; then
+            log_error ".env file is tracked by git (SECURITY RISK!)"
+        else
+            log_success ".env file is not tracked by git"
+            ((PASSED_CHECKS++))
+        fi
     else
-        log_success ".env file is not tracked by git"
-        ((PASSED_CHECKS++))
+        log_warning "Not a git repository; skipping .env tracking check"
+        ((WARNING_CHECKS++))
     fi
     ((TOTAL_CHECKS++))
     
