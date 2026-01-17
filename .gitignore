@@ -43,3 +43,6 @@ pnpm-debug.log*
 # Misc
 *.pem
 .cache/
+
+# Transfer exports
+basics-2-export/
