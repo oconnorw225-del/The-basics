@@ -34,6 +34,8 @@ jobs:
   deploy:
     name: Deploy to AWS
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     environment:
       name: ${{ github.event.inputs.environment || 'staging' }}
 
@@ -149,6 +151,8 @@ jobs:
   rollback:
     name: Rollback on failure
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: deploy
     if: failure()
     steps:
