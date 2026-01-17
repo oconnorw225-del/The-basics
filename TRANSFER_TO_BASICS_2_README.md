@@ -1,8 +1,8 @@
-# Transfer PR #94 Work to basics-2 Repository
+# Transfer PR #94 Work to basic-2 Repository
 
 ## Overview
 
-This document addresses the request to send the task from PR #94 to a "basics-2" repository.
+This document addresses the request to send the task from PR #94 to a "basic-2" repository.
 
 ## Current Situation
 
@@ -17,7 +17,7 @@ This document addresses the request to send the task from PR #94 to a "basics-2"
     - Infrastructure setup with Docker, Turborepo, pnpm workspaces
 
 ### Issue Identified
-The "basics-2" repository **does not currently exist** under the oconnorw225-del GitHub account.
+The "basic-2" repository **does not currently exist** under the oconnorw225-del GitHub account.
 
 ## What Cannot Be Done Automatically
 
@@ -29,32 +29,32 @@ As an AI coding agent, I cannot:
 
 ## Recommended Approaches
 
-### Option 1: Create basics-2 Repository (Recommended)
+### Option 1: Create basic-2 Repository (Recommended)
 If you want the PR #94 changes in a new repository:
 
-1. **Create the basics-2 repository on GitHub:**
+1. **Create the basic-2 repository on GitHub:**
    ```bash
    # Via GitHub UI: Click "New Repository" button
    # Or via GitHub CLI (choose public or private):
-   gh repo create oconnorw225-del/basics-2 --public
+   gh repo create oconnorw225-del/basic-2 --public
    # For private repository (recommended for trading/financial projects):
-   gh repo create oconnorw225-del/basics-2 --private
+   gh repo create oconnorw225-del/basic-2 --private
    ```
 
 2. **Clone both repositories locally:**
    ```bash
    git clone https://github.com/oconnorw225-del/The-basics.git
-   git clone https://github.com/oconnorw225-del/basics-2.git
+   git clone https://github.com/oconnorw225-del/basic-2.git
    ```
 
-3. **Copy the PR branch to basics-2:**
+3. **Copy the PR branch to basic-2:**
    ```bash
    # Note: Run these commands from the parent directory containing both repos
    cd The-basics
    git checkout copilot/reset-repo-to-monorepo-structure
    git format-patch main --stdout > ../pr94-changes.patch
    
-   cd ../basics-2
+   cd ../basic-2
    # Use --3way flag to help with potential conflicts
    git am --3way < ../pr94-changes.patch
    # If conflicts occur, resolve them, then:
@@ -67,20 +67,20 @@ If you want the PR #94 changes in a new repository:
    ```bash
    cd The-basics
    git checkout copilot/reset-repo-to-monorepo-structure
-   git remote add basics-2 https://github.com/oconnorw225-del/basics-2.git
-   git push basics-2 copilot/reset-repo-to-monorepo-structure:main
+   git remote add basic-2 https://github.com/oconnorw225-del/basic-2.git
+   git push basic-2 copilot/reset-repo-to-monorepo-structure:main
    ```
 
 ### Option 2: Rename This Repository
-If you want to rename "The-basics" to "basics-2":
+If you want to rename "The-basics" to "basic-2":
 
 1. Go to repository Settings on GitHub
 2. Scroll to "Repository name"
-3. Change name from "The-basics" to "basics-2"
+3. Change name from "The-basics" to "basic-2"
 4. Click "Rename"
 
-### Option 3: Apply Changes to Existing basics-2
-If basics-2 already exists elsewhere or will be created:
+### Option 3: Apply Changes to Existing basic-2
+If basic-2 already exists elsewhere or will be created:
 
 1. Create the repository on GitHub
 2. Let me know, and I can help recreate the same structure in a new branch
@@ -88,17 +88,17 @@ If basics-2 already exists elsewhere or will be created:
 
 ## What I Can Help With
 
-Once the basics-2 repository exists and you provide access, I can:
-- Create the same monorepo structure in basics-2
+Once the basic-2 repository exists and you provide access, I can:
+- Create the same monorepo structure in basic-2
 - Replicate the changes from PR #94
 - Set up the same configuration files
-- Create a new PR in basics-2 with these changes
+- Create a new PR in basic-2 with these changes
 
 ## Next Steps
 
 Please clarify what you'd like to do:
 
-1. **Create basics-2 repository** - I can then help set it up with the Project Chimera structure
+1. **Create basic-2 repository** - I can then help set it up with the Project Chimera structure
 2. **Rename this repository** - Simpler if you just want to change the name
 3. **Something else** - Please provide more specific instructions
 
@@ -131,6 +131,6 @@ For reference, here are the key files that would be created in the monorepo stru
 ## Contact
 
 If you need further assistance or have questions, please provide:
-1. Whether basics-2 should be a new repository or a rename
-2. Any specific requirements for the basics-2 repository
+1. Whether basic-2 should be a new repository or a rename
+2. Any specific requirements for the basic-2 repository
 3. Whether the structure should be identical to PR #94 or modified
