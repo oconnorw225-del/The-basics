@@ -25,6 +25,8 @@ jobs:
   validate-prerequisites:
     name: ✅ Validate Prerequisites
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -87,6 +89,8 @@ jobs:
     needs: validate-prerequisites
     if: ${{ github.event.inputs.setup_type == 'full' || github.event.inputs.setup_type == 'infrastructure-only' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     environment:
       name: ${{ github.event.inputs.environment }}
     outputs:
@@ -159,6 +163,8 @@ jobs:
       (needs.setup-infrastructure.result == 'success' || needs.setup-infrastructure.result == 'skipped') &&
       (github.event.inputs.setup_type == 'full' || github.event.inputs.setup_type == 'deploy-only')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     environment:
       name: ${{ github.event.inputs.environment }}
 
@@ -232,6 +238,8 @@ jobs:
     needs: [setup-infrastructure, deploy-application]
     if: always()
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Display final summary
         run: |
