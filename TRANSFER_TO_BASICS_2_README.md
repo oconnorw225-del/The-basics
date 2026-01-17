@@ -35,8 +35,10 @@ If you want the PR #94 changes in a new repository:
 1. **Create the basics-2 repository on GitHub:**
    ```bash
    # Via GitHub UI: Click "New Repository" button
-   # Or via GitHub CLI:
+   # Or via GitHub CLI (choose public or private):
    gh repo create oconnorw225-del/basics-2 --public
+   # For private repository (recommended for trading/financial projects):
+   gh repo create oconnorw225-del/basics-2 --private
    ```
 
 2. **Clone both repositories locally:**
@@ -47,12 +49,17 @@ If you want the PR #94 changes in a new repository:
 
 3. **Copy the PR branch to basics-2:**
    ```bash
+   # Note: Run these commands from the parent directory containing both repos
    cd The-basics
    git checkout copilot/reset-repo-to-monorepo-structure
    git format-patch main --stdout > ../pr94-changes.patch
    
    cd ../basics-2
-   git am < ../pr94-changes.patch
+   # Use --3way flag to help with potential conflicts
+   git am --3way < ../pr94-changes.patch
+   # If conflicts occur, resolve them, then:
+   # git add <resolved-files>
+   # git am --continue
    git push origin main
    ```
 
