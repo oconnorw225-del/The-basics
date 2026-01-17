@@ -1,0 +1,21 @@
+{
+  "name": "@chimera/ai-strategies",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@chimera/shared-types": "workspace:*",
+    "@chimera/shared-utils": "workspace:*",
+    "@chimera/trading-engine": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  }
+}
