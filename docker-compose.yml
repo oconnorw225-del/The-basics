@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: ./apps/dashboard/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://trading-api:4000
+    depends_on:
+      - trading-api
+    volumes:
+      - ./apps/dashboard:/app/apps/dashboard
+      - /app/node_modules
+
+  trading-api:
+    build:
+      context: .
+      dockerfile: ./apps/trading-api/Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/chimera
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./apps/trading-api:/app/apps/trading-api
+      - /app/node_modules
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=chimera
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  postgres-data:
+  redis-data:
