@@ -91,7 +91,7 @@ echo "  - Failed: $FAILED files"
 # Create README for basics-2
 echo ""
 echo "Step 5: Creating README for basics-2..."
-cat > "$EXPORT_DIR/README.md" << 'EOF'
+cat > "$EXPORT_DIR/README.md" << EOF
 # basics-2
 
 This repository contains the legacy files and workflows from The-basics repository that were removed in PR #94.
@@ -118,7 +118,7 @@ Files transferred: $(date +"%Y-%m-%d %H:%M:%S")
 
 - Repository: oconnorw225-del/The-basics
 - PR #94: Reset repository to Project Chimera monorepo structure
-- Files preserved from commit: $(git rev-parse --short $PARENT_COMMIT)
+- Files preserved from commit: ${PARENT_COMMIT}
 
 ## Structure
 
@@ -211,7 +211,7 @@ After pushing:
 
 ## Files Transferred
 
-Total files: $(wc -l < deleted_files.txt)
+Total files: \$(wc -l < deleted_files.txt)
 
 Key directories:
 - .github/workflows/ - GitHub Actions workflows
