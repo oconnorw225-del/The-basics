@@ -138,7 +138,7 @@ python3 automation/repo_analyzer.py
   - Critical for detecting historical data leaks
 - Generates detailed report in `security_audit_report.txt`
 - Color-coded console output for easy review
-- Searches for keywords: API_KEY, SECRET, PRIVATE_KEY, Mnemonic, PASSWORD, TOKEN, CREDENTIAL, AWS_SECRET, GITHUB_TOKEN, API_SECRET
+- Searches for keywords: API_KEY, SECRET, PRIVATE_KEY, MNEMONIC, PASSWORD, TOKEN, CREDENTIAL, AWS_SECRET, GITHUB_TOKEN, API_SECRET
 
 **Usage**:
 
