@@ -120,9 +120,9 @@ find "$AGGREGATION_DIR" -name ".git" -type d | while read -r git_dir; do
     pushd "$repo_path" > /dev/null
     
     # Get git log output once for efficiency
-    # Note: For very large repositories, this may consume significant memory
+    # Note: Limiting to first 10000 lines to manage memory usage for large repositories
     echo "    Fetching git history..."
-    git_log_output=$(git log --all -p 2>/dev/null | head -10000 || echo "")
+    git_log_output=$(git log --all -p --max-count=500 2>/dev/null || echo "")
     
     # Scan for each keyword in git history
     for keyword in "${KEYWORDS[@]}"; do
@@ -139,14 +139,14 @@ find "$AGGREGATION_DIR" -name ".git" -type d | while read -r git_dir; do
     echo "    Searching git history for: Ethereum addresses"
     echo "#### Pattern: Ethereum Address" >> "$REPORT_FILE_ABS"
     
-    echo "$git_log_output" | grep -E -n "$ETH_PATTERN" | head -20 >> "$REPORT_FILE_ABS" 2>/dev/null || true
+    echo "$git_log_output" | grep -E -n "$ETH_PATTERN" | head -20 >> "$REPORT_FILE_ABS" 2>/dev/null || echo "No matches found" >> "$REPORT_FILE_ABS"
     echo "" >> "$REPORT_FILE_ABS"
     
     # Scan for Bech32 addresses in git history
     echo "    Searching git history for: Bitcoin Bech32 addresses"
     echo "#### Pattern: Bitcoin Bech32 Address" >> "$REPORT_FILE_ABS"
     
-    echo "$git_log_output" | grep -E -n "$BECH32_PATTERN" | head -20 >> "$REPORT_FILE_ABS" 2>/dev/null || true
+    echo "$git_log_output" | grep -E -n "$BECH32_PATTERN" | head -20 >> "$REPORT_FILE_ABS" 2>/dev/null || echo "No matches found" >> "$REPORT_FILE_ABS"
     echo "" >> "$REPORT_FILE_ABS"
     
     echo "---" >> "$REPORT_FILE_ABS"

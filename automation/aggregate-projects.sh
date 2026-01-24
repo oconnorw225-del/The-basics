@@ -93,7 +93,7 @@ for repo in "${REPOS[@]}"; do
         else
             # Fallback: use find command if tree is not available
             echo "$repo_path/" >> "$SUMMARY_FILE"
-            find "$repo_path" -path '*/\.git' -prune -o -path '*/node_modules' -prune -o -type f -print | \
+            find "$repo_path" -type d \( -name '.git' -o -name 'node_modules' \) -prune -o -type f -print | \
                 sed "s|$repo_path/||" | sed 's/^/  /' | head -100 >> "$SUMMARY_FILE" 2>/dev/null || \
                 echo "Error listing files for $repo_name" >> "$SUMMARY_FILE"
         fi
