@@ -82,3 +82,8 @@ data/knowledge/learning_history/
 # Environment files with sensitive data
 wallets.env
 manual_wallets.json
+
+# Automation script outputs
+project_aggregation/
+project_summary.md
+security_audit_report.txt

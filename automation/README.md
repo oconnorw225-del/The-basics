@@ -88,6 +88,73 @@ python3 automation/repo_analyzer.py
 - Conflict detection and resolution
 - Rollback capability
 
+### aggregate-projects.sh
+
+**Purpose**: Clone multiple related repositories for comprehensive project aggregation and analysis.
+
+**Features**:
+
+- Clones 9 related repositories into a `project_aggregation/` directory
+- Generates `project_summary.md` with directory structures of each repository
+- Uses `tree` command when available for better visualization
+- Creates timestamped documentation
+- Safe execution with user confirmation for overwriting existing directories
+
+**Usage**:
+
+```bash
+./automation/aggregate-projects.sh
+```
+
+**Repositories Aggregated**:
+
+- `oconnorw225-del/ndax-quantum-engine`
+- `oconnorw225-del/The-basics`
+- `oconnorw225-del/The-new-ones`
+- `oconnorw225-del/Cons_path-`
+- `oconnorw225-del/shadowforge-ai-trader`
+- `oconnorw225-del/quantum-engine-dashb`
+- `oconnorw225-del/Cons_path`
+- `oconnorw225-del/repository-web-app`
+- `oconnorw225-del/Trader-bot-`
+
+**Output**:
+
+- `project_aggregation/` - Directory containing all cloned repositories
+- `project_summary.md` - Markdown document with directory trees and metadata
+
+### security-audit.sh
+
+**Purpose**: Comprehensive security scanning for sensitive data in both current files and git history.
+
+**Features**:
+
+- **Current Files Scan**: Searches for sensitive keywords in working directory
+  - Excludes common directories (`.git`, `node_modules`, `__pycache__`, etc.)
+  - Finds exposed API keys, secrets, tokens, and credentials
+- **Git History Scan**: Searches commit history for deleted secrets
+  - Uses `git log` to find commits that added/removed sensitive data
+  - Helps identify if secrets were committed and later deleted
+  - Critical for detecting historical data leaks
+- Generates detailed report in `security_audit_report.txt`
+- Color-coded console output for easy review
+- Searches for keywords: API_KEY, SECRET, PRIVATE_KEY, MNEMONIC, PASSWORD, TOKEN, CREDENTIAL, AWS_SECRET, GITHUB_TOKEN, API_SECRET
+
+**Usage**:
+
+```bash
+./automation/security-audit.sh
+```
+
+**Output**:
+
+- `security_audit_report.txt` - Comprehensive security audit report with:
+  - Section 1: Current Files Scan results
+  - Section 2: Git History Scan results
+  - Summary and recommendations
+
+**Important**: Even if no secrets are found in current files, the git history scan may reveal secrets that were committed and later removed. These secrets should be rotated as they may have been exposed.
+
 ## Consolidation Process
 
 ### Step-by-Step Workflow
@@ -314,7 +381,11 @@ rm -rf source/
 
 6. **Version control**: Always commit changes after reviewing consolidation results
 
-7. **Security first**: Run `audit.py` after consolidation to check for exposed secrets
+7. **Security first**: Run `security-audit.sh` after consolidation to check for exposed secrets and historical leaks
+
+8. **Project aggregation**: Use `aggregate-projects.sh` when you need to analyze multiple related repositories together
+
+9. **History awareness**: Always run `security-audit.sh` to check git history for deleted secrets, not just current files
 
 ## Automation via GitHub Actions
 
