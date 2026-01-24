@@ -119,20 +119,18 @@ find "$AGGREGATION_DIR" -name ".git" -type d | while read -r git_dir; do
     # Change to repo directory
     pushd "$repo_path" > /dev/null
     
-    # Get all git log output once for efficiency
+    # Get git log output once for efficiency
+    # Note: For very large repositories, this may consume significant memory
     echo "    Fetching git history..."
-    git_log_output=$(git log --all -p 2>/dev/null || echo "")
+    git_log_output=$(git log --all -p 2>/dev/null | head -10000 || echo "")
     
     # Scan for each keyword in git history
     for keyword in "${KEYWORDS[@]}"; do
         echo "    Searching git history for: $keyword"
         echo "#### Keyword: $keyword" >> "$REPORT_FILE_ABS"
         
-        # Search entire git history including deleted files
-        git log --all -p -S "$keyword" --oneline 2>/dev/null | head -50 >> "$REPORT_FILE_ABS" || true
-        
-        # Also use grep on cached git log output
-        echo "$git_log_output" | grep -i -n "$keyword" | head -20 >> "$REPORT_FILE_ABS" 2>/dev/null || true
+        # Search git log output for keyword
+        echo "$git_log_output" | grep -i -n "$keyword" | head -20 >> "$REPORT_FILE_ABS" 2>/dev/null || echo "No matches found" >> "$REPORT_FILE_ABS"
         
         echo "" >> "$REPORT_FILE_ABS"
     done
