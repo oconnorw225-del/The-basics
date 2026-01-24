@@ -15,6 +15,12 @@ NC='\033[0m' # No Color
 AGGREGATION_DIR="project_aggregation"
 SUMMARY_FILE="project_summary.md"
 
+# Parse command line arguments
+FORCE_MODE=false
+if [[ "$1" == "--force" || "$1" == "-f" || "$1" == "--yes" || "$1" == "-y" ]]; then
+    FORCE_MODE=true
+fi
+
 # Define repositories to clone
 REPOS=(
     "oconnorw225-del/ndax-quantum-engine"
@@ -34,14 +40,21 @@ echo ""
 # Create aggregation directory if it doesn't exist
 if [ -d "$AGGREGATION_DIR" ]; then
     echo -e "${YELLOW}Warning: $AGGREGATION_DIR already exists.${NC}"
-    read -p "Do you want to remove it and start fresh? (y/n): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo -e "${YELLOW}Removing existing $AGGREGATION_DIR...${NC}"
+    
+    if [ "$FORCE_MODE" = true ]; then
+        echo -e "${YELLOW}Force mode enabled. Removing existing $AGGREGATION_DIR...${NC}"
         rm -rf "$AGGREGATION_DIR"
     else
-        echo -e "${RED}Aborting. Please remove or backup the existing directory first.${NC}"
-        exit 1
+        read -p "Do you want to remove it and start fresh? (y/n): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo -e "${YELLOW}Removing existing $AGGREGATION_DIR...${NC}"
+            rm -rf "$AGGREGATION_DIR"
+        else
+            echo -e "${RED}Aborting. Please remove or backup the existing directory first.${NC}"
+            echo -e "${YELLOW}Or run with --force flag to automatically overwrite.${NC}"
+            exit 1
+        fi
     fi
 fi
 
@@ -102,3 +115,6 @@ echo -e "${GREEN}Repositories cloned to: $AGGREGATION_DIR${NC}"
 echo -e "${GREEN}Summary generated: $SUMMARY_FILE${NC}"
 echo ""
 echo -e "${YELLOW}Note: You may want to add '$AGGREGATION_DIR/' to .gitignore${NC}"
+echo ""
+echo -e "${YELLOW}Usage: $0 [--force|-f|--yes|-y]${NC}"
+echo -e "${YELLOW}  --force, -f, --yes, -y: Skip confirmation prompts and overwrite existing directories${NC}"

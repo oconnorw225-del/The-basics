@@ -20,7 +20,7 @@ SENSITIVE_KEYWORDS=(
     "API_KEY"
     "SECRET"
     "PRIVATE_KEY"
-    "Mnemonic"
+    "MNEMONIC"
     "PASSWORD"
     "TOKEN"
     "CREDENTIAL"
@@ -61,6 +61,7 @@ Searching for sensitive keywords in current working directory...
 EOF
 
 found_current=0
+temp_scan_file=$(mktemp)
 
 for keyword in "${SENSITIVE_KEYWORDS[@]}"; do
     echo -ne "  Searching for '$keyword'...\r"
@@ -69,19 +70,19 @@ for keyword in "${SENSITIVE_KEYWORDS[@]}"; do
     if grep -rIn --exclude-dir={.git,node_modules,__pycache__,.venv,venv,dist,build} \
               --exclude="*.log" \
               --exclude="$REPORT_FILE" \
-              "$keyword" . 2>/dev/null > /tmp/current_scan_$$.tmp; then
+              "$keyword" . 2>/dev/null > "$temp_scan_file"; then
         
         echo "Found '$keyword' in current files:" >> "$REPORT_FILE"
-        cat /tmp/current_scan_$$.tmp >> "$REPORT_FILE"
+        cat "$temp_scan_file" >> "$REPORT_FILE"
         echo "" >> "$REPORT_FILE"
         
-        count=$(wc -l < /tmp/current_scan_$$.tmp)
+        count=$(wc -l < "$temp_scan_file")
         echo -e "  ${RED}✗ Found '$keyword' in $count location(s)${NC}"
         found_current=$((found_current + count))
-        
-        rm /tmp/current_scan_$$.tmp
     fi
 done
+
+rm -f "$temp_scan_file"
 
 if [ $found_current -eq 0 ]; then
     echo -e "  ${GREEN}✓ No sensitive keywords found in current files${NC}"
@@ -111,13 +112,15 @@ EOF
 found_history=0
 
 if [ -d .git ]; then
+    temp_history_file=$(mktemp)
+    
     for keyword in "${SENSITIVE_KEYWORDS[@]}"; do
         echo -ne "  Searching history for '$keyword'...\r"
         
         # Search git log for the keyword in all commits
-        if git log --all -p -S"$keyword" --pretty=format:"%H|%an|%ae|%ad|%s" --date=iso 2>/dev/null > /tmp/history_scan_$$.tmp; then
+        if git log --all -p -S"$keyword" --pretty=format:"%H|%an|%ae|%ad|%s" --date=iso 2>/dev/null > "$temp_history_file"; then
             
-            if [ -s /tmp/history_scan_$$.tmp ]; then
+            if [ -s "$temp_history_file" ]; then
                 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >> "$REPORT_FILE"
                 echo "Keyword: '$keyword'" >> "$REPORT_FILE"
                 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >> "$REPORT_FILE"
@@ -134,19 +137,19 @@ if [ -d .git ]; then
                         
                         found_history=$((found_history + 1))
                     fi
-                done < /tmp/history_scan_$$.tmp
+                done < "$temp_history_file"
                 
-                # Get the actual diff for these commits
-                git log --all -p -S"$keyword" --oneline 2>/dev/null | head -100 >> "$REPORT_FILE"
+                # Get the actual diff for these commits (show more context for security review)
+                git log --all -p -S"$keyword" --oneline 2>/dev/null | head -200 >> "$REPORT_FILE"
                 echo "" >> "$REPORT_FILE"
                 
-                count=$(grep -c "^Commit:" /tmp/history_scan_$$.tmp || echo 0)
+                count=$(grep -c "^Commit:" "$temp_history_file" || echo 0)
                 echo -e "  ${RED}⚠ Found '$keyword' in $count commit(s)${NC}"
             fi
-            
-            rm -f /tmp/history_scan_$$.tmp
         fi
     done
+    
+    rm -f "$temp_history_file"
     
     if [ $found_history -eq 0 ]; then
         echo -e "  ${GREEN}✓ No sensitive keywords found in git history${NC}"
