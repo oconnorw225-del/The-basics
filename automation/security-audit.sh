@@ -104,49 +104,58 @@ echo "2. Scanning Git History for sensitive keywords..." | tee -a "$REPORT_FILE"
 echo "=================================================" | tee -a "$REPORT_FILE"
 echo "" >> "$REPORT_FILE"
 
+# Get absolute path for report file
+REPORT_FILE_ABS="$(pwd)/$REPORT_FILE"
+
 # Find all git repositories in aggregation directory
 find "$AGGREGATION_DIR" -name ".git" -type d | while read -r git_dir; do
     repo_path=$(dirname "$git_dir")
     repo_name=$(basename "$repo_path")
     
     echo "  Scanning repository: $repo_name"
-    echo "### Repository: $repo_name" >> "$REPORT_FILE"
-    echo "" >> "$REPORT_FILE"
+    echo "### Repository: $repo_name" >> "$REPORT_FILE_ABS"
+    echo "" >> "$REPORT_FILE_ABS"
     
-    cd "$repo_path"
+    # Change to repo directory
+    pushd "$repo_path" > /dev/null
+    
+    # Get all git log output once for efficiency
+    echo "    Fetching git history..."
+    git_log_output=$(git log --all -p 2>/dev/null || echo "")
     
     # Scan for each keyword in git history
     for keyword in "${KEYWORDS[@]}"; do
         echo "    Searching git history for: $keyword"
-        echo "#### Keyword: $keyword" >> "$REPORT_FILE"
+        echo "#### Keyword: $keyword" >> "$REPORT_FILE_ABS"
         
         # Search entire git history including deleted files
-        git log --all -p -S "$keyword" --oneline 2>/dev/null | head -50 >> "$REPORT_FILE" || true
+        git log --all -p -S "$keyword" --oneline 2>/dev/null | head -50 >> "$REPORT_FILE_ABS" || true
         
-        # Also use grep on git log output for more comprehensive search
-        git log --all -p 2>/dev/null | grep -i -n "$keyword" | head -20 >> "$REPORT_FILE" 2>/dev/null || true
+        # Also use grep on cached git log output
+        echo "$git_log_output" | grep -i -n "$keyword" | head -20 >> "$REPORT_FILE_ABS" 2>/dev/null || true
         
-        echo "" >> "$REPORT_FILE"
+        echo "" >> "$REPORT_FILE_ABS"
     done
     
     # Scan for Ethereum addresses in git history
     echo "    Searching git history for: Ethereum addresses"
-    echo "#### Pattern: Ethereum Address" >> "$REPORT_FILE"
+    echo "#### Pattern: Ethereum Address" >> "$REPORT_FILE_ABS"
     
-    git log --all -p 2>/dev/null | grep -E -n "$ETH_PATTERN" | head -20 >> "$REPORT_FILE" 2>/dev/null || true
-    echo "" >> "$REPORT_FILE"
+    echo "$git_log_output" | grep -E -n "$ETH_PATTERN" | head -20 >> "$REPORT_FILE_ABS" 2>/dev/null || true
+    echo "" >> "$REPORT_FILE_ABS"
     
     # Scan for Bech32 addresses in git history
     echo "    Searching git history for: Bitcoin Bech32 addresses"
-    echo "#### Pattern: Bitcoin Bech32 Address" >> "$REPORT_FILE"
+    echo "#### Pattern: Bitcoin Bech32 Address" >> "$REPORT_FILE_ABS"
     
-    git log --all -p 2>/dev/null | grep -E -n "$BECH32_PATTERN" | head -20 >> "$REPORT_FILE" 2>/dev/null || true
-    echo "" >> "$REPORT_FILE"
+    echo "$git_log_output" | grep -E -n "$BECH32_PATTERN" | head -20 >> "$REPORT_FILE_ABS" 2>/dev/null || true
+    echo "" >> "$REPORT_FILE_ABS"
     
-    echo "---" >> "$REPORT_FILE"
-    echo "" >> "$REPORT_FILE"
+    echo "---" >> "$REPORT_FILE_ABS"
+    echo "" >> "$REPORT_FILE_ABS"
     
-    cd - > /dev/null
+    # Return to previous directory
+    popd > /dev/null
 done
 
 # Summary
