@@ -34,7 +34,8 @@ OUT_FILE="$OUT_DIR/balances_$TS.json"
 echo "{" > "$OUT_FILE"
 FIRST=true
 while IFS= read -r ADDR || [ -n "$ADDR" ]; do
-  ADDR=$(echo "$ADDR" | tr -d '\r\n' | xargs)
+  # Strip leading/trailing whitespace and carriage returns
+  ADDR=$(echo "$ADDR" | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
   [ -z "$ADDR" ] && continue
   # Skip comment lines
   [[ "$ADDR" =~ ^# ]] && continue
