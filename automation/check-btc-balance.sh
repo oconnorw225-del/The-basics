@@ -36,6 +36,8 @@ FIRST=true
 while IFS= read -r ADDR || [ -n "$ADDR" ]; do
   ADDR=$(echo "$ADDR" | tr -d '\r\n' | xargs)
   [ -z "$ADDR" ] && continue
+  # Skip comment lines
+  [[ "$ADDR" =~ ^# ]] && continue
 
   # Skip obvious invalid lines
   if [[ ${#ADDR} -lt $MIN_ADDR_LENGTH || ${#ADDR} -gt $MAX_ADDR_LENGTH ]]; then
