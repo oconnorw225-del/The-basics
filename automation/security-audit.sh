@@ -21,6 +21,7 @@ KEYWORDS=(
 )
 
 # Define regex patterns for crypto addresses
+# Note: Ethereum addresses are matched case-insensitively via grep -E
 ETH_PATTERN="0x[a-fA-F0-9]{40}"
 BECH32_PATTERN="bc1[a-zA-Z0-9]{25,39}"
 
@@ -108,7 +109,7 @@ echo "" >> "$REPORT_FILE"
 REPORT_FILE_ABS="$(pwd)/$REPORT_FILE"
 
 # Find all git repositories in aggregation directory
-find "$AGGREGATION_DIR" -name ".git" -type d | while read -r git_dir; do
+while read -r git_dir; do
     repo_path=$(dirname "$git_dir")
     repo_name=$(basename "$repo_path")
     
@@ -120,7 +121,7 @@ find "$AGGREGATION_DIR" -name ".git" -type d | while read -r git_dir; do
     pushd "$repo_path" > /dev/null
     
     # Get git log output once for efficiency
-    # Note: Limiting to first 10000 lines to manage memory usage for large repositories
+    # Note: Limiting to most recent 500 commits to manage memory usage for large repositories
     echo "    Fetching git history..."
     git_log_output=$(git log --all -p --max-count=500 2>/dev/null || echo "")
     
@@ -154,7 +155,7 @@ find "$AGGREGATION_DIR" -name ".git" -type d | while read -r git_dir; do
     
     # Return to previous directory
     popd > /dev/null
-done
+done < <(find "$AGGREGATION_DIR" -name ".git" -type d)
 
 # Summary
 echo "" >> "$REPORT_FILE"
