@@ -27,6 +27,21 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
+      # Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Build the project
+      - name: Build project
+        run: npm run build
+
       # Verify repository structure
       - name: Verify repository structure
         run: |
@@ -40,3 +55,11 @@ jobs:
             fi
           done
           echo "✅ CI check completed"
+
+      # Upload build artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist/
+          retention-days: 30
