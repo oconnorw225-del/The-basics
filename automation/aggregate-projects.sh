@@ -33,11 +33,17 @@ clone_or_update() {
   else
     echo "Cloning $name..."
     if [ -n "${GITHUB_PAT-}" ]; then
-      # Use PAT for private repo access if set
-      auth_url=$(echo "$url" | sed -E "s#https://#https://${GITHUB_PAT}@#")
-      git clone "$auth_url"
-      # remove credentials from the remote after cloning
-      (cd "$name" && git remote set-url origin "$(echo $url)")
+      # Use PAT for private repo access via GIT_ASKPASS without embedding it in the URL
+      (
+        tmp_askpass="$(mktemp)"
+        chmod 700 "$tmp_askpass"
+        cat > "$tmp_askpass" <<EOF
+#!/bin/sh
+echo "${GITHUB_PAT}"
+EOF
+        GIT_ASKPASS="$tmp_askpass" GIT_TERMINAL_PROMPT=0 git clone "$url" 2>/dev/null || git clone "$url"
+        rm -f "$tmp_askpass"
+      )
     else
       git clone "$url"
     fi
@@ -53,7 +59,7 @@ SUMMARY_FILE="project_summary.md"
 echo "# Project Portfolio Summary" > "$SUMMARY_FILE"
 echo "Generated on: $(date)" >> "$SUMMARY_FILE"
 
-echo "\n## Repositories\n" >> "$SUMMARY_FILE"
+printf "\n## Repositories\n\n" >> "$SUMMARY_FILE"
 for repo in "${REPOS[@]}"; do
   name=$(basename "$repo" .git)
   echo "Processing $name..."
