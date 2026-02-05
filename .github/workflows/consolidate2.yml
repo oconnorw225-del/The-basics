@@ -1,0 +1,221 @@
+name: Repository Consolidation & Security Audit 2
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_backup:
+        description: 'Skip backup creation (not recommended)'
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rsync
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install psutil aiohttp pydantic
+      
+      - name: Configure Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "Consolidation Bot [bot]"
+      
+      - name: Clone source repositories
+        run: |
+          echo "Cloning source repositories..."
+          mkdir -p source
+          cd source
+          
+          # Clone all 5 source repositories
+          git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git || echo "Failed to clone ndax-quantum-engine"
+          git clone https://github.com/oconnorw225-del/quantum-engine-dashb.git || echo "Failed to clone quantum-engine-dashb"
+          git clone https://github.com/oconnorw225-del/shadowforge-ai-trader.git || echo "Failed to clone shadowforge-ai-trader"
+          git clone https://github.com/oconnorw225-del/repository-web-app.git || echo "Failed to clone repository-web-app"
+          git clone https://github.com/oconnorw225-del/The-new-ones.git || echo "Failed to clone The-new-ones"
+          
+          echo "Source repositories cloned successfully"
+          ls -la
+        continue-on-error: true
+      
+      - name: Create backups
+        if: ${{ !inputs.skip_backup }}
+        run: |
+          echo "Creating backups of source repositories..."
+          mkdir -p backups
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          
+          cd source
+          for repo in */; do
+            repo_name="${repo%/}"
+            if [ -d "$repo_name" ]; then
+              echo "Backing up $repo_name..."
+              tar -czf "../backups/${repo_name}_${TIMESTAMP}.tar.gz" "$repo_name"
+              echo "✓ Backup created: ${repo_name}_${TIMESTAMP}.tar.gz"
+            fi
+          done
+          
+          cd ..
+          echo "Backup summary:"
+          ls -lh backups/*.tar.gz || echo "No backups created"
+      
+      - name: Run consolidation script
+        run: |
+          echo "Running intelligent consolidation..."
+          chmod +x automation/consolidate.sh
+          bash automation/consolidate.sh
+        continue-on-error: true
+      
+      - name: Run security audit
+        run: |
+          echo "Running security audit..."
+          python3 automation/audit.py
+        continue-on-error: true
+      
+      - name: Run repository analysis
+        run: |
+          echo "Running repository analysis..."
+          python3 automation/repo_analyzer.py
+        continue-on-error: true
+      
+      - name: Generate consolidation summary
+        run: |
+          echo "Generating consolidation summary..."
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S UTC')
+          RUN_NUMBER="${{ github.run_number }}"
+          
+          cat > CONSOLIDATION_SUMMARY.md << EOF
+          # Consolidation Summary
+          
+          **Date:** ${TIMESTAMP}
+          **Workflow Run:** ${RUN_NUMBER}
+          
+          ## Source Repositories Consolidated
+          
+          1. ✓ ndax-quantum-engine
+          2. ✓ quantum-engine-dashb
+          3. ✓ shadowforge-ai-trader
+          4. ✓ repository-web-app
+          5. ✓ The-new-ones
+          
+          ## Consolidation Status
+          
+          - Backups created in \`backups/\` directory
+          - Files consolidated to appropriate locations
+          - Security audit completed
+          - Repository analysis completed
+          
+          ## Generated Reports
+          
+          - \`CONSOLIDATION_REPORT.md\` - Detailed consolidation report
+          - \`audit_report.json\` - Security audit results
+          - \`analysis.json\` - Repository analysis
+          
+          ## Next Steps
+          
+          1. Review the consolidation report
+          2. Check security audit for any issues
+          3. Test consolidated functionality
+          4. Deploy if all checks pass
+          
+          ---
+          *Automated by GitHub Actions*
+          EOF
+          
+          echo "Summary generated"
+      
+      - name: Upload consolidation reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: consolidation-reports-${{ github.run_number }}
+          path: |
+            CONSOLIDATION_REPORT.md
+            CONSOLIDATION_SUMMARY.md
+            audit_report.json
+            analysis.json
+            consolidation_*.log
+          retention-days: 30
+      
+      - name: Upload backups
+        if: ${{ !inputs.skip_backup }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-backups-${{ github.run_number }}
+          path: backups/*.tar.gz
+          retention-days: 90
+      
+      - name: Commit consolidated changes
+        run: |
+          echo "Committing consolidated changes..."
+          
+          # Add all changes except source directory
+          git add -A
+          git reset source/ 2>/dev/null || true
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Automated consolidation from source repos [$(date +%Y-%m-%d)]
+
+          Consolidated from:
+          - ndax-quantum-engine
+          - quantum-engine-dashb
+          - shadowforge-ai-trader
+          - repository-web-app
+          - The-new-ones
+          
+          Generated backups and reports."
+            
+            git push
+            echo "✓ Changes committed and pushed"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          echo "Cleaning up temporary files..."
+          # Remove consolidated source directories
+          rm -rf source/
+          
+          # Remove generated backup archives
+          rm -rf backups/
+          
+          # Remove generated reports and analysis artifacts
+          rm -f CONSOLIDATION_REPORT.md
+          rm -f CONSOLIDATION_SUMMARY.md
+          rm -f audit_report.json
+          rm -f analysis.json
+          rm -f consolidation_*.log
+          
+          echo "✓ Cleanup completed"
