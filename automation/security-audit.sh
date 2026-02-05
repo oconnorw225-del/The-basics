@@ -14,7 +14,14 @@ if ! command -v gitleaks >/dev/null 2>&1; then
   GL_VERSION="8.16.0"  # set a recent known version; adjust if needed
   curl -sL "https://github.com/zricethezav/gitleaks/releases/download/v${GL_VERSION}/gitleaks_${GL_VERSION}_linux_x64.tar.gz" -o /tmp/gitleaks.tar.gz
   tar -xzf /tmp/gitleaks.tar.gz -C /tmp
+  # Ensure local bin directory exists for fallback installation
+  mkdir -p "$HOME/.local/bin"
   sudo mv /tmp/gitleaks /usr/local/bin/gitleaks || mv /tmp/gitleaks "$HOME/.local/bin/gitleaks"
+  # Ensure $HOME/.local/bin is on PATH so that gitleaks is discoverable
+  case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+  esac
 fi
 
 # List of aggregated repos (same as aggregate script). If you changed aggregation, update this list accordingly.
