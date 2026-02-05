@@ -37,7 +37,7 @@ clone_or_update() {
       auth_url=$(echo "$url" | sed -E "s#https://#https://${GITHUB_PAT}@#")
       git clone "$auth_url"
       # remove credentials from the remote after cloning
-      (cd "$name" && git remote set-url origin "$(echo $url)")
+      (cd "$name" && git remote set-url origin "$url")
     else
       git clone "$url"
     fi
