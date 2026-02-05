@@ -38,7 +38,7 @@ clone_or_update() {
         tmp_askpass="$(mktemp)"
         chmod 700 "$tmp_askpass"
         cat > "$tmp_askpass" <<EOF
-#!/bin/sh
+#!/usr/bin/env sh
 echo "${GITHUB_PAT}"
 EOF
         GIT_ASKPASS="$tmp_askpass" GIT_TERMINAL_PROMPT=0 git clone "$url" 2>/dev/null || git clone "$url"

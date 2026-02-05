@@ -45,7 +45,7 @@ fi
 SCRIPT_DIR="$(pwd)"
 for dir in "${REPO_DIRS[@]}"; do
   if [ -d "$dir/.git" ]; then
-    dir_name=$(basename "$dir")
+    dir_name=$(basename "${dir%/}")
     out="$SCRIPT_DIR/$REPORT_DIR/${dir_name}_gitleaks.json"
     echo "Scanning $dir (history) -> $out"
     (cd "$dir" && gitleaks detect --source . --redact --report-path "$out" --report-format json) || true
