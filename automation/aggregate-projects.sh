@@ -3,7 +3,7 @@
 # Script to aggregate multiple projects into a single directory
 # and generate a summary of their structures
 
-set -e  # Exit on error
+set -euo pipefail  # Exit on error, unset variables, and pipeline failures
 
 # Define the aggregation directory
 AGGREGATION_DIR="project_aggregation"
