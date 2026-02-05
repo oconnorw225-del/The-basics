@@ -53,7 +53,7 @@ SUMMARY_FILE="project_summary.md"
 echo "# Project Portfolio Summary" > "$SUMMARY_FILE"
 echo "Generated on: $(date)" >> "$SUMMARY_FILE"
 
-echo "\n## Repositories\n" >> "$SUMMARY_FILE"
+printf "\n## Repositories\n\n" >> "$SUMMARY_FILE"
 for repo in "${REPOS[@]}"; do
   name=$(basename "$repo" .git)
   echo "Processing $name..."
