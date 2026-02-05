@@ -25,7 +25,13 @@ if ! command -v gitleaks >/dev/null 2>&1; then
 fi
 
 # List of aggregated repos (same as aggregate script). If you changed aggregation, update this list accordingly.
-REPO_DIRS=( $(ls -d */ 2>/dev/null || true) )
+if [ -d "project_aggregation" ]; then
+  # When run from repo root, aggregated repositories live under project_aggregation/
+  REPO_DIRS=( $(ls -d project_aggregation/*/ 2>/dev/null || true) )
+else
+  # Fallback: when run from within aggregation dir or a flat layout, use all immediate subdirectories
+  REPO_DIRS=( $(ls -d */ 2>/dev/null || true) )
+fi
 
 # Always scan the current repository first
 echo "Scanning current repo: $(pwd)"
