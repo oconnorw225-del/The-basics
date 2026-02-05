@@ -67,6 +67,43 @@ python3 automation/audit.py
 python3 automation/repo_analyzer.py
 ```
 
+### check-btc-balance.sh
+
+**Purpose**: Read-only Bitcoin balance checker for multiple addresses.
+
+**Features**:
+
+- Queries public blockchain explorer APIs (Blockstream, Blockchain.info, Blockchair)
+- Checks balances for multiple Bitcoin addresses from a file
+- Generates timestamped JSON reports
+- Displays human-readable summary
+- **Read-only**: Does NOT require or accept private keys, seeds, or credentials
+- Safe for security auditing and compliance checking
+
+**Usage**:
+
+```bash
+./automation/check-btc-balance.sh addresses.txt
+```
+
+Where `addresses.txt` contains one Bitcoin address per line.
+
+**Example addresses.txt**:
+```
+1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
+bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
+```
+
+**Output**:
+- JSON report saved to `reports/btc_balances/balances_<timestamp>.json`
+- Human-readable summary printed to console
+
+**Dependencies**:
+- `curl` (for API requests)
+- `jq` (JSON processor)
+
+**Security Note**: This script only performs read-only queries to public APIs. It never requests, stores, or transmits private keys or sensitive credentials.
+
 ### consolidate_repos.sh
 
 **Purpose**: Legacy consolidation script with enhanced features.

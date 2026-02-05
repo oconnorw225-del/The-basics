@@ -1,4 +1,8 @@
 #!/bin/bash
+# Consolidation script for repository integration
+# This script is run by GitHub Actions workflow (.github/workflows/consolidate.yml)
+# It copies files from source repositories to the consolidated repository structure
+
 cp -r source/ndax-quantum-engine/api/* api/ 2>/dev/null || true
 cp -r source/quantum-engine-dashb/src/* frontend/ 2>/dev/null || true
 cp -r source/shadowforge-ai-trader/strategy/* backend/ 2>/dev/null || true

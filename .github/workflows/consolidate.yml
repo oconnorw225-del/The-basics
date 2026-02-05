@@ -3,12 +3,17 @@ name: Consolidate Best Parts
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   consolidate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the-basics repository
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
 
       - name: Clone source repositories
         run: |
@@ -34,6 +39,7 @@ jobs:
 
       - name: Run consolidation script
         run: |
+          chmod +x automation/consolidate.sh
           bash automation/consolidate.sh
 
       - name: Commit consolidated code
@@ -42,4 +48,4 @@ jobs:
           git config --global user.name "CI Bot"
           git add .
           git diff --staged --quiet || git commit -m "Automated consolidation of best parts"
-          git push
+          git push origin ${{ github.ref_name }}
