@@ -13,6 +13,61 @@ Automated consolidation of best parts from:
 2. Go to Actions > Consolidate Best Parts > Run workflow.
 3. Review and use your unified repo!
 
+## Running the NDAX Quantum Trading Bot (CLI)
+
+The bot can be run directly from the command line in several ways:
+
+### Option 1: Using npm script
+```bash
+npm run bot
+```
+
+### Option 2: Direct execution
+```bash
+node bot.js
+```
+
+### Option 3: After global installation
+```bash
+npm install -g .
+ndax-bot
+```
+
+### Bot Configuration
+
+Configure the bot using environment variables:
+
+```bash
+# Trading settings
+export TRADING_MODE=paper           # paper or live
+export AUTO_START=true              # Auto-start trading
+export MAX_TRADES=5                 # Max concurrent trades
+export RISK_LEVEL=low              # low, medium, or high
+
+# Freelance settings
+export FREELANCE_ENABLED=true
+export AUTO_BID=false
+export AUTO_EXECUTE=false
+
+# AI settings
+export AI_ENABLED=true
+export TASK_QUEUE_SIZE=10
+
+# Server settings
+export BOT_PORT=9000
+```
+
+### Bot Endpoints
+
+Once running, the bot exposes the following HTTP endpoints:
+
+- `http://localhost:9000/status` - Full bot status and configuration
+- `http://localhost:9000/health` - Health check and metrics
+- `http://localhost:9000/freelance/status` - Freelance orchestrator status
+- `http://localhost:9000/trading/status` - Trading engine status
+- `http://localhost:9000/tasks/queue` - AI task queue status
+- `POST http://localhost:9000/tasks/add` - Add task to AI queue
+
 ## Contents
 - `/api` — consolidated APIs
 - `/backend` — backend logic
