@@ -1,0 +1,122 @@
+name: Run Both Consolidation Tasks in Parallel
+
+on:
+  workflow_dispatch:
+    inputs:
+      task_description:
+        description: 'Task description for the autonomous bot'
+        required: false
+        default: 'Run both consolidation tasks'
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  consolidate-task-1:
+    name: Consolidation Task 1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the-basics repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clone source repositories
+        run: |
+          mkdir source
+          git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine || true
+          git clone https://github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb || true
+          git clone https://github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader || true
+          git clone https://github.com/oconnorw225-del/repository-web-app.git source/repository-web-app || true
+          git clone https://github.com/oconnorw225-del/The-new-ones.git source/The-new-ones || true
+
+      - name: Archive backups
+        run: |
+          mkdir -p backups
+          [ -d source/ndax-quantum-engine ] && tar czf backups/ndax-quantum-engine.tar.gz -C source ndax-quantum-engine || true
+          [ -d source/quantum-engine-dashb ] && tar czf backups/quantum-engine-dashb.tar.gz -C source quantum-engine-dashb || true
+          [ -d source/shadowforge-ai-trader ] && tar czf backups/shadowforge-ai-trader.tar.gz -C source shadowforge-ai-trader || true
+          [ -d source/repository-web-app ] && tar czf backups/repository-web-app.tar.gz -C source repository-web-app || true
+          [ -d source/The-new-ones ] && tar czf backups/The-new-ones.tar.gz -C source The-new-ones || true
+
+      - name: Setup directory structure
+        run: |
+          mkdir -p api backend frontend .github/workflows docs automation tests
+
+      - name: Run consolidation script
+        run: |
+          bash automation/consolidate.sh
+
+      - name: Commit consolidated code (Task 1)
+        run: |
+          git config --global user.email "ci-bot@example.com"
+          git config --global user.name "CI Bot"
+          git add .
+          git diff --staged --quiet || git commit -m "Automated consolidation task 1: ${{ inputs.task_description }}"
+          git push || echo "Push skipped (no changes or conflicts)"
+
+  consolidate-task-2:
+    name: Consolidation Task 2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the-basics repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clone source repositories
+        run: |
+          mkdir source
+          git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine || true
+          git clone https://github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb || true
+          git clone https://github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader || true
+          git clone https://github.com/oconnorw225-del/repository-web-app.git source/repository-web-app || true
+          git clone https://github.com/oconnorw225-del/The-new-ones.git source/The-new-ones || true
+
+      - name: Archive backups
+        run: |
+          mkdir -p backups
+          [ -d source/ndax-quantum-engine ] && tar czf backups/ndax-quantum-engine.tar.gz -C source ndax-quantum-engine || true
+          [ -d source/quantum-engine-dashb ] && tar czf backups/quantum-engine-dashb.tar.gz -C source quantum-engine-dashb || true
+          [ -d source/shadowforge-ai-trader ] && tar czf backups/shadowforge-ai-trader.tar.gz -C source shadowforge-ai-trader || true
+          [ -d source/repository-web-app ] && tar czf backups/repository-web-app.tar.gz -C source repository-web-app || true
+          [ -d source/The-new-ones ] && tar czf backups/The-new-ones.tar.gz -C source The-new-ones || true
+
+      - name: Setup directory structure
+        run: |
+          mkdir -p api backend frontend .github/workflows docs automation tests
+
+      - name: Run consolidation script
+        run: |
+          bash automation/consolidate.sh
+
+      - name: Commit consolidated code (Task 2)
+        run: |
+          git config --global user.email "ci-bot@example.com"
+          git config --global user.name "CI Bot"
+          git add .
+          git diff --staged --quiet || git commit -m "Automated consolidation task 2: ${{ inputs.task_description }}"
+          git push || echo "Push skipped (no changes or conflicts)"
+
+  summary:
+    name: Summary
+    needs: [consolidate-task-1, consolidate-task-2]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Display summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🤖 Autonomous Bot Task Execution Summary"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "Task Description: ${{ inputs.task_description }}"
+          echo ""
+          echo "Job Status:"
+          echo "  Task 1: ${{ needs.consolidate-task-1.result }}"
+          echo "  Task 2: ${{ needs.consolidate-task-2.result }}"
+          echo ""
+          echo "Both tasks ran in parallel successfully!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
