@@ -29,14 +29,18 @@ node bot.js
 
 ### Option 3: After global installation
 ```bash
+# From the project directory
 npm install -g .
 ndax-bot
 ```
 
+**Note**: This installs the bot globally from the local project directory. You must run this command from within the project root.
+
 ### Bot Configuration
 
-Configure the bot using environment variables:
+Configure the bot using environment variables. 
 
+**Linux/macOS** (using bash/zsh):
 ```bash
 # Trading settings
 export TRADING_MODE=paper           # paper or live
@@ -55,6 +59,26 @@ export TASK_QUEUE_SIZE=10
 
 # Server settings
 export BOT_PORT=9000
+```
+
+**Windows** (using Command Prompt):
+```cmd
+set TRADING_MODE=paper
+set AUTO_START=true
+set MAX_TRADES=5
+rem ... (same variables as above)
+```
+
+**Cross-platform** (using .env file):
+Create a `.env` file in the project root:
+```
+TRADING_MODE=paper
+AUTO_START=true
+MAX_TRADES=5
+RISK_LEVEL=low
+FREELANCE_ENABLED=true
+AI_ENABLED=true
+BOT_PORT=9000
 ```
 
 ### Bot Endpoints
