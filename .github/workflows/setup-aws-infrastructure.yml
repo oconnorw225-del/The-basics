@@ -25,6 +25,8 @@ jobs:
   setup-infrastructure:
     name: Setup AWS Infrastructure with Terraform
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     environment:
       name: ${{ github.event.inputs.environment }}
 
@@ -94,6 +96,8 @@ jobs:
     name: Deploy Application
     needs: setup-infrastructure
     if: ${{ github.event.inputs.auto_deploy == 'true' }}
+    permissions:
+      contents: read
     uses: ./.github/workflows/deploy-to-aws.yml
     secrets: inherit
     with:
