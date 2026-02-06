@@ -18,10 +18,11 @@ These workflows handle consolidation of code from multiple source repositories:
   - `repository-web-app`
   - `The-new-ones`
 
-#### 2. **consolidate2.yml** - Consolidate Best Parts 2
+#### 2. **consolidate2.yml** - Consolidate Best Parts (Secondary Instance)
 - **Trigger**: Manual via `workflow_dispatch`
-- **Purpose**: Duplicate of consolidate.yml, can run independently
+- **Purpose**: Independent duplicate of consolidate.yml that can run separately
 - Performs the same consolidation task as consolidate.yml
+- Useful for parallel execution or backup consolidation runs
 
 #### 3. **parallel-consolidation.yml** - Run Both Consolidation Tasks in Parallel
 - **Trigger**: Manual via `workflow_dispatch`
@@ -69,10 +70,11 @@ The `parallel-consolidation.yml` workflow enables the autonomous bot to run mult
 4. **Summary Job**: After both tasks complete, displays comprehensive results
 
 This approach:
-- Reduces overall execution time by ~50% compared to sequential execution
+- Significantly reduces overall execution time when validation and consolidation overlap
 - Allows the bot to handle consolidation while simultaneously validating code
 - Provides clear status for each parallel task
 - Handles failures gracefully with conditional summary messages
+- Note: Validation runs against pre-consolidation code; for validating consolidated code, run validation after consolidation completes
 
 ## Disabled Workflows
 

@@ -1,4 +1,4 @@
-name: Consolidate Best Parts 2
+name: Consolidate Best Parts (Secondary Instance)
 
 on:
   workflow_dispatch:

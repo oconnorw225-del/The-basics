@@ -63,6 +63,8 @@ jobs:
     steps:
       - name: Checkout the-basics repository
         uses: actions/checkout@v4
+        # Note: This validates the code at workflow start, not after consolidation.
+        # For validating consolidated code, use the consolidate.yml workflow followed by a separate validation workflow.
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -71,7 +73,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install || echo "No package-lock.json, using npm install"
+          npm install
 
       - name: Run linting
         continue-on-error: true
