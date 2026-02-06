@@ -14,7 +14,6 @@ check_repo_health() {
     fi
 }
 
-# Check all source repos
 REPOS=("ndax-quantum-engine" "quantum-engine-dashb" "shadowforge-ai-trader" "repository-web-app" "The-new-ones")
 
 echo "{\"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"repos\": {" > $STATUS_FILE

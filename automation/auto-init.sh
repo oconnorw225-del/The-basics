@@ -6,8 +6,7 @@ GITHUB_USER="oconnorw225-del"
 
 echo "🚀 Initializing The Chimera..."
 
-# Check if gh CLI is available
-if ! command -v gh &> /dev/null; then
+aif ! command -v gh &> /dev/null; then
     echo "⚠️  GitHub CLI not found. Install it from: https://cli.github.com/"
     echo "📝 Manual steps:"
     echo "   1. Create repo 'the-basics' on GitHub"
@@ -17,19 +16,22 @@ if ! command -v gh &> /dev/null; then
     exit 1
 fi
 
-# Auto-create repo if it doesn't exist
 echo "🔍 Checking if repo exists..."
 if ! gh repo view "$GITHUB_USER/$REPO_NAME" &>/dev/null; then
     echo "📦 Creating repository..."
     gh repo create "$GITHUB_USER/$REPO_NAME" --public --description "Automated consolidation - The Chimera Project" --confirm
 fi
 
-# Initialize and push
 echo "📤 Pushing code..."
 git init
 git add .
-git commit -m "🎯 Initial Chimera setup - Automated consolidation system\n\n- 24/7 scheduled consolidation (every 6 hours)\n- Continuous health monitoring (every 30 minutes)\n- Automated backups with retention policy\n- Smart error handling and validation\n- Self-healing architecture"
+git commit -m "🎯 Initial Chimera setup - Automated consolidation system
 
+- 24/7 scheduled consolidation (every 6 hours)
+- Continuous health monitoring (every 30 minutes)
+- Automated backups with retention policy
+- Smart error handling and validation
+- Self-healing architecture"
 git branch -M main
 git remote add origin "https://github.com/$GITHUB_USER/$REPO_NAME.git" 2>/dev/null || git remote set-url origin "https://github.com/$GITHUB_USER/$REPO_NAME.git"
 git push -u origin main --force
