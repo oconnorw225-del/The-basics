@@ -15,7 +15,9 @@ Automated consolidation of best parts from:
 
 ## Running the NDAX Quantum Trading Bot (CLI)
 
-The bot can be run directly from the command line in several ways:
+The bot can be run directly from the command line in several ways.
+
+📖 **[View the Complete CLI Guide](CLI_GUIDE.md)** for detailed instructions and examples.
 
 ### Option 1: Using npm script
 ```bash
