@@ -13,6 +13,87 @@ Automated consolidation of best parts from:
 2. Go to Actions > Consolidate Best Parts > Run workflow.
 3. Review and use your unified repo!
 
+## Running the NDAX Quantum Trading Bot (CLI)
+
+The bot can be run directly from the command line in several ways.
+
+📖 **[View the Complete CLI Guide](CLI_GUIDE.md)** for detailed instructions and examples.
+
+### Option 1: Using npm script
+```bash
+npm run bot
+```
+
+### Option 2: Direct execution
+```bash
+node bot.js
+```
+
+### Option 3: After global installation
+```bash
+# From the project directory
+npm install -g .
+ndax-bot
+```
+
+**Note**: This installs the bot globally from the local project directory. You must run this command from within the project root.
+
+### Bot Configuration
+
+Configure the bot using environment variables. 
+
+**Linux/macOS** (using bash/zsh):
+```bash
+# Trading settings
+export TRADING_MODE=paper           # paper or live
+export AUTO_START=true              # Auto-start trading
+export MAX_TRADES=5                 # Max concurrent trades
+export RISK_LEVEL=low              # low, medium, or high
+
+# Freelance settings
+export FREELANCE_ENABLED=true
+export AUTO_BID=false
+export AUTO_EXECUTE=false
+
+# AI settings
+export AI_ENABLED=true
+export TASK_QUEUE_SIZE=10
+
+# Server settings
+export BOT_PORT=9000
+```
+
+**Windows** (using Command Prompt):
+```cmd
+set TRADING_MODE=paper
+set AUTO_START=true
+set MAX_TRADES=5
+rem ... (same variables as above)
+```
+
+**Cross-platform** (using .env file):
+Create a `.env` file in the project root:
+```
+TRADING_MODE=paper
+AUTO_START=true
+MAX_TRADES=5
+RISK_LEVEL=low
+FREELANCE_ENABLED=true
+AI_ENABLED=true
+BOT_PORT=9000
+```
+
+### Bot Endpoints
+
+Once running, the bot exposes the following HTTP endpoints:
+
+- `http://localhost:9000/status` - Full bot status and configuration
+- `http://localhost:9000/health` - Health check and metrics
+- `http://localhost:9000/freelance/status` - Freelance orchestrator status
+- `http://localhost:9000/trading/status` - Trading engine status
+- `http://localhost:9000/tasks/queue` - AI task queue status
+- `POST http://localhost:9000/tasks/add` - Add task to AI queue
+
 ## Contents
 - `/api` — consolidated APIs
 - `/backend` — backend logic
