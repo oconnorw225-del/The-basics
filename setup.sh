@@ -5,40 +5,26 @@
 
 set -e
 
-echo "🚀 NDAX Quantum Engine Setup"
-echo "=============================="
+# Source common utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/scripts/common.sh"
 
-# Check Node.js
-if ! command -v node &> /dev/null; then
-    echo "❌ Node.js is not installed. Please install Node.js 18 or higher."
-    exit 1
-fi
+log_step "NDAX Quantum Engine Setup"
 
-echo "✅ Node.js detected: $(node --version)"
-
-# Check Python
-if ! command -v python3 &> /dev/null; then
-    echo "⚠️  Python3 not found. Some features may not work."
-else
-    echo "✅ Python3 detected: $(python3 --version)"
-fi
+# Check Node.js and Python
+check_node || exit 1
+check_python || true
 
 # Install Node dependencies
-echo ""
-echo "📦 Installing Node.js dependencies..."
+log_info "Installing Node.js dependencies..."
 npm install
 
 # Create necessary directories
-echo ""
-echo "📁 Creating directory structure..."
-mkdir -p .unified-system/logs
-mkdir -p .unified-system/generated
-mkdir -p .unified-system/backups
+create_directories
 
 # Create .env if it doesn't exist
 if [ ! -f .env ]; then
-    echo ""
-    echo "📝 Creating .env file..."
+    log_info "Creating .env file..."
     cat > .env << 'EOF'
 # NDAX Quantum Engine Configuration
 NODE_ENV=development
@@ -58,17 +44,14 @@ VITE_API_URL=http://localhost:8000
 # NDAX_API_KEY=
 # NDAX_API_SECRET=
 EOF
-    echo "✅ .env file created"
+    log_success ".env file created"
 else
-    echo "ℹ️  .env file already exists"
+    log_info ".env file already exists"
 fi
 
-echo ""
-echo "✅ Setup complete!"
-echo ""
-echo "Next steps:"
-echo "1. Run 'npm run dev' to start the frontend development server"
-echo "2. Run 'npm run unified' to start the Python backend (if configured)"
-echo "3. Run 'node bot.js' to start the trading bot"
-echo ""
-echo "For more information, see QUICK_START.md"
+log_success "Setup complete!"
+log_info "Next steps:"
+echo "  1. Run 'npm run dev' to start the frontend development server"
+echo "  2. Run 'npm run unified' to start the Python backend (if configured)"
+echo "  3. Run 'node bot.js' to start the trading bot"
+log_info "For more information, see QUICK_START.md"
