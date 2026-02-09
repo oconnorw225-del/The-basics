@@ -20,10 +20,10 @@ jobs:
         run: |
           mkdir source
           
-          # Create a helper script for secure git authentication
-          export GIT_ASKPASS=$(mktemp)
-          chmod 700 "$GIT_ASKPASS"
+          # Create a helper script for secure git authentication with secure permissions
+          export GIT_ASKPASS=$(umask 077 && mktemp)
           printf '#!/bin/sh\necho "$GH_PAT"\n' > "$GIT_ASKPASS"
+          chmod 700 "$GIT_ASKPASS"
           
           # Clone repositories in parallel for better performance
           git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine &

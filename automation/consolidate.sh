@@ -8,7 +8,8 @@ copy_with_check() {
     local desc="$3"
     
     if [ -e "$src" ]; then
-        cp -r "$src" "$dest"
+        mkdir -p "$dest"
+        cp -r "$src"/* "$dest"/ 2>/dev/null || true
         echo "✓ Copied $desc"
     else
         echo "⚠ Warning: $src not found, skipping $desc"

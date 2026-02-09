@@ -31,8 +31,19 @@ echo "new data" > source/The-new-ones/data/data.txt
 # Create target directories
 mkdir -p api backend frontend workflows docs automation tests
 
-# Copy the consolidate.sh script
-cp /home/runner/work/The-basics/The-basics/automation/consolidate.sh automation/
+# Copy the consolidate.sh script (use relative path for portability)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="${SCRIPT_DIR%/tests}"
+
+if [ -f "$REPO_ROOT/automation/consolidate.sh" ]; then
+    cp "$REPO_ROOT/automation/consolidate.sh" automation/
+elif [ -f "/home/runner/work/The-basics/The-basics/automation/consolidate.sh" ]; then
+    # Fallback for GitHub Actions environment
+    cp /home/runner/work/The-basics/The-basics/automation/consolidate.sh automation/
+else
+    echo "❌ Error: Could not find consolidate.sh"
+    exit 1
+fi
 
 echo ""
 echo "🧪 Running consolidate.sh..."
