@@ -103,15 +103,23 @@ jobs:
 
       - name: Run flake8 code analysis
         run: |
-          find . -name "*.py" -not -path "./source/*" -not -path "./.unified-system/*" -not -path "./.git/*" -not -path "./archive/*" | xargs flake8 --max-line-length=100 --ignore=W503 --exit-zero > flake8_report.txt || true
+          # Define exclusion paths for Python file search
+          EXCLUDE_PATHS="-not -path ./source/* -not -path ./.unified-system/* -not -path ./.git/* -not -path ./archive/*"
+          
+          # Run flake8 on Python files
+          find . -name "*.py" $EXCLUDE_PATHS | \
+            xargs flake8 --max-line-length=100 --ignore=W503 --exit-zero > flake8_report.txt || true
 
       - name: Generate analysis report
         run: |
+          # Define exclusion paths for consistency
+          EXCLUDE_PATHS="-not -path ./source/* -not -path ./.unified-system/* -not -path ./.git/* -not -path ./archive/*"
+          
           echo "# Code Analysis Report" > code_analysis_report.md
           echo "Generated: $(date)" >> code_analysis_report.md
           echo "" >> code_analysis_report.md
           echo "## Python Files Analyzed" >> code_analysis_report.md
-          PYFILE_COUNT=$(find . -name "*.py" -not -path "./source/*" -not -path "./.git/*" -not -path "./archive/*" | wc -l)
+          PYFILE_COUNT=$(find . -name "*.py" $EXCLUDE_PATHS | wc -l)
           echo "Total files: $PYFILE_COUNT" >> code_analysis_report.md
           echo "" >> code_analysis_report.md
           echo "## Flake8 Results" >> code_analysis_report.md
