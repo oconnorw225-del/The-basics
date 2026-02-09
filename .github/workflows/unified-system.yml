@@ -22,14 +22,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: 'npm'
 
       - name: Install dependencies
         run: |
@@ -37,9 +38,9 @@ jobs:
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
           else
-            pip install fastapi uvicorn websockets pydantic aiofiles python-multipart || true
+            pip install fastapi uvicorn websockets pydantic aiofiles python-multipart
           fi
-          npm install || true
+          npm install
 
       - name: Run system health check
         run: |
@@ -61,17 +62,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install analysis tools
         run: |
-          pip install black flake8 || true
+          pip install black flake8
 
       - name: Check code quality
         run: |
-          find . -name "*.py" -not -path "./source/*" -not -path "./.unified-system/*" -not -path "./.git/*" | xargs flake8 --max-line-length=100 --ignore=E501,W503 || true
+          find . -name "*.py" -not -path "./source/*" -not -path "./.unified-system/*" -not -path "./.git/*" | xargs flake8 --max-line-length=100 --ignore=E501,W503
 
       - name: Generate analysis report
         run: |
@@ -97,26 +98,45 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: 'npm'
 
       - name: Install dependencies
         run: |
-          pip install fastapi uvicorn websockets pydantic || true
-          npm install || true
+          python3 -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            pip install fastapi uvicorn websockets pydantic
+          fi
+          npm install
+
+      - name: Build application
+        run: |
+          npm run build
 
       - name: Test Node.js server
         run: |
-          timeout 10 node server.js &
+          # Start server in background
+          timeout 30 node server.js &
+          SERVER_PID=$!
+          
+          # Wait for server to start
           sleep 5
-          curl -f http://localhost:3000/health || echo "Server test completed"
-          pkill -f "node server.js" || true
+          
+          # Health check with timeout
+          timeout 10 curl -f http://localhost:3000/health || echo "⚠️ Health check failed"
+          
+          # Cleanup
+          kill $SERVER_PID || true
+          wait $SERVER_PID 2>/dev/null || true
 
   # Generate system report
   generate-report:
@@ -147,10 +167,22 @@ jobs:
           $(git log -5 --pretty=format:"- %h %s (%an)" || echo "No recent commits")
           
           ## Configuration
-          - Python: 3.10+
-          - Node.js: 18+
+          - Python: 3.11
+          - Node.js: 18
           - Dashboard: http://localhost:8000
-          - Railway: Auto-deployed on push
+          
+          ## Railway Integration
+          
+          ⚠️ **Railway deployment requires RAILWAY_TOKEN secret**
+          
+          To enable Railway deployment:
+          1. Add RAILWAY_TOKEN to repository secrets
+          2. Workflow will automatically deploy on push to main
+          3. Deployment is gated and will not run without the secret
+          
+          ### Safety Defaults
+          - TRADING_MODE: paper (safe default for testing)
+          - Production deployment requires manual secret configuration
           
           ## Quick Access
           - Dashboard: `python3 unified_system.py`
@@ -166,6 +198,34 @@ jobs:
         with:
           name: system-status-report
           path: SYSTEM_STATUS.md
+
+  # Deploy to Railway (optional, gated on secret)
+  deploy-railway:
+    runs-on: ubuntu-latest
+    needs: [code-analysis, test-deployment]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.RAILWAY_TOKEN != ''
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Railway CLI
+        run: |
+          npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          TRADING_MODE: paper
+        run: |
+          echo "🚀 Deploying to Railway..."
+          echo "TRADING_MODE set to: $TRADING_MODE (safe default)"
+          railway up --detach
+          echo "✅ Deployment completed"
 
   # Cleanup old artifacts
   cleanup:
