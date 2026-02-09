@@ -70,8 +70,8 @@ jobs:
           timeout 10 curl -f http://localhost:3000/health || echo "⚠️  Health check endpoint not available"
           
           # Cleanup server process
-          kill $SERVER_PID || true
-          wait $SERVER_PID 2>/dev/null || true
+          kill "$SERVER_PID" || true
+          wait "$SERVER_PID" 2>/dev/null || true
 
       - name: Run system health check
         run: |
@@ -103,23 +103,26 @@ jobs:
 
       - name: Run flake8 code analysis
         run: |
-          # Define exclusion paths for Python file search
-          EXCLUDE_PATHS='-not -path "./source/*" -not -path "./.unified-system/*" -not -path "./.git/*" -not -path "./archive/*"'
-          
-          # Run flake8 on Python files
-          find . -name "*.py" $EXCLUDE_PATHS | \
-            xargs flake8 --max-line-length=100 --ignore=W503 --exit-zero > flake8_report.txt
+          # Run flake8 on Python files with exclusions
+          find . -name "*.py" \
+            -not -path "./source/*" \
+            -not -path "./.unified-system/*" \
+            -not -path "./.git/*" \
+            -not -path "./archive/*" \
+            -exec flake8 --max-line-length=100 --ignore=W503 --exit-zero {} + > flake8_report.txt
 
       - name: Generate analysis report
         run: |
-          # Define exclusion paths for consistency
-          EXCLUDE_PATHS='-not -path "./source/*" -not -path "./.unified-system/*" -not -path "./.git/*" -not -path "./archive/*"'
-          
           echo "# Code Analysis Report" > code_analysis_report.md
           echo "Generated: $(date)" >> code_analysis_report.md
           echo "" >> code_analysis_report.md
           echo "## Python Files Analyzed" >> code_analysis_report.md
-          PYFILE_COUNT=$(find . -name "*.py" $EXCLUDE_PATHS | wc -l)
+          PYFILE_COUNT=$(find . -name "*.py" \
+            -not -path "./source/*" \
+            -not -path "./.unified-system/*" \
+            -not -path "./.git/*" \
+            -not -path "./archive/*" \
+            | wc -l)
           echo "Total files: $PYFILE_COUNT" >> code_analysis_report.md
           echo "" >> code_analysis_report.md
           echo "## Flake8 Results" >> code_analysis_report.md
