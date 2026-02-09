@@ -1,4 +1,6 @@
 # This is a basic workflow to help you get started with Actions
+# Note: This workflow is currently a placeholder and does not perform any meaningful operations.
+# Consider removing it if not needed, or implementing actual CI/CD tasks.
 
 name: CI
 
@@ -34,3 +36,14 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
+      
+      # TODO: Add actual linting, testing, or build steps here
+      # Examples:
+      # - name: Lint Python code
+      #   run: |
+      #     pip install flake8
+      #     flake8 backend/
+      #
+      # - name: Run tests
+      #   run: |
+      #     python -m pytest tests/
