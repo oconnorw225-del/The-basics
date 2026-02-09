@@ -1,0 +1,189 @@
+name: Push Changes to Source Repositories
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_repos:
+        description: 'Comma-separated list of repos to push to (or "all")'
+        required: true
+        default: 'all'
+        type: string
+
+jobs:
+  push-to-sources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the-basics repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "ci-bot@example.com"
+          git config --global user.name "CI Bot"
+
+      - name: Push to ndax-quantum-engine
+        if: ${{ github.event.inputs.target_repos == 'all' || contains(github.event.inputs.target_repos, 'ndax-quantum-engine') }}
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          echo "Pushing consolidated changes to ndax-quantum-engine main branch..."
+          
+          # Clone the target repository
+          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/ndax-quantum-engine.git /tmp/ndax-quantum-engine
+          cd /tmp/ndax-quantum-engine
+          
+          # Switch to main branch
+          git checkout main || git checkout -b main
+          
+          # Copy relevant files from consolidated repo
+          # (API, backend, and core files that belong to this repo)
+          cp -r $GITHUB_WORKSPACE/api/* . 2>/dev/null || true
+          cp -r $GITHUB_WORKSPACE/backend/* . 2>/dev/null || true
+          
+          # Commit and push if there are changes
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to push to ndax-quantum-engine"
+          else
+            git commit -m "Update from consolidated repository (automated)"
+            git push origin main
+            echo "Successfully pushed to ndax-quantum-engine"
+          fi
+
+      - name: Push to quantum-engine-dashb
+        if: ${{ github.event.inputs.target_repos == 'all' || contains(github.event.inputs.target_repos, 'quantum-engine-dashb') }}
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          echo "Pushing consolidated changes to quantum-engine-dashb main branch..."
+          
+          # Clone the target repository
+          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/quantum-engine-dashb.git /tmp/quantum-engine-dashb
+          cd /tmp/quantum-engine-dashb
+          
+          # Switch to main branch
+          git checkout main || git checkout -b main
+          
+          # Copy frontend files that belong to this dashboard repo
+          mkdir -p src
+          cp -r $GITHUB_WORKSPACE/frontend/* src/ 2>/dev/null || true
+          
+          # Copy workflows if any
+          mkdir -p .github/workflows
+          cp -r $GITHUB_WORKSPACE/workflows/* .github/workflows/ 2>/dev/null || true
+          
+          # Commit and push if there are changes
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to push to quantum-engine-dashb"
+          else
+            git commit -m "Update from consolidated repository (automated)"
+            git push origin main
+            echo "Successfully pushed to quantum-engine-dashb"
+          fi
+
+      - name: Push to shadowforge-ai-trader
+        if: ${{ github.event.inputs.target_repos == 'all' || contains(github.event.inputs.target_repos, 'shadowforge-ai-trader') }}
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          echo "Pushing consolidated changes to shadowforge-ai-trader main branch..."
+          
+          # Clone the target repository
+          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/shadowforge-ai-trader.git /tmp/shadowforge-ai-trader
+          cd /tmp/shadowforge-ai-trader
+          
+          # Switch to main branch
+          git checkout main || git checkout -b main
+          
+          # Copy trading-related files from consolidated repo
+          # This repo gets full copy of certain directories
+          cp -r $GITHUB_WORKSPACE/api/* . 2>/dev/null || true
+          cp -r $GITHUB_WORKSPACE/backend/* . 2>/dev/null || true
+          
+          # Copy wizard_tools and config if they exist
+          [ -d "$GITHUB_WORKSPACE/wizzard_tools" ] && cp -r $GITHUB_WORKSPACE/wizzard_tools/* . 2>/dev/null || true
+          [ -d "$GITHUB_WORKSPACE/config" ] && cp -r $GITHUB_WORKSPACE/config/* . 2>/dev/null || true
+          
+          # Commit and push if there are changes
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to push to shadowforge-ai-trader"
+          else
+            git commit -m "Update from consolidated repository (automated)"
+            git push origin main
+            echo "Successfully pushed to shadowforge-ai-trader"
+          fi
+
+      - name: Push to repository-web-app
+        if: ${{ github.event.inputs.target_repos == 'all' || contains(github.event.inputs.target_repos, 'repository-web-app') }}
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          echo "Pushing consolidated changes to repository-web-app main branch..."
+          
+          # Clone the target repository
+          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/repository-web-app.git /tmp/repository-web-app
+          cd /tmp/repository-web-app
+          
+          # Switch to main branch
+          git checkout main || git checkout -b main
+          
+          # Copy frontend/web files that belong to this repo
+          mkdir -p src
+          cp -r $GITHUB_WORKSPACE/frontend/* src/ 2>/dev/null || true
+          
+          # Copy workflows if any
+          mkdir -p .github/workflows
+          cp -r $GITHUB_WORKSPACE/workflows/* .github/workflows/ 2>/dev/null || true
+          
+          # Commit and push if there are changes
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to push to repository-web-app"
+          else
+            git commit -m "Update from consolidated repository (automated)"
+            git push origin main
+            echo "Successfully pushed to repository-web-app"
+          fi
+
+      - name: Push to The-new-ones
+        if: ${{ github.event.inputs.target_repos == 'all' || contains(github.event.inputs.target_repos, 'The-new-ones') }}
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          echo "Pushing consolidated changes to The-new-ones main branch..."
+          
+          # Clone the target repository
+          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/The-new-ones.git /tmp/The-new-ones
+          cd /tmp/The-new-ones
+          
+          # Switch to main branch
+          git checkout main || git checkout -b main
+          
+          # Copy from new_additions directory
+          if [ -d "$GITHUB_WORKSPACE/new_additions" ]; then
+            cp -r $GITHUB_WORKSPACE/new_additions/* . 2>/dev/null || true
+          fi
+          
+          # Commit and push if there are changes
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to push to The-new-ones"
+          else
+            git commit -m "Update from consolidated repository (automated)"
+            git push origin main
+            echo "Successfully pushed to The-new-ones"
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "==================================="
+          echo "Push to Source Repositories Summary"
+          echo "==================================="
+          echo "Target repositories: ${{ github.event.inputs.target_repos }}"
+          echo "Check individual step logs above for details on each repository"
+          echo "==================================="
