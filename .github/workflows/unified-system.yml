@@ -104,16 +104,16 @@ jobs:
       - name: Run flake8 code analysis
         run: |
           # Define exclusion paths for Python file search
-          EXCLUDE_PATHS="-not -path ./source/* -not -path ./.unified-system/* -not -path ./.git/* -not -path ./archive/*"
+          EXCLUDE_PATHS='-not -path "./source/*" -not -path "./.unified-system/*" -not -path "./.git/*" -not -path "./archive/*"'
           
           # Run flake8 on Python files
           find . -name "*.py" $EXCLUDE_PATHS | \
-            xargs flake8 --max-line-length=100 --ignore=W503 --exit-zero > flake8_report.txt || true
+            xargs flake8 --max-line-length=100 --ignore=W503 --exit-zero > flake8_report.txt
 
       - name: Generate analysis report
         run: |
           # Define exclusion paths for consistency
-          EXCLUDE_PATHS="-not -path ./source/* -not -path ./.unified-system/* -not -path ./.git/* -not -path ./archive/*"
+          EXCLUDE_PATHS='-not -path "./source/*" -not -path "./.unified-system/*" -not -path "./.git/*" -not -path "./archive/*"'
           
           echo "# Code Analysis Report" > code_analysis_report.md
           echo "Generated: $(date)" >> code_analysis_report.md
