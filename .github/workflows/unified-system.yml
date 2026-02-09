@@ -51,7 +51,11 @@ jobs:
 
       - name: Build application
         run: |
-          npm run build
+          if grep -q '"build"' package.json; then
+            npm run build
+          else
+            echo "⚠️  No build script found in package.json, skipping build"
+          fi
 
       - name: Test Node.js server health
         run: |
@@ -198,34 +202,26 @@ jobs:
   deploy-railway:
     runs-on: ubuntu-latest
     needs: [setup-unified-system, code-analysis]
-    # Only run on push to main when RAILWAY_TOKEN is available
+    # Only run on push to main
     if: |
       github.event_name == 'push' && 
       github.ref == 'refs/heads/main'
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Check Railway token availability
-        id: check-token
-        run: |
-          if [ -z "${{ secrets.RAILWAY_TOKEN }}" ]; then
-            echo "Railway token not configured, skipping deployment"
-            echo "skip=true" >> $GITHUB_OUTPUT
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
-          fi
+        if: env.RAILWAY_TOKEN != ''
 
       - name: Install Railway CLI
-        if: steps.check-token.outputs.skip != 'true'
+        if: env.RAILWAY_TOKEN != ''
         run: |
           # Official Railway CLI installation from https://railway.app/install.sh
           curl -fsSL https://railway.app/install.sh | sh
 
       - name: Deploy to Railway
-        if: steps.check-token.outputs.skip != 'true'
+        if: env.RAILWAY_TOKEN != ''
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           TRADING_MODE: paper
         run: |
           railway up --service ${{ github.event.repository.name }}
