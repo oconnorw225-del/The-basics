@@ -109,7 +109,7 @@ jobs:
             -not -path "./.unified-system/*" \
             -not -path "./.git/*" \
             -not -path "./archive/*" \
-            -exec flake8 --max-line-length=100 --ignore=W503 --exit-zero {} + > flake8_report.txt
+            -exec flake8 --max-line-length=100 --ignore=W503 --exit-zero {} + 2>&1 | tee flake8_report.txt
 
       - name: Generate analysis report
         run: |
@@ -235,4 +235,7 @@ jobs:
         env:
           TRADING_MODE: paper
         run: |
-          railway up --service ${{ github.event.repository.name }}
+          # Note: This assumes the Railway service name matches the GitHub repository name.
+          # If your Railway service has a different name, set RAILWAY_SERVICE environment variable.
+          SERVICE_NAME="${RAILWAY_SERVICE:-${{ github.event.repository.name }}}"
+          railway up --service "$SERVICE_NAME"
