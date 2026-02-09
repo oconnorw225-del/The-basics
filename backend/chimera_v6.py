@@ -6,9 +6,10 @@ Neural Market Prediction, Swarm Intelligence, and Self-Replication
 from typing import Dict, List, Optional
 from datetime import datetime
 import random
+from chimera_base import ChimeraComponentBase, SystemVersion, create_system_dict, DemoData
 
 
-class V6_NeuralMarketPredictor:
+class V6_NeuralMarketPredictor(ChimeraComponentBase):
     """
     V6 Feature: Advanced Neural Market Prediction
     Deep learning models for market prediction with 80%+ accuracy.
@@ -16,6 +17,7 @@ class V6_NeuralMarketPredictor:
     
     def __init__(self):
         """Initialize neural market predictor."""
+        super().__init__()
         self.models: Dict[str, Dict] = {}
         self.prediction_history: List[Dict] = []
         self.accuracy_tracker: Dict[str, float] = {}
@@ -188,7 +190,7 @@ class V6_NeuralMarketPredictor:
             return "Potential buying opportunity if other indicators confirm"
 
 
-class V6_SwarmIntelligence:
+class V6_SwarmIntelligence(ChimeraComponentBase):
     """
     V6 Feature: Swarm Intelligence
     Multiple AI agents working together, sharing insights.
@@ -196,6 +198,7 @@ class V6_SwarmIntelligence:
     
     def __init__(self, num_agents: int = 10):
         """Initialize swarm intelligence."""
+        super().__init__()
         self.num_agents = num_agents
         self.agents: List[Dict] = []
         self.shared_knowledge: Dict = {}
@@ -345,7 +348,7 @@ class V6_SwarmIntelligence:
         return consensus
 
 
-class V6_SelfReplication:
+class V6_SelfReplication(ChimeraComponentBase):
     """
     V6 Feature: Self-Replication System
     Ability to clone and deploy new instances of itself.
@@ -353,6 +356,7 @@ class V6_SelfReplication:
     
     def __init__(self):
         """Initialize self-replication system."""
+        super().__init__()
         self.instances: List[Dict] = []
         self.replication_count = 0
         
@@ -450,11 +454,73 @@ class V6_SelfReplication:
 
 def create_v6_system() -> Dict:
     """Create V6 Chimera system."""
-    return {
-        "version": "6.0",
-        "codename": "CONSCIOUSNESS_PROTOCOL",
-        "neural_predictor": V6_NeuralMarketPredictor(),
-        "swarm_intelligence": V6_SwarmIntelligence(num_agents=10),
-        "self_replication": V6_SelfReplication(),
-        "initialized_at": datetime.now().isoformat()
-    }
+    # Create components
+    neural_predictor = V6_NeuralMarketPredictor()
+    swarm_intelligence = V6_SwarmIntelligence(num_agents=10)
+    self_replication = V6_SelfReplication()
+    
+    # Create system version for banner display
+    system = SystemVersion("6.0", [neural_predictor, swarm_intelligence, self_replication])
+    system.print_banner(
+        "PROJECT CHIMERA V6 - CONSCIOUSNESS PROTOCOL",
+        [
+            "Advanced neural market prediction with 80%+ accuracy",
+            "Swarm intelligence with 10 specialized agents",
+            "Self-replication and horizontal scaling",
+            "Emergent consciousness through multi-agent coordination"
+        ]
+    )
+    
+    return create_system_dict(
+        version="6.0",
+        components={
+            "neural_predictor": neural_predictor,
+            "swarm_intelligence": swarm_intelligence,
+            "self_replication": self_replication
+        },
+        codename="CONSCIOUSNESS_PROTOCOL"
+    )
+
+
+def demo_v6():
+    """Demonstrate V6 capabilities."""
+    v6 = create_v6_system()
+    
+    # Demo: Train neural model
+    print("\n🧠 DEMO: Training neural market predictor...")
+    model = v6["neural_predictor"].train_model(
+        "BTC",
+        [{"price": 50000 + i*100} for i in range(100)]
+    )
+    
+    # Demo: Generate prediction
+    print("\n🔮 DEMO: Generating price prediction...")
+    prediction = v6["neural_predictor"].predict_price("BTC", horizon=24)
+    
+    # Demo: Sentiment analysis
+    print("\n📊 DEMO: Sentiment analysis...")
+    sentiment = v6["neural_predictor"].sentiment_analysis(
+        ["twitter", "reddit", "news", "telegram"]
+    )
+    
+    # Demo: Gather swarm insights
+    print("\n🐝 DEMO: Gathering swarm intelligence...")
+    market_data = DemoData.get_sample_market_data()
+    insights = v6["swarm_intelligence"].gather_insights(market_data)
+    
+    # Demo: Build consensus
+    print("\n🤝 DEMO: Building swarm consensus...")
+    consensus = v6["swarm_intelligence"].build_consensus(insights)
+    
+    # Demo: Self-replication
+    print("\n📱 DEMO: Creating new instances...")
+    instance = v6["self_replication"].create_instance(
+        purpose="arbitrage_specialist",
+        config={"capital": 50000, "risk_tolerance": 0.05}
+    )
+    
+    print("\n✅ V6 Demo Complete!")
+
+
+if __name__ == "__main__":
+    demo_v6()
