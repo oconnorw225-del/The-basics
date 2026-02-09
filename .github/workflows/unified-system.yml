@@ -99,7 +99,7 @@ jobs:
 
       - name: Run flake8 code analysis
         run: |
-          find . -name "*.py" -not -path "./source/*" -not -path "./.unified-system/*" -not -path "./.git/*" -not -path "./archive/*" | xargs flake8 --max-line-length=100 --ignore=E501,W503 --exit-zero > flake8_report.txt || true
+          find . -name "*.py" -not -path "./source/*" -not -path "./.unified-system/*" -not -path "./.git/*" -not -path "./archive/*" | xargs flake8 --max-line-length=100 --ignore=W503 --exit-zero > flake8_report.txt || true
 
       - name: Generate analysis report
         run: |
@@ -202,13 +202,14 @@ jobs:
       always() && 
       github.event_name == 'push' && 
       github.ref == 'refs/heads/main' &&
-      secrets.RAILWAY_TOKEN != ''
+      secrets.RAILWAY_TOKEN
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Railway CLI
         run: |
+          # Official Railway CLI installation from https://railway.app/install.sh
           curl -fsSL https://railway.app/install.sh | sh
 
       - name: Deploy to Railway
