@@ -6,9 +6,10 @@ Self-Learning AI, Multi-Chain Operations, and Autonomous Expansion
 from typing import Dict, List, Optional
 from datetime import datetime
 from enum import Enum
+from chimera_base import ChimeraComponentBase, SystemVersion, create_system_dict, DemoData
 
 
-class V5_SelfLearningAI:
+class V5_SelfLearningAI(ChimeraComponentBase):
     """
     V5 Feature: Self-Learning AI Engine
     Continuously learns from market data and adapts strategies without human intervention.
@@ -16,6 +17,7 @@ class V5_SelfLearningAI:
     
     def __init__(self):
         """Initialize self-learning AI."""
+        super().__init__()
         self.knowledge_base: List[Dict] = []
         self.learned_patterns: List[Dict] = []
         self.adaptation_history: List[Dict] = []
@@ -146,7 +148,7 @@ class V5_SelfLearningAI:
         return adaptation
 
 
-class V5_MultiChainBridge:
+class V5_MultiChainBridge(ChimeraComponentBase):
     """
     V5 Feature: Multi-Chain Operations
     Operate across multiple blockchains simultaneously.
@@ -154,6 +156,7 @@ class V5_MultiChainBridge:
     
     def __init__(self):
         """Initialize multi-chain bridge."""
+        super().__init__()
         self.supported_chains = [
             "Ethereum", "BSC", "Polygon", "Arbitrum", "Optimism", 
             "Avalanche", "Fantom", "Solana"
@@ -295,7 +298,7 @@ class V5_MultiChainBridge:
         return bridge_tx
 
 
-class V5_AutonomousExpansion:
+class V5_AutonomousExpansion(ChimeraComponentBase):
     """
     V5 Feature: Autonomous Expansion Engine
     Automatically identifies and enters new markets/opportunities.
@@ -303,6 +306,7 @@ class V5_AutonomousExpansion:
     
     def __init__(self):
         """Initialize autonomous expansion."""
+        super().__init__()
         self.expansion_candidates: List[Dict] = []
         self.active_markets: List[str] = ["crypto", "stocks"]
         
@@ -398,11 +402,35 @@ class V5_AutonomousExpansion:
 
 def create_v5_system(capital: float = 1000000) -> Dict:
     """Create V5 Chimera system."""
-    return {
-        "version": "5.0",
-        "codename": "QUANTUM_LEAP",
-        "self_learning_ai": V5_SelfLearningAI(),
-        "multi_chain_bridge": V5_MultiChainBridge(),
-        "autonomous_expansion": V5_AutonomousExpansion(),
-        "initialized_at": datetime.now().isoformat()
-    }
+    # Create components
+    self_learning_ai = V5_SelfLearningAI()
+    multi_chain_bridge = V5_MultiChainBridge()
+    autonomous_expansion = V5_AutonomousExpansion()
+    
+    # Create system version for banner display
+    system = SystemVersion("5.0", [self_learning_ai, multi_chain_bridge, autonomous_expansion])
+    system.print_banner(
+        "PROJECT CHIMERA V5 - QUANTUM LEAP EDITION",
+        [
+            "Self-Learning AI that adapts strategies",
+            "Multi-Chain operations across 8+ blockchains",
+            "Autonomous market expansion",
+            f"Starting capital: ${capital:,.0f}"
+        ]
+    )
+    
+    return create_system_dict(
+        version="5.0",
+        components={
+            "self_learning_ai": self_learning_ai,
+            "multi_chain_bridge": multi_chain_bridge,
+            "autonomous_expansion": autonomous_expansion
+        },
+        codename="QUANTUM_LEAP",
+        capital=capital
+    )
+
+
+if __name__ == "__main__":
+    v5 = create_v5_system()
+    print("\n✅ V5 System initialized successfully!")

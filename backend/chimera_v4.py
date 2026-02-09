@@ -6,9 +6,10 @@ Autonomous freelancing system with treasury management and intelligence core
 from typing import Dict, List, Optional
 from datetime import datetime
 from enum import Enum
+from chimera_base import ChimeraComponentBase, SystemVersion, create_system_dict, DemoData
 
 
-class V4_FreelanceEngine:
+class V4_FreelanceEngine(ChimeraComponentBase):
     """
     V4 Feature: Autonomous Freelance Engine
     Automates job searching, bidding, execution, and payment processing.
@@ -16,6 +17,7 @@ class V4_FreelanceEngine:
     
     def __init__(self):
         """Initialize freelance engine."""
+        super().__init__()
         self.active_jobs: List[Dict] = []
         self.completed_jobs: List[Dict] = []
         self.earnings: float = 0.0
@@ -31,37 +33,20 @@ class V4_FreelanceEngine:
         Returns:
             List of matching opportunities
         """
-        opportunities = [
-            {
-                "job_id": "FL-001",
-                "title": "Python Trading Bot Development",
-                "budget": 5000,
-                "duration": "2 weeks",
-                "skills": ["Python", "Trading", "API Integration"],
-                "match_score": 0.95,
-                "platform": "Upwork"
-            },
-            {
-                "job_id": "FL-002",
-                "title": "Smart Contract Audit",
-                "budget": 3000,
-                "duration": "1 week",
-                "skills": ["Solidity", "Security", "Blockchain"],
-                "match_score": 0.88,
-                "platform": "Freelancer"
-            },
-            {
-                "job_id": "FL-003",
-                "title": "AI Model Training",
-                "budget": 4500,
-                "duration": "3 weeks",
-                "skills": ["Machine Learning", "Python", "TensorFlow"],
-                "match_score": 0.82,
-                "platform": "Toptal"
-            }
-        ]
+        opportunities = DemoData.get_sample_opportunities()
         
-        print(f"✓ Found {len(opportunities)} matching opportunities")
+        # Add one more opportunity for v4 demo
+        opportunities.append({
+            "job_id": "FL-003",
+            "title": "AI Model Training",
+            "budget": 4500,
+            "duration": "3 weeks",
+            "skills": ["Machine Learning", "Python", "TensorFlow"],
+            "match_score": 0.82,
+            "platform": "Toptal"
+        })
+        
+        self.log_success(f"Found {len(opportunities)} matching opportunities")
         return opportunities
     
     def submit_bid(self, job: Dict, proposal: Dict) -> Dict:
@@ -85,9 +70,10 @@ class V4_FreelanceEngine:
             "success_probability": 0.75
         }
         
-        print(f"✓ Bid submitted for {job['title']}")
-        print(f"  Amount: ${bid_result['bid_amount']}")
-        print(f"  Success probability: {bid_result['success_probability']*100}%")
+        self.log_success(f"Bid submitted for {job['title']}", {
+            "Amount": f"${bid_result['bid_amount']}",
+            "Success probability": f"{bid_result['success_probability']*100}%"
+        })
         
         return bid_result
     
@@ -162,7 +148,7 @@ Chimera Freelance Engine
         return completion
 
 
-class V4_TreasurySystem:
+class V4_TreasurySystem(ChimeraComponentBase):
     """
     V4 Feature: Advanced Treasury Management
     Manages funds, payments, and financial operations.
@@ -170,6 +156,7 @@ class V4_TreasurySystem:
     
     def __init__(self, initial_balance: float = 0.0):
         """Initialize treasury system."""
+        super().__init__()
         self.balance: float = initial_balance
         self.transactions: List[Dict] = []
         self.reserves: float = initial_balance * 0.2  # 20% reserve
@@ -253,7 +240,7 @@ class V4_TreasurySystem:
         }
 
 
-class V4_IntelligenceCore:
+class V4_IntelligenceCore(ChimeraComponentBase):
     """
     V4 Feature: Intelligence and Decision-Making Core
     Analyzes data and makes autonomous decisions.
@@ -261,6 +248,7 @@ class V4_IntelligenceCore:
     
     def __init__(self):
         """Initialize intelligence core."""
+        super().__init__()
         self.decisions_made: List[Dict] = []
         self.learning_data: List[Dict] = []
         self.confidence_threshold: float = 0.7
@@ -348,32 +336,32 @@ def create_v4_system() -> Dict:
     Returns:
         Dictionary of V4 components
     """
-    print("\n" + "="*70)
-    print("INITIALIZING PROJECT CHIMERA V4 - FREELANCE ENGINE")
-    print("="*70)
-    
+    # Create components
     freelance_engine = V4_FreelanceEngine()
     treasury_system = V4_TreasurySystem(initial_balance=10000)
     intelligence_core = V4_IntelligenceCore()
     
-    print("\n✓ V4 Freelance Engine initialized")
-    print("✓ V4 Treasury System initialized (Balance: $10,000)")
-    print("✓ V4 Intelligence Core initialized")
-    print("\nV4 CAPABILITIES:")
-    print("  • Autonomous job searching and bidding")
-    print("  • Intelligent opportunity analysis")
-    print("  • Advanced treasury management")
-    print("  • Automated code execution")
-    print("  • Financial health monitoring")
-    print("="*70 + "\n")
+    # Create system version for banner display
+    system = SystemVersion("4.0", [freelance_engine, treasury_system, intelligence_core])
+    system.print_banner(
+        "PROJECT CHIMERA V4 - FREELANCE ENGINE",
+        [
+            "Autonomous job searching and bidding",
+            "Intelligent opportunity analysis",
+            "Advanced treasury management",
+            "Automated code execution",
+            "Financial health monitoring"
+        ]
+    )
     
-    return {
-        "freelance_engine": freelance_engine,
-        "treasury_system": treasury_system,
-        "intelligence_core": intelligence_core,
-        "version": "4.0",
-        "status": "operational"
-    }
+    return create_system_dict(
+        version="4.0",
+        components={
+            "freelance_engine": freelance_engine,
+            "treasury_system": treasury_system,
+            "intelligence_core": intelligence_core
+        }
+    )
 
 
 def demo_v4():
