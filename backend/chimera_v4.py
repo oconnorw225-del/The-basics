@@ -72,7 +72,7 @@ class V4_FreelanceEngine(ChimeraComponentBase):
         
         self.log_success(f"Bid submitted for {job['title']}", {
             "Amount": f"${bid_result['bid_amount']}",
-            "Success probability": f"{bid_result['success_probability']*100}%"
+            "Success probability": f"{bid_result['success_probability'] * 100}%"
         })
         
         return bid_result

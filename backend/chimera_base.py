@@ -5,10 +5,9 @@ Common functionality shared across all Chimera versions
 
 from typing import Dict, List, Optional, Any
 from datetime import datetime
-from abc import ABC, abstractmethod
 
 
-class ChimeraComponentBase(ABC):
+class ChimeraComponentBase:
     """
     Base class for all Chimera components across all versions.
     Provides common initialization and utility methods.
