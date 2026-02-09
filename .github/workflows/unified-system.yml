@@ -51,7 +51,7 @@ jobs:
 
       - name: Build application
         run: |
-          if grep -q '"build"' package.json; then
+          if [ -f package.json ] && grep -q '"build"' package.json; then
             npm run build
           else
             echo "⚠️  No build script found in package.json, skipping build"
@@ -104,6 +104,7 @@ jobs:
       - name: Run flake8 code analysis
         run: |
           # Run flake8 on Python files with exclusions
+          # Using --exit-zero to prevent workflow failure; this job provides feedback only
           find . -name "*.py" \
             -not -path "./source/*" \
             -not -path "./.unified-system/*" \
