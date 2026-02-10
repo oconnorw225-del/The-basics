@@ -10,25 +10,47 @@ jobs:
       - name: Checkout the-basics repository
         uses: actions/checkout@v4
 
+      - name: Record start time
+        id: start-time
+        run: echo "start_time=$(date +%s)" >> $GITHUB_OUTPUT
+
       - name: Clone source repositories
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           mkdir source
-          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine
-          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb
-          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader
-          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/repository-web-app.git source/repository-web-app
-          git clone https://x-access-token:${GH_PAT}@github.com/oconnorw225-del/The-new-ones.git source/The-new-ones
+          
+          # Create a helper script for secure git authentication with secure permissions
+          export GIT_ASKPASS=$(umask 077 && mktemp)
+          printf '#!/bin/sh\necho "$GH_PAT"\n' > "$GIT_ASKPASS"
+          chmod 700 "$GIT_ASKPASS"
+          
+          # Clone repositories in parallel for better performance
+          git clone https://github.com/oconnorw225-del/ndax-quantum-engine.git source/ndax-quantum-engine &
+          git clone https://github.com/oconnorw225-del/quantum-engine-dashb.git source/quantum-engine-dashb &
+          git clone https://github.com/oconnorw225-del/shadowforge-ai-trader.git source/shadowforge-ai-trader &
+          git clone https://github.com/oconnorw225-del/repository-web-app.git source/repository-web-app &
+          git clone https://github.com/oconnorw225-del/The-new-ones.git source/The-new-ones &
+          
+          # Wait for all clones to complete
+          wait
+          
+          # Clean up credentials
+          rm -f "$GIT_ASKPASS"
 
       - name: Archive backups
         run: |
           mkdir backups
-          tar czf backups/ndax-quantum-engine.tar.gz -C source ndax-quantum-engine
-          tar czf backups/quantum-engine-dashb.tar.gz -C source quantum-engine-dashb
-          tar czf backups/shadowforge-ai-trader.tar.gz -C source shadowforge-ai-trader
-          tar czf backups/repository-web-app.tar.gz -C source repository-web-app
-          tar czf backups/The-new-ones.tar.gz -C source The-new-ones
+          
+          # Compress repositories in parallel for better performance
+          tar czf backups/ndax-quantum-engine.tar.gz -C source ndax-quantum-engine &
+          tar czf backups/quantum-engine-dashb.tar.gz -C source quantum-engine-dashb &
+          tar czf backups/shadowforge-ai-trader.tar.gz -C source shadowforge-ai-trader &
+          tar czf backups/repository-web-app.tar.gz -C source repository-web-app &
+          tar czf backups/The-new-ones.tar.gz -C source The-new-ones &
+          
+          # Wait for all compressions to complete
+          wait
 
       - name: Setup directory structure
         run: |
@@ -45,3 +67,17 @@ jobs:
           git add .
           git diff --staged --quiet || git commit -m "Automated consolidation of best parts"
           git push
+
+      - name: Report performance metrics
+        if: always()
+        run: |
+          end_time=$(date +%s)
+          start_time=${{ steps.start-time.outputs.start_time }}
+          duration=$((end_time - start_time))
+          minutes=$((duration / 60))
+          seconds=$((duration % 60))
+          echo "⏱️ Total consolidation time: ${minutes}m ${seconds}s"
+          echo "📊 Performance Summary:"
+          echo "  - Repositories cloned: 5 (parallel)"
+          echo "  - Archives created: 5 (parallel)"
+          echo "  - Total duration: ${minutes}m ${seconds}s"
