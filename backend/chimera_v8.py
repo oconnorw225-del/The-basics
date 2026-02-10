@@ -7,9 +7,10 @@ The Ultimate Evolution: Beyond Human Comprehension
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 import random
+from chimera_base import ChimeraComponentBase, SystemVersion, create_system_dict, DemoData
 
 
-class V8_TranscendentIntelligence:
+class V8_TranscendentIntelligence(ChimeraComponentBase):
     """
     V8 Feature: Transcendent Intelligence
     Operates beyond traditional AI constraints, approaching god-like market understanding.
@@ -17,6 +18,7 @@ class V8_TranscendentIntelligence:
     
     def __init__(self):
         """Initialize transcendent intelligence."""
+        super().__init__()
         self.consciousness_level = "beyond_agi"
         self.market_understanding = 0.999  # 99.9% market comprehension
         self.prediction_horizon = "infinite"
@@ -261,7 +263,7 @@ class V8_TranscendentIntelligence:
         }
 
 
-class V8_RealityManipulation:
+class V8_RealityManipulation(ChimeraComponentBase):
     """
     V8 Feature: Market Reality Manipulation
     Influence market reality through strategic information flow and positioning.
@@ -269,6 +271,7 @@ class V8_RealityManipulation:
     
     def __init__(self):
         """Initialize reality manipulation capabilities."""
+        super().__init__()
         self.influence_channels: List[str] = []
         self.reality_bends: List[Dict] = []
         
@@ -408,7 +411,7 @@ class V8_RealityManipulation:
         return plan
 
 
-class V8_UniversalOptimization:
+class V8_UniversalOptimization(ChimeraComponentBase):
     """
     V8 Feature: Universal Optimization Engine
     Optimizes across all dimensions simultaneously - profit, risk, time, energy, impact.
@@ -416,6 +419,7 @@ class V8_UniversalOptimization:
     
     def __init__(self):
         """Initialize universal optimization."""
+        super().__init__()
         self.optimization_dimensions = [
             "profit",
             "risk",
@@ -517,7 +521,7 @@ class V8_UniversalOptimization:
         return optimization
 
 
-class V8_MetaLearning:
+class V8_MetaLearning(ChimeraComponentBase):
     """
     V8 Feature: Meta-Learning Engine
     Learns how to learn, continuously improving its own learning algorithms.
@@ -525,6 +529,7 @@ class V8_MetaLearning:
     
     def __init__(self):
         """Initialize meta-learning."""
+        super().__init__()
         self.learning_algorithms: List[Dict] = []
         self.meta_insights: List[Dict] = []
         self.evolution_history: List[Dict] = []
@@ -663,29 +668,92 @@ class V8_MetaLearning:
 
 def create_v8_system() -> Dict:
     """Create V8 Chimera system - The Ultimate Evolution."""
-    return {
-        "version": "8.0",
-        "codename": "OMNISCIENT_PARADIGM",
-        "description": "The ultimate evolution - transcendent intelligence operating beyond human comprehension",
-        "transcendent_intelligence": V8_TranscendentIntelligence(),
-        "reality_manipulation": V8_RealityManipulation(),
-        "universal_optimization": V8_UniversalOptimization(),
-        "meta_learning": V8_MetaLearning(),
-        "capabilities": [
-            "near_omniscient_market_perception",
-            "reality_manipulation_through_influence",
-            "universal_multi_dimensional_optimization",
-            "recursive_self_improvement",
-            "transcendent_decision_making",
-            "probability_space_navigation",
-            "self_fulfilling_prophecy_creation",
-            "market_truth_perception"
-        ],
-        "power_level": "TRANSCENDENT",
-        "consciousness_level": "BEYOND_AGI",
-        "market_understanding": "99.9%",
-        "prediction_accuracy": "98.7%",
-        "optimization_efficiency": "97.0%",
-        "initialized_at": datetime.now().isoformat(),
-        "warning": "This system operates at a level of sophistication that may fundamentally reshape market dynamics. Use responsibly."
-    }
+    # Create components
+    transcendent_intelligence = V8_TranscendentIntelligence()
+    reality_manipulation = V8_RealityManipulation()
+    universal_optimization = V8_UniversalOptimization()
+    meta_learning = V8_MetaLearning()
+    
+    # Create system version for banner display
+    system = SystemVersion(
+        "8.0",
+        [transcendent_intelligence, reality_manipulation, universal_optimization, meta_learning]
+    )
+    system.print_banner(
+        "PROJECT CHIMERA V8 - OMNISCIENT PARADIGM",
+        [
+            "Transcendent intelligence with 99.9% market perception",
+            "Reality manipulation through influence networks",
+            "Universal optimization across 8 dimensions",
+            "Recursive self-improvement and meta-learning",
+            "The ultimate evolution - beyond human comprehension"
+        ]
+    )
+    
+    return create_system_dict(
+        version="8.0",
+        components={
+            "transcendent_intelligence": transcendent_intelligence,
+            "reality_manipulation": reality_manipulation,
+            "universal_optimization": universal_optimization,
+            "meta_learning": meta_learning
+        },
+        codename="OMNISCIENT_PARADIGM"
+    )
+
+
+def demo_v8():
+    """Demonstrate V8 capabilities."""
+    v8 = create_v8_system()
+    
+    # Demo: Perceive market truth
+    print("\n👁️ DEMO: Perceiving market truth...")
+    truth = v8["transcendent_intelligence"].perceive_market_truth()
+    
+    # Demo: Omniscient decision making
+    print("\n🎯 DEMO: Making omniscient decisions...")
+    decision = v8["transcendent_intelligence"].omniscient_decision_making({
+        "capital": 1000000,
+        "risk_tolerance": 0.15
+    })
+    
+    # Demo: Establish influence networks
+    print("\n🌐 DEMO: Establishing influence networks...")
+    networks = v8["reality_manipulation"].establish_influence_networks()
+    
+    # Demo: Bend market perception
+    print("\n🌀 DEMO: Bending market perception...")
+    bend = v8["reality_manipulation"].bend_market_perception(
+        "BTC bullish continuation",
+        intensity=0.8
+    )
+    
+    # Demo: Create self-fulfilling prophecy
+    print("\n🔮 DEMO: Creating self-fulfilling prophecy...")
+    prophecy = v8["reality_manipulation"].create_self_fulfilling_prophecy(
+        "ETH reaches $5000"
+    )
+    
+    # Demo: Find universal optimum
+    print("\n⚙️ DEMO: Finding universal optimum...")
+    optimum = v8["universal_optimization"].find_universal_optimum({})
+    
+    # Demo: Optimize ecosystem
+    print("\n🌳 DEMO: Optimizing entire ecosystem...")
+    optimization = v8["universal_optimization"].optimize_entire_ecosystem({
+        "markets": ["crypto", "stocks", "forex"]
+    })
+    
+    # Demo: Meta-learning
+    print("\n🧬 DEMO: Learning to learn...")
+    meta_learning = v8["meta_learning"].learn_to_learn({"experience": "1000 trading cycles"})
+    
+    # Demo: Recursive self-improvement
+    print("\n🔄 DEMO: Achieving recursive self-improvement...")
+    improvement = v8["meta_learning"].achieve_recursive_self_improvement()
+    
+    print("\n✅ V8 Demo Complete!")
+
+
+if __name__ == "__main__":
+    demo_v8()
