@@ -13,6 +13,30 @@ Automated consolidation of best parts from:
 2. Go to Actions > Consolidate Best Parts > Run workflow.
 3. Review and use your unified repo!
 
+## Deployment
+
+### Railway Deployment
+
+This project includes automated Railway deployment through GitHub Actions. 
+
+**Requirements:**
+- Add `RAILWAY_TOKEN` secret to your repository (Settings → Secrets → Actions → New repository secret)
+- The workflow will automatically deploy to Railway on push to main branch
+- Deployment is fully gated and will NOT run without the secret configured
+
+**Safety Defaults:**
+- `TRADING_MODE=paper` - Safe paper trading mode is the default
+- Production trading requires explicit configuration change
+- Never commit secrets or sensitive data to the repository
+
+**To Enable Deployment:**
+1. Create a Railway account at https://railway.app
+2. Generate an API token from your Railway account settings
+3. Add the token as `RAILWAY_TOKEN` in GitHub repository secrets
+4. Push to main branch - deployment will run automatically
+
+For more details, see the [Unified System CI/CD workflow](.github/workflows/unified-system.yml).
+
 ## Running the NDAX Quantum Trading Bot (CLI)
 
 The bot can be run directly from the command line in several ways.
