@@ -100,7 +100,7 @@ class SystemConfig:
 
 
 class UnifiedSystem:
-    """Complete autonomous system manager"""
+    """Complete autonomous system manager with environment preloading"""
     
     def __init__(self, repo_path: str = "."):
         self.repo_path = Path(repo_path)
@@ -108,6 +108,25 @@ class UnifiedSystem:
         self.config_file = self.config_dir / "config.json"
         self.generated_dir = self.config_dir / "generated"
         self.config: Optional[SystemConfig] = None
+        
+        # Initialize environment preloader
+        self.env_preloader = None
+        self._init_env_preloader()
+        
+        logger.info(f"Unified System initialized at: {self.repo_path.absolute()}")
+    
+    def _init_env_preloader(self):
+        """Initialize the Chimera environment preloader."""
+        try:
+            # Import locally to avoid circular dependencies
+            sys.path.insert(0, str(self.repo_path / "backend"))
+            from chimera_env_preloader import create_env_preloader
+            
+            self.env_preloader = create_env_preloader(str(self.config_dir))
+            logger.info("Environment preloader initialized")
+        except ImportError as e:
+            logger.warning(f"Could not initialize environment preloader: {e}")
+            self.env_preloader = None
         
     def load_config(self) -> SystemConfig:
         """Load or create configuration"""

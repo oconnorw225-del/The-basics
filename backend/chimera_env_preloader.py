@@ -14,7 +14,15 @@ from datetime import datetime
 import hashlib
 import secrets as crypto_secrets
 from enum import Enum
-from chimera_base import ChimeraComponentBase
+
+# Import chimera_base - works for both direct execution and package import
+try:
+    from chimera_base import ChimeraComponentBase
+except ImportError:
+    try:
+        from backend.chimera_base import ChimeraComponentBase
+    except ImportError:
+        from .chimera_base import ChimeraComponentBase
 
 
 logger = logging.getLogger('ChimeraEnvPreloader')
@@ -383,7 +391,7 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
         
         env_file_path = Path(filepath)
         
-        with open(env_file_path, 'w') as f:
+        with open(env_file_path, 'w', encoding='utf-8') as f:
             f.write("# CHIMERA SYSTEM - RAILWAY ENVIRONMENT VARIABLES\n")
             f.write(f"# Auto-generated: {datetime.now().isoformat()}\n")
             f.write("# WARNING: Contains sensitive data - never commit to git!\n\n")
@@ -448,9 +456,17 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
         
         return validation
     
-    def _generate_secret_key(self, length: int = 32) -> str:
-        """Generate a secure random secret key."""
-        return crypto_secrets.token_hex(length)
+    def _generate_secret_key(self, byte_length: int = 32) -> str:
+        """
+        Generate a secure random secret key.
+        
+        Args:
+            byte_length: Number of random bytes (hex string will be 2x this length)
+        
+        Returns:
+            Hexadecimal string (2 * byte_length characters)
+        """
+        return crypto_secrets.token_hex(byte_length)
     
     def _save_preload_cache(self, summary: Dict[str, Any]) -> None:
         """Save preload cache for Railway deployment."""
@@ -469,7 +485,7 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
             for key, env_var in self.env_cache.items()
         ]
         
-        with open(cache_file, 'w') as f:
+        with open(cache_file, 'w', encoding='utf-8') as f:
             json.dump(safe_summary, f, indent=2)
         
         self.log_info(f"Preload cache saved to {cache_file}")
