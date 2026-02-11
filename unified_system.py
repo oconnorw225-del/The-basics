@@ -4,6 +4,7 @@ unified_system.py - Complete Autonomous System
 Integrates Chimera Auto-Pilot with The-Basics repository
 Auto-configures missing APIs, wallets, and all inputs
 SECURITY HARDENED - All file operations now use safe methods
+ENHANCED - Preloads all environments, secrets, and credentials for Railway
 """
 
 import asyncio
@@ -99,7 +100,7 @@ class SystemConfig:
 
 
 class UnifiedSystem:
-    """Complete autonomous system manager"""
+    """Complete autonomous system manager with environment preloading"""
     
     def __init__(self, repo_path: str = "."):
         self.repo_path = Path(repo_path)
@@ -107,6 +108,25 @@ class UnifiedSystem:
         self.config_file = self.config_dir / "config.json"
         self.generated_dir = self.config_dir / "generated"
         self.config: Optional[SystemConfig] = None
+        
+        # Initialize environment preloader
+        self.env_preloader = None
+        self._init_env_preloader()
+        
+        logger.info(f"Unified System initialized at: {self.repo_path.absolute()}")
+    
+    def _init_env_preloader(self):
+        """Initialize the Chimera environment preloader."""
+        try:
+            # Import locally to avoid circular dependencies
+            sys.path.insert(0, str(self.repo_path / "backend"))
+            from chimera_env_preloader import create_env_preloader
+            
+            self.env_preloader = create_env_preloader(str(self.config_dir))
+            logger.info("Environment preloader initialized")
+        except ImportError as e:
+            logger.warning(f"Could not initialize environment preloader: {e}")
+            self.env_preloader = None
         
     def load_config(self) -> SystemConfig:
         """Load or create configuration"""
@@ -791,11 +811,38 @@ echo ""
                 httpd.serve_forever()
     
     async def run(self):
-        """Run the unified system"""
+        """Run the unified system with environment preloading"""
         print("\n" + "="*80)
-        print("║ 🚀 UNIFIED AUTONOMOUS SYSTEM")
+        print("║ 🚀 UNIFIED AUTONOMOUS SYSTEM - ENHANCED")
         print("║ The-Basics + Chimera Auto-Pilot + Full Dashboard")
         print("="*80 + "\n")
+        
+        # STEP 1: Preload all environments, secrets, and credentials
+        if self.env_preloader:
+            print("🔐 Preloading environments, secrets, and credentials...")
+            preload_summary = self.env_preloader.preload_all_environments()
+            print(f"  ✓ Loaded {preload_summary['total_variables']} environment variables")
+            print(f"  ✓ {preload_summary['secrets_count']} secrets configured")
+            print(f"  ✓ Platforms: {', '.join(preload_summary['platforms'])}")
+            
+            # Export Railway environment if Railway is configured
+            if preload_summary.get('credentials_loaded', {}).get('railway'):
+                print("  ✓ Railway credentials detected")
+                self.env_preloader.export_to_dotenv(".env.railway")
+                print("  ✓ Railway environment exported to .env.railway")
+            
+            # Validate Railway deployment
+            print("\n🚂 Validating Railway deployment configuration...")
+            validation = self.env_preloader.validate_railway_deployment()
+            if validation['valid']:
+                print("  ✅ Railway deployment validated")
+            else:
+                print("  ⚠️  Railway deployment validation warnings:")
+                for error in validation.get('errors', []):
+                    print(f"      - {error}")
+                for warning in validation.get('warnings', []):
+                    print(f"      - {warning}")
+            print()
         
         # Load configuration
         self.config = self.load_config()

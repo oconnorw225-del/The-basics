@@ -225,18 +225,99 @@ jobs:
         uses: actions/checkout@v4
         if: env.RAILWAY_TOKEN != ''
 
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        if: env.RAILWAY_TOKEN != ''
+        with:
+          python-version: '3.11'
+
+      - name: Preload environment variables and secrets
+        if: env.RAILWAY_TOKEN != ''
+        run: |
+          echo "🔐 Preloading environments, secrets, and credentials for Railway..."
+          
+          # Install Python dependencies for preloader
+          pip install -q fastapi uvicorn pydantic aiofiles
+          
+          # Create backend directory if it doesn't exist
+          mkdir -p backend
+          
+          # Run the environment preloader
+          python3 -c "
+          import sys
+          sys.path.insert(0, 'backend')
+          from chimera_env_preloader import create_env_preloader
+          
+          # Create and run preloader
+          preloader = create_env_preloader()
+          summary = preloader.preload_all_environments()
+          
+          print(f'✅ Preloaded {summary[\"total_variables\"]} variables')
+          print(f'✅ {summary[\"secrets_count\"]} secrets configured')
+          print(f'✅ Platforms: {summary[\"platforms\"]}')
+          
+          # Validate Railway deployment
+          validation = preloader.validate_railway_deployment()
+          if validation['valid']:
+              print('✅ Railway deployment validated')
+          else:
+              print('⚠️ Validation warnings:', validation['errors'])
+          
+          # Export to .env.railway for deployment
+          preloader.export_to_dotenv('.env.railway')
+          print('✅ Environment exported to .env.railway')
+          "
+          
+          echo "✅ Environment preloading complete"
+
       - name: Install Railway CLI
         if: env.RAILWAY_TOKEN != ''
         run: |
           # Official Railway CLI installation from https://railway.app/install.sh
           curl -fsSL https://railway.app/install.sh | sh
 
-      - name: Deploy to Railway
+      - name: Deploy to Railway with preloaded environment
         if: env.RAILWAY_TOKEN != ''
         env:
+          # Core application settings
+          NODE_ENV: production
+          PYTHON_ENV: production
+          API_PORT: 8000
+          API_HOST: 0.0.0.0
+          
+          # Trading settings (safe defaults)
           TRADING_MODE: paper
+          RISK_TOLERANCE: "0.05"
+          MAX_POSITION_SIZE: "0.1"
+          
+          # Security settings from secrets
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          
+          # Database URLs (optional)
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          
+          # API credentials (optional)
+          NDAX_API_KEY: ${{ secrets.NDAX_API_KEY }}
+          NDAX_API_SECRET: ${{ secrets.NDAX_API_SECRET }}
+          EXCHANGE_API_KEY: ${{ secrets.EXCHANGE_API_KEY }}
+          EXCHANGE_API_SECRET: ${{ secrets.EXCHANGE_API_SECRET }}
+          
+          # Wallet addresses (optional)
+          INFLOW_WALLET_ADDR: ${{ secrets.INFLOW_WALLET_ADDR }}
+          OPERATIONAL_WALLET_ADDR: ${{ secrets.OPERATIONAL_WALLET_ADDR }}
+          COLD_STORAGE_ADDR: ${{ secrets.COLD_STORAGE_ADDR }}
+          EMERGENCY_WALLET_ADDR: ${{ secrets.EMERGENCY_WALLET_ADDR }}
         run: |
+          echo "🚂 Deploying to Railway with preloaded configuration..."
+          
           # Note: This assumes the Railway service name matches the GitHub repository name.
           # If your Railway service has a different name, set RAILWAY_SERVICE environment variable.
           SERVICE_NAME="${RAILWAY_SERVICE:-${{ github.event.repository.name }}}"
+          
+          # Deploy with Railway CLI
           railway up --service "$SERVICE_NAME"
+          
+          echo "✅ Railway deployment complete"
+          echo "🔗 Check your Railway dashboard for deployment status"
