@@ -27,8 +27,10 @@ fi
 
 cd "$WORKFLOW_DIR"
 
-# Count disabled workflows
-DISABLED_COUNT=$(ls -1 *.disabled 2>/dev/null | wc -l)
+# Count disabled workflows using glob pattern
+shopt -s nullglob
+disabled_files=(*.disabled)
+DISABLED_COUNT=${#disabled_files[@]}
 
 if [ "$DISABLED_COUNT" -eq 0 ]; then
     echo "  ℹ No disabled workflows found"

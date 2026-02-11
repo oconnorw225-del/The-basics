@@ -212,8 +212,9 @@ class RestorationPlanner:
         
         # Task 1: Restore system configuration
         task_id += 1
+        config_task_id = f"task-{task_id:03d}"
         self.tasks.append(RestorationTask(
-            task_id=f"task-{task_id:03d}",
+            task_id=config_task_id,
             category="configuration",
             description="Restore system configuration files",
             priority=1
@@ -227,29 +228,34 @@ class RestorationPlanner:
                 category="workflows",
                 description="Re-enable critical GitHub workflows",
                 priority=2,
-                dependencies=["task-001"]
+                dependencies=[config_task_id]
             ))
         
         # Task 3: Restore bot connections
+        bots_task_id = None
         if restore_bots:
             task_id += 1
+            bots_task_id = f"task-{task_id:03d}"
             self.tasks.append(RestorationTask(
-                task_id=f"task-{task_id:03d}",
+                task_id=bots_task_id,
                 category="bots",
                 description="Re-establish bot connections and verify operations",
                 priority=2,
-                dependencies=["task-001"]
+                dependencies=[config_task_id]
             ))
         
         # Task 4: Restore trading operations
         if restore_trading:
             task_id += 1
+            trading_deps = [config_task_id]
+            if bots_task_id:
+                trading_deps.append(bots_task_id)
             self.tasks.append(RestorationTask(
                 task_id=f"task-{task_id:03d}",
                 category="trading",
                 description="Restore autonomous trading operations in paper mode",
                 priority=3,
-                dependencies=["task-001", "task-003"]
+                dependencies=trading_deps
             ))
         
         # Task 5: Restore freelance operations
@@ -260,7 +266,7 @@ class RestorationPlanner:
                 category="freelance",
                 description="Restore freelance AI job operations",
                 priority=3,
-                dependencies=["task-001"]
+                dependencies=[config_task_id]
             ))
         
         # Task 6: Restore platform connections
@@ -270,17 +276,18 @@ class RestorationPlanner:
             category="platforms",
             description="Re-establish connections with GitHub, Railway, and other platforms",
             priority=4,
-            dependencies=["task-001"]
+            dependencies=[config_task_id]
         ))
         
-        # Task 7: Validate system
+        # Task 7: Validate system - depends on all previous tasks
         task_id += 1
+        validation_deps = [task.task_id for task in self.tasks]
         self.tasks.append(RestorationTask(
             task_id=f"task-{task_id:03d}",
             category="validation",
             description="Validate all systems operational at maximum capacity",
             priority=5,
-            dependencies=[f"task-{i:03d}" for i in range(1, task_id)]
+            dependencies=validation_deps
         ))
         
         plan = {
