@@ -4,6 +4,7 @@ unified_system.py - Complete Autonomous System
 Integrates Chimera Auto-Pilot with The-Basics repository
 Auto-configures missing APIs, wallets, and all inputs
 SECURITY HARDENED - All file operations now use safe methods
+ENHANCED - Preloads all environments, secrets, and credentials for Railway
 """
 
 import asyncio
@@ -791,11 +792,38 @@ echo ""
                 httpd.serve_forever()
     
     async def run(self):
-        """Run the unified system"""
+        """Run the unified system with environment preloading"""
         print("\n" + "="*80)
-        print("║ 🚀 UNIFIED AUTONOMOUS SYSTEM")
+        print("║ 🚀 UNIFIED AUTONOMOUS SYSTEM - ENHANCED")
         print("║ The-Basics + Chimera Auto-Pilot + Full Dashboard")
         print("="*80 + "\n")
+        
+        # STEP 1: Preload all environments, secrets, and credentials
+        if self.env_preloader:
+            print("🔐 Preloading environments, secrets, and credentials...")
+            preload_summary = self.env_preloader.preload_all_environments()
+            print(f"  ✓ Loaded {preload_summary['total_variables']} environment variables")
+            print(f"  ✓ {preload_summary['secrets_count']} secrets configured")
+            print(f"  ✓ Platforms: {', '.join(preload_summary['platforms'])}")
+            
+            # Export Railway environment if Railway is configured
+            if preload_summary.get('credentials_loaded', {}).get('railway'):
+                print("  ✓ Railway credentials detected")
+                self.env_preloader.export_to_dotenv(".env.railway")
+                print("  ✓ Railway environment exported to .env.railway")
+            
+            # Validate Railway deployment
+            print("\n🚂 Validating Railway deployment configuration...")
+            validation = self.env_preloader.validate_railway_deployment()
+            if validation['valid']:
+                print("  ✅ Railway deployment validated")
+            else:
+                print("  ⚠️  Railway deployment validation warnings:")
+                for error in validation.get('errors', []):
+                    print(f"      - {error}")
+                for warning in validation.get('warnings', []):
+                    print(f"      - {warning}")
+            print()
         
         # Load configuration
         self.config = self.load_config()

@@ -85,3 +85,23 @@ data/knowledge/learning_history/
 # Environment files with sensitive data
 wallets.env
 manual_wallets.json
+
+# Secrets and credentials (Chimera Environment Preloader)
+.env
+.env.*
+!.env.example
+secrets.yaml
+secrets.yml
+config/secrets.yaml
+config/secrets.yml
+.env.railway
+.env.production
+.env.staging
+*.pem
+*.crt
+*.p12
+*.pfx
+credentials.json
+api_keys.json
+.unified-system/secrets/
+.unified-system/cache/
