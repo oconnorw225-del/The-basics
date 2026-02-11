@@ -142,7 +142,7 @@ jobs:
           cache: 'pip'
       
       - name: Download Scan Results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.1.3
         with:
           name: scan-results
       
@@ -209,7 +209,7 @@ jobs:
           npm install || echo "No package.json found"
       
       - name: Download Restoration Plan
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.1.3
         with:
           name: restoration-plan
       
@@ -319,7 +319,7 @@ jobs:
           cache: 'pip'
       
       - name: Download Restoration Results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.1.3
         with:
           name: restoration-results
       
