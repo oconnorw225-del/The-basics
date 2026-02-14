@@ -49,7 +49,12 @@ fi
 # Activate virtual environment and install Python dependencies
 echo ""
 echo "📦 Installing Python dependencies..."
-source venv/bin/activate 2>/dev/null || . venv/Scripts/activate 2>/dev/null
+if source venv/bin/activate 2>/dev/null || . venv/Scripts/activate 2>/dev/null; then
+    echo "✅ Virtual environment activated"
+else
+    echo "⚠️  Failed to activate virtual environment"
+    echo "   Attempting to continue, but packages may install globally"
+fi
 
 pip install --upgrade pip --quiet
 pip install -r requirements.txt
@@ -81,7 +86,7 @@ echo "🔍 Verifying installations..."
 node -e "console.log('  ✅ Node.js works')" 2>/dev/null || echo "  ❌ Node.js test failed"
 
 # Test Python imports
-python3 -c "import aiohttp; import fastapi; print('  ✅ Python packages work')" 2>/dev/null || echo "  ⚠️  Some Python packages may need attention"
+python3 -c "import aiohttp, fastapi, pytest, pandas, websockets; print('  ✅ Python core packages work')" 2>/dev/null || echo "  ⚠️  Some Python packages may need attention"
 
 echo ""
 echo "✅ Setup complete!"
