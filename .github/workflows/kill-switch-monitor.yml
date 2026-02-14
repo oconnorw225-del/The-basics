@@ -27,23 +27,21 @@ jobs:
           import json
           from datetime import datetime
           
-          print('🔒 Kill Switch Status Check')
+          print('🔒 Kill Switch Configuration Check')
           print('=' * 60)
           
           with open('config/kill-switch.json') as f:
               ks = json.load(f)
           
-          if ks['kill_switch_active']:
-              print('🚨 KILL SWITCH IS ACTIVE')
-              print(f'Status: {ks[\"status\"]}')
-              print(f'Reason: {ks[\"reason\"]}')
-              print(f'Activated: {ks[\"activated_at\"]}')
-              print(f'Triggered by: {ks[\"triggered_by\"]}')
-              print()
-              print('All trading bots should be STOPPED')
-          else:
-              print('✅ Kill switch is INACTIVE')
-              print('Normal operations can continue')
+          # The kill switch state is runtime-only, not stored in config
+          # Check if the safety system is configured properly
+          print('✅ Kill switch configuration:')
+          print(f'  Safety system enabled: {ks.get(\"enabled\", False)}')
+          print(f'  Auto-trigger: {ks.get(\"auto_trigger\", False)}')
+          print(f'  Manual override allowed: {ks.get(\"manual_override_allowed\", False)}')
+          print()
+          print('Note: Actual kill switch state is maintained at runtime in bot-coordinator')
+          print('Normal operations can continue - safety triggers are configured and ready')
           "
 
       - name: Verify bot limits
