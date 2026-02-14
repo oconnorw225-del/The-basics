@@ -85,3 +85,12 @@ data/knowledge/learning_history/
 # Environment files with sensitive data
 wallets.env
 manual_wallets.json
+
+# Bot System Backups
+backups/*.tar.gz
+backups/pre-deploy/*.tar.gz
+!backups/.gitkeep
+!backups/README.md
+
+# Safe mode state (temporary runtime file)
+config/safe-mode-active.json

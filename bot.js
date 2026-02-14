@@ -82,6 +82,12 @@ const botState = {
     memory: 0,
     uptime: 0
   },
+  killSwitch: {
+    active: false,
+    triggered_at: null,
+    reason: null,
+    can_override: true
+  },
   startTime: Date.now()
 }
 
@@ -201,6 +207,55 @@ function updateHealthMetrics() {
     memory: Math.round(usage.heapUsed / 1024 / 1024), // MB
     uptime: Math.round((Date.now() - botState.startTime) / 1000) // seconds
   }
+}
+
+/**
+ * Activate kill switch - emergency stop all operations
+ */
+function activateKillSwitch(reason = 'Manual activation') {
+  console.log(`🚨 KILL SWITCH ACTIVATED: ${reason}`)
+  
+  botState.killSwitch.active = true
+  botState.killSwitch.triggered_at = new Date().toISOString()
+  botState.killSwitch.reason = reason
+  
+  // Stop trading
+  botState.trading.active = false
+  
+  // Stop AI processing
+  taskQueue.length = 0
+  botState.ai.queueSize = 0
+  
+  // Stop freelance (keep process running but inactive)
+  botState.freelance.active = false
+  
+  console.log('✅ Kill switch activated - all operations halted')
+}
+
+/**
+ * Deactivate kill switch with override
+ */
+function deactivateKillSwitch(overrideReason = 'Manual override') {
+  if (!botState.killSwitch.can_override) {
+    console.log('⚠️ Kill switch override not allowed')
+    return false
+  }
+  
+  console.log(`🔓 Kill switch deactivated: ${overrideReason}`)
+  
+  botState.killSwitch.active = false
+  botState.killSwitch.triggered_at = null
+  botState.killSwitch.reason = null
+  
+  console.log('✅ Kill switch deactivated - operations can resume')
+  return true
+}
+
+/**
+ * Check if operations are allowed (kill switch check)
+ */
+function isOperationAllowed() {
+  return !botState.killSwitch.active
 }
 
 /**
@@ -356,6 +411,105 @@ const server = createServer(async (req, res) => {
       riskLevel: botConfig.riskLevel
     }))
   }
+  else if (url === '/kill-switch' && req.method === 'POST') {
+    // Handle kill switch control
+    let body = ''
+    req.on('data', chunk => { body += chunk })
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body)
+        const action = data.action
+        const reason = data.reason || 'No reason provided'
+        
+        if (action === 'activate') {
+          activateKillSwitch(reason)
+          res.writeHead(200)
+          res.end(JSON.stringify({ 
+            success: true, 
+            message: 'Kill switch activated',
+            killSwitch: botState.killSwitch
+          }))
+        } else if (action === 'deactivate' || action === 'override') {
+          const success = deactivateKillSwitch(reason)
+          res.writeHead(success ? 200 : 403)
+          res.end(JSON.stringify({ 
+            success, 
+            message: success ? 'Kill switch deactivated' : 'Override not allowed',
+            killSwitch: botState.killSwitch
+          }))
+        } else {
+          res.writeHead(400)
+          res.end(JSON.stringify({ error: 'Invalid action. Use activate, deactivate, or override' }))
+        }
+      } catch (error) {
+        console.error('Kill switch error:', error)
+        res.writeHead(400)
+        res.end(JSON.stringify({ error: 'Invalid request' }))
+      }
+    })
+  }
+  else if (url === '/control' && req.method === 'POST') {
+    // Bot control endpoint for coordinator
+    let body = ''
+    req.on('data', chunk => { body += chunk })
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body)
+        const action = data.action
+        
+        if (!isOperationAllowed() && action === 'start') {
+          res.writeHead(403)
+          res.end(JSON.stringify({ 
+            error: 'Kill switch is active',
+            killSwitch: botState.killSwitch
+          }))
+          return
+        }
+        
+        if (action === 'start') {
+          botState.trading.active = true
+          res.writeHead(200)
+          res.end(JSON.stringify({ success: true, status: 'starting' }))
+        } else if (action === 'stop') {
+          botState.trading.active = false
+          res.writeHead(200)
+          res.end(JSON.stringify({ success: true, status: 'stopped' }))
+        } else if (action === 'pause') {
+          botState.trading.active = false
+          res.writeHead(200)
+          res.end(JSON.stringify({ success: true, status: 'paused' }))
+        } else {
+          res.writeHead(400)
+          res.end(JSON.stringify({ error: 'Invalid action' }))
+        }
+      } catch (error) {
+        console.error('Control error:', error)
+        res.writeHead(400)
+        res.end(JSON.stringify({ error: 'Invalid request' }))
+      }
+    })
+  }
+  else if (url === '/metrics') {
+    // Metrics endpoint for monitoring
+    updateHealthMetrics()
+    res.writeHead(200)
+    res.end(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      uptime: botState.health.uptime,
+      memory_mb: botState.health.memory,
+      cpu_ms: botState.health.cpu,
+      trading: {
+        active: botState.trading.active,
+        positions: botState.trading.positions,
+        profit: botState.trading.profit
+      },
+      ai: {
+        tasks_processed: botState.ai.tasksProcessed,
+        queue_size: botState.ai.queueSize
+      },
+      kill_switch: botState.killSwitch
+    }))
+  }
   else {
     res.writeHead(404)
     res.end(JSON.stringify({ error: 'Not found' }))
@@ -385,6 +539,12 @@ server.listen(PORT, () => {
 })
 
 // Graceful shutdown with integrated shutdown handler
+// Activate kill switch on shutdown to prevent new operations
+shutdownHandler.registerHook('activate-kill-switch', async () => {
+  console.log('🛑 Activating kill switch for shutdown...')
+  activateKillSwitch('System shutdown')
+}, 110)
+
 shutdownHandler.registerHook('freelance-process', async () => {
   if (freelanceProcess) {
     console.log('🛑 Stopping freelance orchestrator...')
