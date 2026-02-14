@@ -52,3 +52,30 @@ backups/pre-deploy/*.tar.gz
 
 # Safe mode state (temporary runtime file)
 config/safe-mode-active.json
+
+# Dashboard
+dashboard/frontend/node_modules/
+dashboard/frontend/.next/
+dashboard/frontend/out/
+dashboard/frontend/build/
+
+# Auto-generated config files (contain credentials)
+config/auto_discovered_credentials.json
+config/wallets.json
+config/mtgox_credentials.json
+config/*_config.json
+config/shared_credential_pool.json
+config/credential_requests.json
+config/bot_registry.json
+config/sync/bot_states.json
+config/sync/shared_memory.json
+config/recovery_log.json
+
+# Auto-generated dashboard components
+dashboard/frontend/src/components/bots/*.tsx
+!dashboard/frontend/src/components/bots/.gitkeep
+dashboard/frontend/src/config/bot_grid.json
+dashboard/backend/routes/auto_generated.py
+
+# Keep .gitkeep files
+!**/.gitkeep

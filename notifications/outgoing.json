@@ -1,0 +1,56 @@
+[
+  {
+    "id": "notif_1_20260214173048",
+    "to": "oconnorw225@gmail.com",
+    "subject": "\ud83d\ude80 Bot System Initialized",
+    "body": "\n<html>\n<body>\n    <h2>Bot System Successfully Initialized</h2>\n    <p>Your autonomous bot system has been initialized and is now running.</p>\n    \n    <h3>Initialization Summary:</h3>\n    <ul>\n        <li>Bots discovered: 44</li>\n        <li>Credentials found: 15</li>\n        <li>Recovery system: Active</li>\n        <li>Dashboard: Running</li>\n    </ul>\n    \n    <h3>System Configuration:</h3>\n    <ul>\n        <li>Recovery scans: Every 2 hours</li>\n        <li>Bot discovery: Every 30 minutes</li>\n        <li>Credential rescans: Every hour</li>\n        <li>Daily summary: 8 AM daily</li>\n    </ul>\n    \n    <h3>Access:</h3>\n    <ul>\n        <li>Dashboard: http://localhost:3000</li>\n        <li>API: http://localhost:8000</li>\n        <li>API Docs: http://localhost:8000/docs</li>\n    </ul>\n    \n    <p><strong>Status:</strong> All systems operational</p>\n    <p><strong>Time:</strong> 2026-02-14 17:30:48 UTC</p>\n</body>\n</html>\n",
+    "type": "initialization",
+    "priority": "normal",
+    "data": {
+      "bots_discovered": 44,
+      "credentials_found": 15,
+      "recovery_status": "Active",
+      "dashboard_status": "Running"
+    },
+    "queued_at": "2026-02-14T17:30:48.019155",
+    "sent": false
+  },
+  {
+    "id": "notif_2_20260214173048",
+    "to": "oconnorw225@gmail.com",
+    "subject": "\ud83e\udd16 2 New Bot(s) Discovered",
+    "body": "\n<html>\n<body>\n    <h2>Bot Discovery Report</h2>\n    <p>The autonomous system has discovered 2 new bot(s):</p>\n    <pre>  \u2022 quantum_bot - trading\n  \u2022 shadowforge_bot - ai_trader</pre>\n    <p>These bots have been registered and configured automatically.</p>\n    <p><strong>Time:</strong> 2026-02-14 17:30:48 UTC</p>\n</body>\n</html>\n",
+    "type": "bot_discovery",
+    "priority": "normal",
+    "data": {
+      "bots": [
+        {
+          "name": "quantum_bot",
+          "type": "trading"
+        },
+        {
+          "name": "shadowforge_bot",
+          "type": "ai_trader"
+        }
+      ]
+    },
+    "queued_at": "2026-02-14T17:30:48.019317",
+    "sent": false
+  },
+  {
+    "id": "notif_3_20260214173048",
+    "to": "oconnorw225@gmail.com",
+    "subject": "\u26a0\ufe0f CRITICAL: Missing Gatekeeper Credentials",
+    "body": "\n<html>\n<body>\n    <h2 style=\"color: red;\">CRITICAL ALERT: Missing Gatekeeper Credentials</h2>\n    <p>The autonomous system is missing the following critical credentials:</p>\n    <pre>  \u2022 GITHUB_TOKEN\n  \u2022 MAIN_WALLET_KEY</pre>\n    \n    <h3>Required Actions:</h3>\n    <ol>\n        <li>Add missing credentials to GitHub Secrets</li>\n        <li>Set environment variables locally if running locally</li>\n        <li>Restart the system after adding credentials</li>\n    </ol>\n    \n    <p><strong>Time:</strong> 2026-02-14 17:30:48 UTC</p>\n    <p><strong>Impact:</strong> Some bots may not function until these credentials are provided.</p>\n</body>\n</html>\n",
+    "type": "gatekeeper_alert",
+    "priority": "critical",
+    "data": {
+      "missing_gatekeepers": [
+        "GITHUB_TOKEN",
+        "MAIN_WALLET_KEY"
+      ]
+    },
+    "queued_at": "2026-02-14T17:30:48.019499",
+    "sent": false
+  }
+]
