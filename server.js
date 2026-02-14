@@ -1,7 +1,11 @@
-const express = require('express');
-const path = require('path');
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -70,4 +74,6 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`📊 Dashboard: http://localhost:${PORT}`);
   console.log(`❤️  Health check: http://localhost:${PORT}/health`);
 });
+
+export default app;
 
