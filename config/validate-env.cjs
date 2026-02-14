@@ -36,7 +36,7 @@ function validateEnvironment() {
   
   // Report results
   if (missing.length > 0) {
-    console.error('❌ SECURITY ERROR: Missing required environment variables:');
+    console.error('❌ SECURITY ERROR: Environment validation failed. Missing required environment variables:');
     missing.forEach(v => console.error(`  - ${v}`));
     process.exit(1);
   }

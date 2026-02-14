@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import request from 'supertest';
+import { RATE_LIMIT_MAX } from '../../middleware/security.js';
 
 // Import the app factory
 async function getApp() {
@@ -31,7 +32,6 @@ describe('Security Headers', () => {
   });
   
   it('should enforce rate limiting', async () => {
-    const RATE_LIMIT_MAX = 100; // Should match security config
     const EXTRA_REQUESTS = 50;
     const requests = [];
     

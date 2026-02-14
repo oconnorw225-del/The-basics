@@ -36,6 +36,9 @@ const securityConfig = {
   }
 };
 
+// Export constants for testing
+export const RATE_LIMIT_MAX = securityConfig.rateLimit.max;
+
 // HTTPS Enforcement
 function enforceHTTPS(req, res, next) {
   if (process.env.NODE_ENV === 'production' && !req.secure && req.get('x-forwarded-proto') !== 'https') {

@@ -17,7 +17,7 @@ module.exports = {
   session: {
     secret: (() => {
       if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
-        throw new Error('SESSION_SECRET environment variable is required in production');
+        throw new Error('SESSION_SECRET environment variable is required in production. Generate one with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
       }
       return process.env.SESSION_SECRET || require('crypto').randomBytes(32).toString('hex');
     })(),
