@@ -1,0 +1,68 @@
+name: CI - Test Bot System
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt || echo "No requirements.txt found"
+          pip install pytest pytest-asyncio aiohttp websockets
+
+      - name: Validate config files
+        run: |
+          python -c "
+          import json
+          import sys
+          
+          configs = [
+              'config/bot-limits.json',
+              'config/kill-switch.json',
+              'config/api-endpoints.json',
+              'config/recovery-settings.json',
+              'config/notification-config.json'
+          ]
+          
+          print('🔍 Validating configuration files...')
+          failed = False
+          
+          for config_file in configs:
+              try:
+                  with open(config_file) as f:
+                      json.load(f)
+                  print(f'✅ {config_file}')
+              except Exception as e:
+                  print(f'❌ {config_file}: {e}')
+                  failed = True
+          
+          if failed:
+              sys.exit(1)
+          print()
+          print('✅ All config files are valid JSON')
+          "
+
+      - name: Run tests
+        run: |
+          if [ -d "tests" ]; then
+            pytest tests/ -v
+          else
+            echo "⚠️  No tests directory found, skipping tests"
+          fi
+
+      - name: Lint Python files
+        run: |
+          pip install pylint
+          find backend -name "*.py" -exec pylint {} + || echo "⚠️  Linting found issues but not blocking"

@@ -20,6 +20,11 @@
     "control_endpoint": "/control",
     "metrics_endpoint": "/metrics"
   },
+  "health_check_endpoints": {
+    "ndax_bot": "http://localhost:9000/health",
+    "quantum_bot": "http://localhost:9001/health",
+    "shadowforge_bot": "http://localhost:9002/health"
+  },
   "coordinator": {
     "base_url": "http://localhost:8000",
     "health_endpoint": "/health",

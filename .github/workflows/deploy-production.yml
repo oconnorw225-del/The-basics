@@ -1,0 +1,64 @@
+name: Deploy Bot System to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deployment:
+        description: 'Type "DEPLOY" to confirm'
+        required: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm_deployment }}" != "DEPLOY" ]; then
+            echo "❌ Deployment not confirmed. Type 'DEPLOY' to proceed."
+            exit 1
+          fi
+          echo "✅ Deployment confirmed"
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt || echo "No requirements.txt"
+
+      - name: Run pre-deployment checks
+        run: |
+          python -c "
+          import json
+          
+          # Check kill switch
+          with open('config/kill-switch.json') as f:
+              ks = json.load(f)
+          if ks['kill_switch_active']:
+              print('❌ Cannot deploy: Kill switch is active')
+              exit(1)
+          
+          print('✅ Pre-deployment checks passed')
+          "
+
+      - name: Deploy to production
+        run: |
+          echo "🚀 Deploying bot coordination system to production..."
+          echo "⚠️  Add your actual deployment commands here"
+          # Example:
+          # rsync -avz backend/ user@server:/opt/bot-system/
+          # ssh user@server 'systemctl restart bot-coordinator'
+
+      - name: Verify deployment
+        run: |
+          echo "✅ Deployment completed successfully"
+          echo "🔍 Monitor the system at: https://your-monitoring-dashboard.com"

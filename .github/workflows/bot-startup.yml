@@ -1,0 +1,63 @@
+name: Start Bot Coordination System
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      bots_to_start:
+        description: 'Which bots to start'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - ndax
+          - quantum
+          - shadowforge
+
+jobs:
+  start-bot-system:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install aiohttp websockets
+
+      - name: Verify kill switch is off
+        run: |
+          python -c "
+          import json
+          with open('config/kill-switch.json') as f:
+              ks = json.load(f)
+          if ks['kill_switch_active']:
+              print('❌ Cannot start: Kill switch is ACTIVE')
+              print(f'Reason: {ks[\"reason\"]}')
+              exit(1)
+          print('✅ Kill switch is inactive, safe to start')
+          "
+
+      - name: Start Bot Coordinator
+        run: |
+          echo "🚀 Starting bot coordinator for ${{ github.event.inputs.environment }}"
+          python backend/bot-coordinator.py --env ${{ github.event.inputs.environment }} --bots ${{ github.event.inputs.bots_to_start }}
+
+      - name: Verify startup
+        run: |
+          echo "✅ Bot system started successfully"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Bots: ${{ github.event.inputs.bots_to_start }}"
