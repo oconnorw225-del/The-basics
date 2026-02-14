@@ -1,0 +1,145 @@
+name: Send Email Notifications
+
+on:
+  schedule:
+    # Run every 30 minutes
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    # Allow manual trigger
+
+permissions:
+  contents: read
+
+jobs:
+  send-emails:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests python-dotenv
+      
+      - name: Check for pending notifications
+        id: check_notifications
+        run: |
+          if [ -f "notifications/outgoing.json" ]; then
+            echo "has_notifications=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_notifications=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Send notifications via SendGrid
+        if: steps.check_notifications.outputs.has_notifications == 'true'
+        env:
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          RECIPIENT_EMAIL: oconnorw225@gmail.com
+        run: |
+          python - <<'EOF'
+          import os
+          import json
+          import requests
+          from datetime import datetime
+          from pathlib import Path
+          
+          # HARDCODED recipient - DO NOT CHANGE
+          RECIPIENT_EMAIL = "oconnorw225@gmail.com"
+          SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+          
+          if not SENDGRID_API_KEY:
+              print("⚠️ SENDGRID_API_KEY not found")
+              exit(0)
+          
+          # Load pending notifications
+          notifications_file = Path("notifications/outgoing.json")
+          sent_file = Path("notifications/sent.json")
+          
+          if not notifications_file.exists():
+              print("No pending notifications")
+              exit(0)
+          
+          notifications = json.loads(notifications_file.read_text())
+          sent = json.loads(sent_file.read_text()) if sent_file.exists() else []
+          
+          # Filter unsent notifications
+          pending = [n for n in notifications if not n.get("sent", False)]
+          
+          if not pending:
+              print("No pending notifications to send")
+              exit(0)
+          
+          print(f"📧 Sending {len(pending)} notification(s) to {RECIPIENT_EMAIL}")
+          
+          # Send each notification
+          sent_count = 0
+          for notification in pending:
+              try:
+                  # Prepare SendGrid request
+                  url = "https://api.sendgrid.com/v3/mail/send"
+                  headers = {
+                      "Authorization": f"Bearer {SENDGRID_API_KEY}",
+                      "Content-Type": "application/json"
+                  }
+                  
+                  data = {
+                      "personalizations": [{
+                          "to": [{"email": RECIPIENT_EMAIL}],
+                          "subject": notification["subject"]
+                      }],
+                      "from": {
+                          "email": "noreply@autonomous-bots.com",
+                          "name": "Autonomous Bot System"
+                      },
+                      "content": [{
+                          "type": "text/html",
+                          "value": notification["body"]
+                      }]
+                  }
+                  
+                  response = requests.post(url, headers=headers, json=data)
+                  
+                  if response.status_code in [200, 202]:
+                      # Mark as sent
+                      notification["sent"] = True
+                      notification["sent_at"] = datetime.now().isoformat()
+                      sent.append(notification)
+                      sent_count += 1
+                      print(f"  ✅ Sent: {notification['subject']}")
+                  else:
+                      print(f"  ❌ Failed to send: {notification['subject']}")
+                      print(f"     Status: {response.status_code}")
+              
+              except Exception as e:
+                  print(f"  ❌ Error sending notification: {e}")
+          
+          # Update files
+          # Remove sent notifications from outgoing
+          remaining = [n for n in notifications if not n.get("sent", False)]
+          notifications_file.write_text(json.dumps(remaining, indent=2))
+          
+          # Update sent log
+          sent_file.write_text(json.dumps(sent, indent=2))
+          
+          print(f"\n✅ Sent {sent_count} notification(s)")
+          print(f"   Remaining: {len(remaining)}")
+          EOF
+      
+      - name: Commit updated notification files
+        if: steps.check_notifications.outputs.has_notifications == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          if [ -f "notifications/outgoing.json" ] || [ -f "notifications/sent.json" ]; then
+            git add notifications/*.json || true
+            git diff --staged --quiet || git commit -m "Update notification logs [skip ci]"
+            git push || echo "Nothing to push"
+          fi
