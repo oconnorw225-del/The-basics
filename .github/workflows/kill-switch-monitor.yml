@@ -50,7 +50,7 @@ jobs:
           print(f'  Auto-trigger: {ks.get(\"auto_trigger\", False)}')
           print(f'  Manual override allowed: {ks.get(\"manual_override_allowed\", False)}')
           
-          if enable_kill_switch_input and enable_kill_switch_input != '':
+          if enable_kill_switch_input:
               is_enabled = enable_kill_switch_input == 'true'
               print(f'  Workflow input enabled: {is_enabled}')
               if is_enabled:
