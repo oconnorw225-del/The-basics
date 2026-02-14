@@ -1,0 +1,76 @@
+name: Bot Health Monitor
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Every 15 minutes
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write  # Required to trigger bot-recovery workflow
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Check all bot health endpoints
+        id: health
+        continue-on-error: true
+        run: |
+          python -c "
+          import requests
+          import json
+          import sys
+          
+          print('🏥 Bot Health Check')
+          print('=' * 60)
+          
+          with open('config/api-endpoints.json') as f:
+              config = json.load(f)
+          
+          endpoints = config.get('health_check_endpoints', {})
+          failed = []
+          
+          for bot_name, url in endpoints.items():
+              try:
+                  response = requests.get(url, timeout=10)
+                  if response.status_code == 200:
+                      print(f'✅ {bot_name}: Healthy ({response.status_code})')
+                  else:
+                      print(f'⚠️  {bot_name}: Unhealthy ({response.status_code})')
+                      failed.append(bot_name)
+              except Exception as e:
+                  print(f'❌ {bot_name}: ERROR - {str(e)}')
+                  failed.append(bot_name)
+          
+          print()
+          print(f'Summary: {len(endpoints) - len(failed)}/{len(endpoints)} bots healthy')
+          
+          if failed:
+              print(f'Failed bots: {', '.join(failed)}')
+              sys.exit(1)
+          "
+
+      - name: Trigger recovery if needed
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'bot-recovery.yml',
+              ref: 'main'
+            });
+            console.log('🔧 Triggered bot recovery workflow');

@@ -2,22 +2,25 @@
   "channels": {
     "email": {
       "enabled": false,
-      "smtp_server": "",
+      "smtp_server": "smtp.gmail.com",
       "smtp_port": 587,
       "username": "",
-      "recipients": [],
-      "priority_levels": ["critical", "high"]
+      "recipients": ["your-email@example.com"],
+      "priority_levels": ["critical", "high"],
+      "note": "Enable in production and set credentials via environment variables"
     },
     "slack": {
       "enabled": false,
-      "webhook_url": "",
+      "webhook_url": "USE_SLACK_WEBHOOK_URL_ENV",
       "channel": "#trading-alerts",
-      "priority_levels": ["critical", "high", "medium"]
+      "priority_levels": ["critical", "high", "medium"],
+      "note": "Enable in production and set SLACK_WEBHOOK_URL environment variable"
     },
     "discord": {
       "enabled": false,
-      "webhook_url": "",
-      "priority_levels": ["critical", "high"]
+      "webhook_url": "USE_DISCORD_WEBHOOK_URL_ENV",
+      "priority_levels": ["critical", "high"],
+      "note": "Enable in production and set DISCORD_WEBHOOK_URL environment variable"
     },
     "dashboard": {
       "enabled": true,

@@ -1,0 +1,66 @@
+name: Kill Switch Monitor
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Every 5 minutes
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-kill-switch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check kill switch status
+        id: check
+        run: |
+          python -c "
+          import json
+          from datetime import datetime
+          
+          print('🔒 Kill Switch Status Check')
+          print('=' * 60)
+          
+          with open('config/kill-switch.json') as f:
+              ks = json.load(f)
+          
+          if ks['kill_switch_active']:
+              print('🚨 KILL SWITCH IS ACTIVE')
+              print(f'Status: {ks[\"status\"]}')
+              print(f'Reason: {ks[\"reason\"]}')
+              print(f'Activated: {ks[\"activated_at\"]}')
+              print(f'Triggered by: {ks[\"triggered_by\"]}')
+              print()
+              print('All trading bots should be STOPPED')
+          else:
+              print('✅ Kill switch is INACTIVE')
+              print('Normal operations can continue')
+          "
+
+      - name: Verify bot limits
+        run: |
+          python -c "
+          import json
+          
+          with open('config/bot-limits.json') as f:
+              limits = json.load(f)
+          
+          print()
+          print('💰 Current Bot Limits:')
+          print('=' * 60)
+          
+          for bot, config in limits.items():
+              if isinstance(config, dict):
+                  print(f'{bot}:')
+                  print(f'  Max Daily Loss: \${config.get(\"max_daily_loss\", \"N/A\")}')
+                  print(f'  Max Position Size: \${config.get(\"max_position_size\", \"N/A\")}')
+          "
