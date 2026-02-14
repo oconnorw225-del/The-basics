@@ -15,7 +15,12 @@ module.exports = {
   
   // Session Security
   session: {
-    secret: process.env.SESSION_SECRET || require('crypto').randomBytes(32).toString('hex'),
+    secret: (() => {
+      if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+        throw new Error('SESSION_SECRET environment variable is required in production');
+      }
+      return process.env.SESSION_SECRET || require('crypto').randomBytes(32).toString('hex');
+    })(),
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -34,7 +39,7 @@ module.exports = {
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
         imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", process.env.API_URL || "http://localhost:8000"],
+        connectSrc: ["'self'", process.env.API_URL || (process.env.NODE_ENV === 'production' ? "'self'" : "http://localhost:8000")],
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],

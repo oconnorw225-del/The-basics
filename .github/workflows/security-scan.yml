@@ -8,10 +8,16 @@ on:
   schedule:
     - cron: '0 0 * * 0' # Weekly on Sunday
 
+permissions:
+  contents: read
+
 jobs:
   trivy-scan:
     name: Trivy Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - uses: actions/checkout@v4
       
@@ -32,6 +38,9 @@ jobs:
   dependency-review:
     name: Dependency Review
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
@@ -42,6 +51,8 @@ jobs:
   npm-audit:
     name: NPM Security Audit
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -52,6 +63,8 @@ jobs:
   python-safety:
     name: Python Safety Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4

@@ -11,7 +11,7 @@ const securityConfig = {
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
         imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", process.env.API_URL || "http://localhost:8000"],
+        connectSrc: ["'self'", process.env.API_URL || (process.env.NODE_ENV === 'production' ? "'self'" : "http://localhost:8000")],
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],

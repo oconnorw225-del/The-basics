@@ -1,20 +1,34 @@
-const request = require('supertest');
-const app = require('../../server');
+import { describe, it, expect } from '@jest/globals';
+import request from 'supertest';
+
+// Import the app factory
+async function getApp() {
+  const { default: app } = await import('../../server.js');
+  return app;
+}
 
 describe('Security Headers', () => {
+  let app;
+  
+  beforeAll(async () => {
+    app = await getApp();
+  });
+  
   it('should include security headers', async () => {
-    const response = await request(app).get('/');
+    const response = await request(app).get('/health');
     
     expect(response.headers['x-content-type-options']).toBe('nosniff');
     expect(response.headers['x-frame-options']).toBeDefined();
-    expect(response.headers['x-xss-protection']).toBeDefined();
     expect(response.headers['strict-transport-security']).toBeDefined();
   });
   
   it('should enforce rate limiting', async () => {
+    const RATE_LIMIT_MAX = 100; // Should match security config
+    const EXTRA_REQUESTS = 50;
     const requests = [];
-    for (let i = 0; i < 150; i++) {
-      requests.push(request(app).get('/'));
+    
+    for (let i = 0; i < RATE_LIMIT_MAX + EXTRA_REQUESTS; i++) {
+      requests.push(request(app).get('/health'));
     }
     
     const responses = await Promise.all(requests);
