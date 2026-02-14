@@ -39,6 +39,8 @@ module.exports = {
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
         imgSrc: ["'self'", "data:", "https:"],
+        // Allow HTTP localhost in development for backend API connections
+        // In production, this falls back to 'self' (HTTPS only)
         connectSrc: ["'self'", process.env.API_URL || (process.env.NODE_ENV === 'production' ? "'self'" : "http://localhost:8000")],
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],

@@ -11,6 +11,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Security: Rate limiting for all routes
+// Note: This value should match config/security.config.cjs and middleware/security.js
+// Configuration is duplicated here for direct use in server.js
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs

@@ -28,7 +28,8 @@ function validateEnvironment() {
   const insecureValues = ['changeme', 'password', 'test', 'admin', '12345'];
   Object.keys(process.env).forEach(key => {
     if (key.includes('PASSWORD') || key.includes('SECRET') || key.includes('KEY')) {
-      if (insecureValues.includes(process.env[key]?.toLowerCase())) {
+      const value = process.env[key];
+      if (typeof value === 'string' && insecureValues.includes(value.toLowerCase())) {
         warnings.push(`${key} appears to use an insecure default value`);
       }
     }
