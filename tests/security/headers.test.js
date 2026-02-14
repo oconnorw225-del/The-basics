@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import request from 'supertest';
 
 // Import the app factory
@@ -9,9 +9,17 @@ async function getApp() {
 
 describe('Security Headers', () => {
   let app;
+  let server;
   
   beforeAll(async () => {
     app = await getApp();
+  });
+  
+  afterAll(async () => {
+    // Close server if it was started
+    if (server) {
+      await new Promise((resolve) => server.close(resolve));
+    }
   });
   
   it('should include security headers', async () => {

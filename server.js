@@ -70,12 +70,15 @@ app.get('*', (req, res) => {
 });
 
 // Only start server when run directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 NDAX Quantum Engine running on port ${PORT}`);
-    console.log(`📊 Dashboard: http://localhost:${PORT}`);
-    console.log(`❤️  Health check: http://localhost:${PORT}/health`);
-  });
+if (import.meta.url.startsWith('file:')) {
+  const modulePath = fileURLToPath(import.meta.url);
+  if (process.argv[1] === modulePath) {
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 NDAX Quantum Engine running on port ${PORT}`);
+      console.log(`📊 Dashboard: http://localhost:${PORT}`);
+      console.log(`❤️  Health check: http://localhost:${PORT}/health`);
+    });
+  }
 }
 
 export default app;
