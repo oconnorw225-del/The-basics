@@ -1,0 +1,77 @@
+{
+  "auto_recovery": {
+    "enabled": false,
+    "max_attempts": 3,
+    "backoff_strategy": "exponential",
+    "initial_delay_seconds": 60,
+    "max_delay_seconds": 3600
+  },
+  "recovery_procedures": {
+    "api_connection_failure": {
+      "steps": [
+        "verify_network_connectivity",
+        "check_api_credentials",
+        "test_health_endpoint",
+        "restart_bot_service"
+      ],
+      "max_retries": 3,
+      "retry_delay_seconds": 30
+    },
+    "trading_execution_error": {
+      "steps": [
+        "cancel_pending_orders",
+        "verify_account_status",
+        "check_position_integrity",
+        "restart_with_conservative_limits"
+      ],
+      "max_retries": 2,
+      "retry_delay_seconds": 60
+    },
+    "data_feed_failure": {
+      "steps": [
+        "switch_to_backup_feed",
+        "verify_data_freshness",
+        "resync_market_data",
+        "resume_operations"
+      ],
+      "max_retries": 5,
+      "retry_delay_seconds": 10
+    },
+    "circuit_breaker_triggered": {
+      "steps": [
+        "analyze_trigger_cause",
+        "wait_cooldown_period",
+        "verify_system_health",
+        "manual_approval_check",
+        "restart_with_reduced_limits"
+      ],
+      "max_retries": 1,
+      "retry_delay_seconds": 3600
+    }
+  },
+  "health_checks": {
+    "pre_recovery": [
+      "check_api_connectivity",
+      "verify_account_balance",
+      "validate_system_resources"
+    ],
+    "post_recovery": [
+      "verify_bot_status",
+      "check_active_positions",
+      "validate_data_feeds",
+      "confirm_monitoring_active"
+    ]
+  },
+  "safe_mode": {
+    "enabled_on_recovery": true,
+    "reduced_position_sizes": 0.5,
+    "reduced_trade_frequency": 0.5,
+    "duration_minutes": 120
+  },
+  "notifications": {
+    "send_on_recovery_start": true,
+    "send_on_recovery_success": true,
+    "send_on_recovery_failure": true,
+    "escalate_on_repeated_failures": true
+  }
+}
