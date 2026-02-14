@@ -1,0 +1,58 @@
+{
+  "ndax_bot": {
+    "base_url": "http://localhost:9000",
+    "health_endpoint": "/health",
+    "status_endpoint": "/status",
+    "control_endpoint": "/control",
+    "metrics_endpoint": "/metrics"
+  },
+  "quantum_bot": {
+    "base_url": "http://localhost:9001",
+    "health_endpoint": "/health",
+    "status_endpoint": "/status",
+    "control_endpoint": "/control",
+    "metrics_endpoint": "/metrics"
+  },
+  "shadowforge_bot": {
+    "base_url": "http://localhost:9002",
+    "health_endpoint": "/health",
+    "status_endpoint": "/status",
+    "control_endpoint": "/control",
+    "metrics_endpoint": "/metrics"
+  },
+  "coordinator": {
+    "base_url": "http://localhost:8000",
+    "health_endpoint": "/health",
+    "bots_endpoint": "/bots",
+    "start_endpoint": "/start",
+    "stop_endpoint": "/stop",
+    "pause_endpoint": "/pause",
+    "resume_endpoint": "/resume",
+    "kill_switch_endpoint": "/kill-switch"
+  },
+  "monitoring": {
+    "base_url": "http://localhost:8080",
+    "dashboard_endpoint": "/",
+    "metrics_endpoint": "/metrics",
+    "logs_endpoint": "/logs",
+    "alerts_endpoint": "/alerts"
+  },
+  "external_apis": {
+    "ndax": {
+      "base_url": "https://api.ndax.io",
+      "health_check": "/health",
+      "timeout_seconds": 10
+    },
+    "market_data": {
+      "primary": "https://api.cryptowatch.com",
+      "backup": "https://api.coingecko.com",
+      "timeout_seconds": 5
+    }
+  },
+  "health_check_config": {
+    "interval_seconds": 60,
+    "timeout_seconds": 5,
+    "failure_threshold": 3,
+    "success_threshold": 2
+  }
+}

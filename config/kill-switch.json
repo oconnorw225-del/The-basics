@@ -1,0 +1,52 @@
+{
+  "enabled": true,
+  "auto_trigger": true,
+  "manual_override_allowed": true,
+  "conditions": {
+    "max_daily_loss_reached": {
+      "enabled": true,
+      "threshold": 400,
+      "action": "stop_all_bots"
+    },
+    "consecutive_failures": {
+      "enabled": true,
+      "threshold": 5,
+      "window_minutes": 30,
+      "action": "pause_affected_bot"
+    },
+    "account_equity_drop": {
+      "enabled": true,
+      "threshold_percentage": 30,
+      "action": "stop_all_bots"
+    },
+    "api_errors": {
+      "enabled": true,
+      "threshold": 10,
+      "window_minutes": 15,
+      "action": "pause_affected_bot"
+    },
+    "network_issues": {
+      "enabled": true,
+      "threshold": 5,
+      "window_minutes": 10,
+      "action": "pause_affected_bot"
+    },
+    "circuit_breaker": {
+      "enabled": true,
+      "threshold": 3,
+      "cooldown_minutes": 60,
+      "action": "circuit_break"
+    }
+  },
+  "recovery": {
+    "auto_recovery_enabled": false,
+    "manual_approval_required": true,
+    "cooldown_period_minutes": 60,
+    "reduced_limits_on_recovery": true
+  },
+  "notifications": {
+    "send_on_trigger": true,
+    "send_on_manual_override": true,
+    "channels": ["email", "dashboard"]
+  }
+}

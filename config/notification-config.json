@@ -1,0 +1,94 @@
+{
+  "channels": {
+    "email": {
+      "enabled": false,
+      "smtp_server": "",
+      "smtp_port": 587,
+      "username": "",
+      "recipients": [],
+      "priority_levels": ["critical", "high"]
+    },
+    "slack": {
+      "enabled": false,
+      "webhook_url": "",
+      "channel": "#trading-alerts",
+      "priority_levels": ["critical", "high", "medium"]
+    },
+    "discord": {
+      "enabled": false,
+      "webhook_url": "",
+      "priority_levels": ["critical", "high"]
+    },
+    "dashboard": {
+      "enabled": true,
+      "priority_levels": ["critical", "high", "medium", "low"]
+    },
+    "log_file": {
+      "enabled": true,
+      "path": "./logs/notifications.log",
+      "priority_levels": ["critical", "high", "medium", "low", "info"]
+    }
+  },
+  "alert_types": {
+    "bot_stopped": {
+      "priority": "high",
+      "channels": ["dashboard", "log_file"],
+      "message_template": "Bot {bot_name} has stopped. Reason: {reason}"
+    },
+    "kill_switch_triggered": {
+      "priority": "critical",
+      "channels": ["dashboard", "log_file", "email", "slack"],
+      "message_template": "KILL SWITCH TRIGGERED: {condition}. All trading halted."
+    },
+    "loss_limit_reached": {
+      "priority": "critical",
+      "channels": ["dashboard", "log_file", "email"],
+      "message_template": "Loss limit reached for {bot_name}: ${amount}"
+    },
+    "api_error": {
+      "priority": "medium",
+      "channels": ["dashboard", "log_file"],
+      "message_template": "API error in {bot_name}: {error_message}"
+    },
+    "recovery_started": {
+      "priority": "high",
+      "channels": ["dashboard", "log_file"],
+      "message_template": "Recovery procedure started for {bot_name}"
+    },
+    "recovery_success": {
+      "priority": "medium",
+      "channels": ["dashboard", "log_file"],
+      "message_template": "Recovery successful for {bot_name}"
+    },
+    "recovery_failed": {
+      "priority": "critical",
+      "channels": ["dashboard", "log_file", "email"],
+      "message_template": "Recovery failed for {bot_name}. Manual intervention required."
+    },
+    "health_check_failed": {
+      "priority": "high",
+      "channels": ["dashboard", "log_file"],
+      "message_template": "Health check failed for {bot_name}"
+    },
+    "system_startup": {
+      "priority": "info",
+      "channels": ["dashboard", "log_file"],
+      "message_template": "Bot coordinator system started"
+    },
+    "system_shutdown": {
+      "priority": "info",
+      "channels": ["dashboard", "log_file"],
+      "message_template": "Bot coordinator system shutdown"
+    }
+  },
+  "rate_limiting": {
+    "enabled": true,
+    "max_per_minute": 10,
+    "max_per_hour": 100
+  },
+  "aggregation": {
+    "enabled": true,
+    "window_seconds": 300,
+    "similar_alerts_threshold": 3
+  }
+}

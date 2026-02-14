@@ -1,0 +1,39 @@
+{
+  "ndax_bot": {
+    "max_daily_loss": 100,
+    "max_daily_trades": 50,
+    "max_position_size": 1000,
+    "max_concurrent_positions": 5,
+    "stop_loss_percentage": 5,
+    "take_profit_percentage": 10,
+    "max_leverage": 1,
+    "daily_trading_cap": 5000
+  },
+  "quantum_bot": {
+    "max_daily_loss": 150,
+    "max_daily_trades": 75,
+    "max_position_size": 1500,
+    "max_concurrent_positions": 7,
+    "stop_loss_percentage": 4,
+    "take_profit_percentage": 12,
+    "max_leverage": 2,
+    "daily_trading_cap": 7500
+  },
+  "shadowforge_bot": {
+    "max_daily_loss": 200,
+    "max_daily_trades": 100,
+    "max_position_size": 2000,
+    "max_concurrent_positions": 10,
+    "stop_loss_percentage": 3,
+    "take_profit_percentage": 15,
+    "max_leverage": 3,
+    "daily_trading_cap": 10000
+  },
+  "global_limits": {
+    "total_max_daily_loss": 400,
+    "total_max_exposure": 15000,
+    "emergency_stop_loss": 1000,
+    "consecutive_loss_limit": 5,
+    "account_equity_threshold": 0.3
+  }
+}

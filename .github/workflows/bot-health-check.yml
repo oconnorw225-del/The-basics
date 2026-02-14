@@ -1,0 +1,246 @@
+name: Bot Health Check
+
+on:
+  schedule:
+    # Run every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      check_all:
+        description: 'Check all bots'
+        required: false
+        default: 'true'
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install aiohttp requests
+
+      - name: Run health checks
+        id: health_check
+        run: |
+          cat > health_check.py << 'EOF'
+          import json
+          import sys
+          from datetime import datetime
+          
+          # Load configurations
+          try:
+              with open('config/api-endpoints.json') as f:
+                  endpoints = json.load(f)
+              with open('config/bot-limits.json') as f:
+                  limits = json.load(f)
+          except Exception as e:
+              print(f"⚠️  Config files not found: {e}")
+              sys.exit(0)
+          
+          # Health check results
+          results = {
+              "timestamp": datetime.now().isoformat(),
+              "checks": [],
+              "all_healthy": True,
+              "issues": []
+          }
+          
+          bots = ["ndax_bot", "quantum_bot", "shadowforge_bot"]
+          
+          for bot in bots:
+              bot_name = bot.replace("_bot", "")
+              check = {
+                  "bot": bot_name,
+                  "healthy": True,
+                  "message": f"{bot_name} configuration found"
+              }
+              
+              # Check if bot config exists
+              if bot not in endpoints:
+                  check["healthy"] = False
+                  check["message"] = f"No endpoint configuration for {bot_name}"
+                  results["all_healthy"] = False
+                  results["issues"].append(check["message"])
+              
+              # Check if limits are configured
+              bot_limits = limits.get(bot, {})
+              if not bot_limits:
+                  check["healthy"] = False
+                  check["message"] = f"No trading limits configured for {bot_name}"
+                  results["all_healthy"] = False
+                  results["issues"].append(check["message"])
+              
+              results["checks"].append(check)
+          
+          # Output results
+          print("=" * 50)
+          print("BOT HEALTH CHECK REPORT")
+          print("=" * 50)
+          print(f"Timestamp: {results['timestamp']}")
+          print(f"Overall Status: {'✅ HEALTHY' if results['all_healthy'] else '⚠️  ISSUES DETECTED'}")
+          print()
+          
+          for check in results["checks"]:
+              status = "✅" if check["healthy"] else "❌"
+              print(f"{status} {check['bot']}: {check['message']}")
+          
+          if results["issues"]:
+              print("\nIssues requiring attention:")
+              for issue in results["issues"]:
+                  print(f"  - {issue}")
+          
+          print("=" * 50)
+          
+          # Save results
+          with open('health-check-results.json', 'w') as f:
+              json.dump(results, f, indent=2)
+          
+          # Exit with appropriate code
+          sys.exit(0 if results['all_healthy'] else 1)
+          EOF
+          
+          python health_check.py || echo "health_check_failed=true" >> $GITHUB_OUTPUT
+
+      - name: Check for error logs
+        run: |
+          if [ -d "logs" ]; then
+            echo "📋 Recent error logs:"
+            find logs -name "*.log" -type f -mtime -1 -exec tail -20 {} \; 2>/dev/null || echo "No recent logs found"
+          else
+            echo "⚠️  No logs directory found"
+          fi
+
+      - name: Verify trading parameters
+        run: |
+          cat > verify_parameters.py << 'EOF'
+          import json
+          
+          with open('config/bot-limits.json') as f:
+              limits = json.load(f)
+          
+          print("🔍 Trading Parameter Verification")
+          print("=" * 50)
+          
+          for bot_name in ['ndax_bot', 'quantum_bot', 'shadowforge_bot']:
+              bot_limits = limits.get(bot_name, {})
+              print(f"\n{bot_name.upper()}:")
+              print(f"  Max Daily Loss: ${bot_limits.get('max_daily_loss', 'N/A')}")
+              print(f"  Max Trades: {bot_limits.get('max_daily_trades', 'N/A')}")
+              print(f"  Max Position: ${bot_limits.get('max_position_size', 'N/A')}")
+              print(f"  Stop Loss: {bot_limits.get('stop_loss_percentage', 'N/A')}%")
+          
+          global_limits = limits.get('global_limits', {})
+          print(f"\nGLOBAL LIMITS:")
+          print(f"  Total Max Daily Loss: ${global_limits.get('total_max_daily_loss', 'N/A')}")
+          print(f"  Emergency Stop Loss: ${global_limits.get('emergency_stop_loss', 'N/A')}")
+          EOF
+          
+          python verify_parameters.py
+
+      - name: Check kill switch status
+        run: |
+          cat > check_kill_switch.py << 'EOF'
+          import json
+          
+          with open('config/kill-switch.json') as f:
+              kill_switch = json.load(f)
+          
+          print("🔴 Kill Switch Status")
+          print("=" * 50)
+          print(f"Enabled: {kill_switch.get('enabled', False)}")
+          print(f"Auto Trigger: {kill_switch.get('auto_trigger', False)}")
+          print(f"Manual Override Allowed: {kill_switch.get('manual_override_allowed', False)}")
+          
+          print("\nActive Conditions:")
+          conditions = kill_switch.get('conditions', {})
+          for name, config in conditions.items():
+              if config.get('enabled', False):
+                  print(f"  ✓ {name}: {config.get('action', 'N/A')}")
+          EOF
+          
+          python check_kill_switch.py
+
+      - name: Upload health check results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: health-check-results
+          path: health-check-results.json
+          retention-days: 7
+
+      - name: Trigger recovery if needed
+        if: steps.health_check.outputs.health_check_failed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'bot-recovery.yml',
+              ref: context.ref
+            });
+            console.log('🔄 Triggered recovery workflow');
+
+      - name: Create issue if checks fail
+        if: steps.health_check.outputs.health_check_failed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let results = { issues: ['Health check failed'] };
+            
+            try {
+              results = JSON.parse(fs.readFileSync('health-check-results.json', 'utf8'));
+            } catch (e) {
+              console.log('Could not read results file');
+            }
+            
+            const issueBody = `## 🚨 Bot Health Check Failed
+
+**Timestamp:** ${results.timestamp || new Date().toISOString()}
+
+**Issues Detected:**
+${results.issues ? results.issues.map(i => `- ${i}`).join('\n') : '- Health check failed'}
+
+**Action Required:**
+1. Review bot configurations
+2. Check bot service status
+3. Review recent logs
+4. Consider manual intervention
+
+**Automated Actions:**
+- Recovery workflow has been triggered
+- Monitoring continues every 15 minutes
+
+---
+*This issue was automatically created by the health check workflow*
+`;
+
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'bot-health'
+            });
+
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 Bot Health Check Failed - ${new Date().toISOString().split('T')[0]}`,
+                body: issueBody,
+                labels: ['bot-health', 'automated']
+              });
+            }

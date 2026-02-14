@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Monitoring Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .status-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .status-card {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #3b82f6;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .status-card.healthy {
+            border-left-color: #10b981;
+        }
+        
+        .status-card.warning {
+            border-left-color: #f59e0b;
+        }
+        
+        .status-card.error {
+            border-left-color: #ef4444;
+        }
+        
+        .status-card h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+        
+        .status-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .status-label {
+            font-size: 14px;
+            opacity: 0.6;
+        }
+        
+        .bot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .bot-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .bot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .bot-name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .bot-status {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .bot-status.running {
+            background: #10b98120;
+            color: #10b981;
+        }
+        
+        .bot-status.stopped {
+            background: #6b728020;
+            color: #94a3b8;
+        }
+        
+        .bot-status.error {
+            background: #ef444420;
+            color: #ef4444;
+        }
+        
+        .bot-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .metric {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .metric-value.positive {
+            color: #10b981;
+        }
+        
+        .metric-value.negative {
+            color: #ef4444;
+        }
+        
+        .bot-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-start {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-stop {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-pause {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .kill-switch-section {
+            background: #7f1d1d;
+            border: 2px solid #ef4444;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .kill-switch-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .kill-switch-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fca5a5;
+        }
+        
+        .kill-switch-status {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .kill-switch-status.active {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .kill-switch-status.inactive {
+            background: #10b981;
+            color: white;
+        }
+        
+        .kill-switch-controls {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn-kill {
+            background: #dc2626;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+        }
+        
+        .btn-override {
+            background: #f59e0b;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+        }
+        
+        .timestamp {
+            text-align: center;
+            opacity: 0.5;
+            margin-top: 30px;
+            font-size: 14px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .live-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><span class="live-indicator"></span>Bot Monitoring Dashboard</h1>
+            <p class="subtitle">Real-time status of NDAX, Quantum, and ShadowForge trading bots</p>
+        </header>
+        
+        <div class="status-overview">
+            <div class="status-card healthy">
+                <h3>System Status</h3>
+                <div class="status-value">✓ Operational</div>
+                <div class="status-label">All systems functional</div>
+            </div>
+            
+            <div class="status-card">
+                <h3>Active Bots</h3>
+                <div class="status-value">0/3</div>
+                <div class="status-label">Currently running</div>
+            </div>
+            
+            <div class="status-card">
+                <h3>Total P&L (24h)</h3>
+                <div class="status-value positive">+$0.00</div>
+                <div class="status-label">Across all bots</div>
+            </div>
+            
+            <div class="status-card">
+                <h3>Trades (24h)</h3>
+                <div class="status-value">0</div>
+                <div class="status-label">Total executions</div>
+            </div>
+        </div>
+        
+        <div class="kill-switch-section">
+            <div class="kill-switch-header">
+                <div class="kill-switch-title">🚨 Emergency Kill Switch</div>
+                <div class="kill-switch-status inactive">INACTIVE</div>
+            </div>
+            <p style="margin-bottom: 15px; opacity: 0.8;">
+                Emergency shutdown for all trading operations. Use only when immediate halt is required.
+            </p>
+            <div class="kill-switch-controls">
+                <button class="btn-kill" onclick="triggerKillSwitch()">ACTIVATE KILL SWITCH</button>
+                <button class="btn-override" onclick="overrideKillSwitch()">MANUAL OVERRIDE</button>
+            </div>
+        </div>
+        
+        <div class="bot-grid">
+            <div class="bot-card">
+                <div class="bot-header">
+                    <div class="bot-name">NDAX Bot</div>
+                    <div class="bot-status stopped">Stopped</div>
+                </div>
+                
+                <div class="bot-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Health</div>
+                        <div class="metric-value">0%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Positions</div>
+                        <div class="metric-value">0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">P&L (24h)</div>
+                        <div class="metric-value">$0.00</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Trades (24h)</div>
+                        <div class="metric-value">0</div>
+                    </div>
+                </div>
+                
+                <div class="bot-controls">
+                    <button class="btn-start" onclick="startBot('ndax')">Start</button>
+                    <button class="btn-pause" onclick="pauseBot('ndax')">Pause</button>
+                    <button class="btn-stop" onclick="stopBot('ndax')">Stop</button>
+                </div>
+            </div>
+            
+            <div class="bot-card">
+                <div class="bot-header">
+                    <div class="bot-name">Quantum Bot</div>
+                    <div class="bot-status stopped">Stopped</div>
+                </div>
+                
+                <div class="bot-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Health</div>
+                        <div class="metric-value">0%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Positions</div>
+                        <div class="metric-value">0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">P&L (24h)</div>
+                        <div class="metric-value">$0.00</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Trades (24h)</div>
+                        <div class="metric-value">0</div>
+                    </div>
+                </div>
+                
+                <div class="bot-controls">
+                    <button class="btn-start" onclick="startBot('quantum')">Start</button>
+                    <button class="btn-pause" onclick="pauseBot('quantum')">Pause</button>
+                    <button class="btn-stop" onclick="stopBot('quantum')">Stop</button>
+                </div>
+            </div>
+            
+            <div class="bot-card">
+                <div class="bot-header">
+                    <div class="bot-name">ShadowForge Bot</div>
+                    <div class="bot-status stopped">Stopped</div>
+                </div>
+                
+                <div class="bot-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Health</div>
+                        <div class="metric-value">0%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Positions</div>
+                        <div class="metric-value">0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">P&L (24h)</div>
+                        <div class="metric-value">$0.00</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Trades (24h)</div>
+                        <div class="metric-value">0</div>
+                    </div>
+                </div>
+                
+                <div class="bot-controls">
+                    <button class="btn-start" onclick="startBot('shadowforge')">Start</button>
+                    <button class="btn-pause" onclick="pauseBot('shadowforge')">Pause</button>
+                    <button class="btn-stop" onclick="stopBot('shadowforge')">Stop</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="timestamp">
+            Last updated: <span id="timestamp">--</span>
+        </div>
+    </div>
+    
+    <script>
+        // Update timestamp
+        function updateTimestamp() {
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+        
+        // Bot control functions (placeholders - would connect to API)
+        function startBot(botName) {
+            console.log(`Starting ${botName} bot...`);
+            alert(`Start command sent to ${botName} bot`);
+        }
+        
+        function pauseBot(botName) {
+            console.log(`Pausing ${botName} bot...`);
+            alert(`Pause command sent to ${botName} bot`);
+        }
+        
+        function stopBot(botName) {
+            console.log(`Stopping ${botName} bot...`);
+            alert(`Stop command sent to ${botName} bot`);
+        }
+        
+        function triggerKillSwitch() {
+            if (confirm('⚠️ WARNING: This will immediately stop all trading bots. Are you sure?')) {
+                console.log('Kill switch activated');
+                alert('🚨 KILL SWITCH ACTIVATED - All bots stopped');
+            }
+        }
+        
+        function overrideKillSwitch() {
+            if (confirm('Override kill switch and re-enable bot operations?')) {
+                console.log('Kill switch overridden');
+                alert('✅ Kill switch overridden - Bots can be restarted');
+            }
+        }
+    </script>
+</body>
+</html>

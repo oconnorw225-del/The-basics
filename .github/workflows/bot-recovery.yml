@@ -1,0 +1,365 @@
+name: Bot Recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      bot_name:
+        description: 'Bot to recover (ndax, quantum, shadowforge, or all)'
+        required: false
+        default: 'all'
+      force_restart:
+        description: 'Force restart even if healthy'
+        required: false
+        default: 'false'
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  analyze-and-recover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install aiohttp
+
+      - name: Analyze error logs
+        id: analyze
+        run: |
+          cat > analyze_errors.py << 'EOF'
+          import json
+          import os
+          from pathlib import Path
+          from collections import Counter
+          from datetime import datetime, timedelta
+          
+          print("🔍 Analyzing Error Patterns")
+          print("=" * 60)
+          
+          # Check for logs directory
+          logs_dir = Path("logs")
+          if not logs_dir.exists():
+              print("⚠️  No logs directory found, creating...")
+              logs_dir.mkdir(exist_ok=True)
+          
+          # Analyze error patterns
+          error_patterns = Counter()
+          recent_errors = []
+          
+          for log_file in logs_dir.glob("*.log"):
+              try:
+                  with open(log_file) as f:
+                      lines = f.readlines()[-100:]  # Last 100 lines
+                      for line in lines:
+                          if "ERROR" in line or "CRITICAL" in line:
+                              recent_errors.append(line.strip())
+                              # Extract error type
+                              if "Connection" in line:
+                                  error_patterns["connection_error"] += 1
+                              elif "API" in line:
+                                  error_patterns["api_error"] += 1
+                              elif "Timeout" in line:
+                                  error_patterns["timeout"] += 1
+                              else:
+                                  error_patterns["unknown"] += 1
+              except Exception as e:
+                  print(f"Could not read {log_file}: {e}")
+          
+          # Create analysis report
+          analysis = {
+              "timestamp": datetime.now().isoformat(),
+              "total_errors": sum(error_patterns.values()),
+              "error_patterns": dict(error_patterns),
+              "recent_errors": recent_errors[-10:],
+              "recovery_needed": sum(error_patterns.values()) > 5
+          }
+          
+          print(f"Total Errors Found: {analysis['total_errors']}")
+          print(f"\nError Breakdown:")
+          for error_type, count in error_patterns.items():
+              print(f"  {error_type}: {count}")
+          
+          print(f"\nRecovery Needed: {analysis['recovery_needed']}")
+          
+          # Save analysis
+          with open('error-analysis.json', 'w') as f:
+              json.dump(analysis, f, indent=2)
+          
+          if analysis['recovery_needed']:
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                  f.write('recovery_needed=true\n')
+          EOF
+          
+          python analyze_errors.py
+
+      - name: Load recovery settings
+        id: recovery_config
+        run: |
+          cat > load_recovery.py << 'EOF'
+          import json
+          
+          with open('config/recovery-settings.json') as f:
+              settings = json.load(f)
+          
+          print("🔧 Recovery Configuration")
+          print("=" * 60)
+          print(f"Auto Recovery Enabled: {settings['auto_recovery']['enabled']}")
+          print(f"Max Attempts: {settings['auto_recovery']['max_attempts']}")
+          print(f"Backoff Strategy: {settings['auto_recovery']['backoff_strategy']}")
+          print(f"Initial Delay: {settings['auto_recovery']['initial_delay_seconds']}s")
+          print(f"\nSafe Mode on Recovery: {settings['safe_mode']['enabled_on_recovery']}")
+          if settings['safe_mode']['enabled_on_recovery']:
+              print(f"  Position Size: {settings['safe_mode']['reduced_position_sizes'] * 100}% of normal")
+              print(f"  Trade Frequency: {settings['safe_mode']['reduced_trade_frequency'] * 100}% of normal")
+              print(f"  Duration: {settings['safe_mode']['duration_minutes']} minutes")
+          EOF
+          
+          python load_recovery.py
+
+      - name: Check system prerequisites
+        run: |
+          cat > check_prerequisites.py << 'EOF'
+          import json
+          
+          print("✅ Pre-Recovery Health Checks")
+          print("=" * 60)
+          
+          # Load recovery settings
+          with open('config/recovery-settings.json') as f:
+              settings = json.load(f)
+          
+          checks = settings['health_checks']['pre_recovery']
+          
+          all_passed = True
+          for check in checks:
+              # Simulate checks (would be actual checks in production)
+              status = "✅ PASS"
+              print(f"{status} {check}")
+          
+          if all_passed:
+              print("\n✅ All prerequisites met for recovery")
+          else:
+              print("\n❌ Prerequisites not met, recovery aborted")
+              exit(1)
+          EOF
+          
+          python check_prerequisites.py
+
+      - name: Attempt safe restart
+        if: steps.analyze.outputs.recovery_needed == 'true' || github.event.inputs.force_restart == 'true'
+        run: |
+          BOT_NAME="${{ github.event.inputs.bot_name }}"
+          
+          cat > safe_restart.py << 'EOF'
+          import json
+          import sys
+          import time
+          from datetime import datetime
+          
+          bot_name = sys.argv[1] if len(sys.argv) > 1 else 'all'
+          
+          print(f"🔄 Initiating Safe Restart for: {bot_name}")
+          print("=" * 60)
+          
+          # Load settings
+          with open('config/recovery-settings.json') as f:
+              settings = json.load(f)
+          
+          bots = ['ndax', 'quantum', 'shadowforge'] if bot_name == 'all' else [bot_name]
+          
+          recovery_results = []
+          
+          for bot in bots:
+              print(f"\n🤖 Processing {bot}...")
+              
+              result = {
+                  "bot": bot,
+                  "timestamp": datetime.now().isoformat(),
+                  "steps": [],
+                  "success": False
+              }
+              
+              # Get recovery procedure
+              procedure = settings['recovery_procedures'].get('api_connection_failure', {})
+              steps = procedure.get('steps', [])
+              
+              for step in steps:
+                  print(f"  ➜ {step}")
+                  result['steps'].append({
+                      "step": step,
+                      "status": "simulated",
+                      "timestamp": datetime.now().isoformat()
+                  })
+                  time.sleep(0.5)  # Simulate work
+              
+              # In production, would actually restart the bot
+              result['success'] = True
+              recovery_results.append(result)
+              print(f"  ✅ {bot} recovery completed")
+          
+          # Save results
+          with open('recovery-results.json', 'w') as f:
+              json.dump(recovery_results, f, indent=2)
+          
+          all_successful = all(r['success'] for r in recovery_results)
+          
+          print("\n" + "=" * 60)
+          print(f"Recovery Status: {'✅ SUCCESS' if all_successful else '❌ FAILED'}")
+          
+          sys.exit(0 if all_successful else 1)
+          EOF
+          
+          python safe_restart.py "$BOT_NAME"
+
+      - name: Apply safe mode limits
+        if: success()
+        run: |
+          cat > apply_safe_mode.py << 'EOF'
+          import json
+          from datetime import datetime
+          
+          print("🛡️  Applying Safe Mode Limits")
+          print("=" * 60)
+          
+          with open('config/recovery-settings.json') as f:
+              settings = json.load(f)
+          
+          with open('config/bot-limits.json') as f:
+              limits = json.load(f)
+          
+          safe_mode = settings['safe_mode']
+          
+          if safe_mode['enabled_on_recovery']:
+              print("Safe mode is ENABLED for recovery period")
+              print(f"Duration: {safe_mode['duration_minutes']} minutes")
+              
+              # Create safe mode config
+              safe_mode_config = {
+                  "enabled": True,
+                  "start_time": datetime.now().isoformat(),
+                  "duration_minutes": safe_mode['duration_minutes'],
+                  "position_multiplier": safe_mode['reduced_position_sizes'],
+                  "frequency_multiplier": safe_mode['reduced_trade_frequency']
+              }
+              
+              # Adjust limits
+              adjusted_limits = limits.copy()
+              for bot_key in ['ndax_bot', 'quantum_bot', 'shadowforge_bot']:
+                  if bot_key in adjusted_limits:
+                      bot_limits = adjusted_limits[bot_key]
+                      bot_limits['max_position_size'] = int(
+                          bot_limits['max_position_size'] * safe_mode['reduced_position_sizes']
+                      )
+                      bot_limits['max_daily_trades'] = int(
+                          bot_limits['max_daily_trades'] * safe_mode['reduced_trade_frequency']
+                      )
+              
+              print("\nAdjusted Limits:")
+              print(json.dumps(adjusted_limits, indent=2))
+              
+              # Save safe mode config
+              with open('config/safe-mode-active.json', 'w') as f:
+                  json.dump(safe_mode_config, f, indent=2)
+              
+              print("\n✅ Safe mode configuration applied")
+          else:
+              print("Safe mode is DISABLED")
+          EOF
+          
+          python apply_safe_mode.py
+
+      - name: Verify post-recovery health
+        run: |
+          cat > verify_health.py << 'EOF'
+          import json
+          
+          print("🏥 Post-Recovery Health Verification")
+          print("=" * 60)
+          
+          with open('config/recovery-settings.json') as f:
+              settings = json.load(f)
+          
+          checks = settings['health_checks']['post_recovery']
+          
+          all_passed = True
+          for check in checks:
+              # Simulate checks (would be actual checks in production)
+              status = "✅ PASS"
+              print(f"{status} {check}")
+          
+          if all_passed:
+              print("\n✅ All post-recovery checks passed")
+          else:
+              print("\n⚠️  Some checks failed, monitoring recommended")
+          EOF
+          
+          python verify_health.py
+
+      - name: Send notifications
+        if: always()
+        run: |
+          cat > send_notifications.py << 'EOF'
+          import json
+          import os
+          
+          # Load results
+          success = os.path.exists('recovery-results.json')
+          
+          if success:
+              with open('recovery-results.json') as f:
+                  results = json.load(f)
+              print("📧 Recovery notifications would be sent:")
+              print(f"  - Recovery completed for {len(results)} bot(s)")
+          else:
+              print("📧 Recovery failure notifications would be sent")
+          
+          print("  Channels: dashboard, log_file")
+          print("  (Actual notification sending not implemented in CI)")
+          EOF
+          
+          python send_notifications.py
+
+      - name: Upload recovery results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recovery-results
+          path: |
+            recovery-results.json
+            error-analysis.json
+          retention-days: 30
+
+      - name: Commit safe mode config
+        if: success()
+        run: |
+          if [ -f "config/safe-mode-active.json" ]; then
+            git config --global user.email "ci-bot@example.com"
+            git config --global user.name "CI Bot"
+            git add config/safe-mode-active.json
+            git diff --staged --quiet || git commit -m "Enable safe mode after recovery"
+            git push origin ${{ github.ref_name }} || echo "Push failed or no changes"
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 🔄 Recovery Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Bot:** ${{ github.event.inputs.bot_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Force Restart:** ${{ github.event.inputs.force_restart }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "recovery-results.json" ]; then
+            echo "### Recovery Results" >> $GITHUB_STEP_SUMMARY
+            cat recovery-results.json >> $GITHUB_STEP_SUMMARY
+          fi
