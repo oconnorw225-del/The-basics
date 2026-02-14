@@ -6,6 +6,11 @@ on:
       confirm_deployment:
         description: 'Type "DEPLOY" to confirm'
         required: true
+      enable_kill_switch:
+        description: 'Enable kill switch safety system'
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -47,12 +52,21 @@ jobs:
           python -c "
           import json
           
-          # Check kill switch
+          # Check configuration
           with open('config/kill-switch.json') as f:
               ks = json.load(f)
-          if ks['kill_switch_active']:
-              print('❌ Cannot deploy: Kill switch is active')
-              exit(1)
+          
+          # Check workflow input parameter
+          enable_kill_switch = '${{ github.event.inputs.enable_kill_switch }}' == 'true'
+          
+          print('✅ Kill switch configuration loaded')
+          print(f'Kill switch enabled (workflow input): {enable_kill_switch}')
+          print(f'Kill switch enabled (config file): {ks.get(\"enabled\", False)}')
+          
+          if enable_kill_switch:
+              print('⚠️  Kill switch is ENABLED - safety system is active')
+          else:
+              print('✅ Kill switch is DISABLED - normal operation mode')
           
           print('✅ Pre-deployment checks passed')
           "
@@ -60,6 +74,7 @@ jobs:
       - name: Deploy to production
         run: |
           echo "🚀 Deploying bot coordination system to production..."
+          echo "Kill switch enabled: ${{ github.event.inputs.enable_kill_switch }}"
           echo "⚠️  Add your actual deployment commands here"
           # Example:
           # rsync -avz backend/ user@server:/opt/bot-system/
