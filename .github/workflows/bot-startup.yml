@@ -39,7 +39,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install aiohttp websockets
+          pip install aiohttp==3.13.3 websockets
 
       - name: Verify kill switch is off
         run: |
