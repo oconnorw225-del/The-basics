@@ -21,6 +21,11 @@ on:
           - ndax
           - quantum
           - shadowforge
+      enable_kill_switch:
+        description: 'Enable kill switch safety system'
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -45,17 +50,36 @@ jobs:
         run: |
           python -c "
           import json
+          
+          # Load kill switch configuration
           with open('config/kill-switch.json') as f:
               ks = json.load(f)
+          
+          # Check workflow input parameter
+          enable_kill_switch = '${{ github.event.inputs.enable_kill_switch }}' == 'true'
+          
           print('✅ Kill switch configuration loaded')
-          print(f'Safety system enabled: {ks.get(\"enabled\", False)}')
+          print(f'Kill switch enabled (workflow input): {enable_kill_switch}')
+          print(f'Kill switch enabled (config file): {ks.get(\"enabled\", False)}')
           print(f'Auto-trigger enabled: {ks.get(\"auto_trigger\", False)}')
+          
+          if enable_kill_switch:
+              print('⚠️  Kill switch is ENABLED - safety system is active')
+          else:
+              print('✅ Kill switch is DISABLED - normal operation mode')
+          
           print('🚀 Ready to start bot system')
           "
 
       - name: Start Bot Coordinator
         run: |
           echo "🚀 Starting bot coordinator for ${{ github.event.inputs.environment }}"
+          echo "Kill switch enabled: ${{ github.event.inputs.enable_kill_switch }}"
+          
+          # Pass kill switch setting to the bot coordinator
+          KILL_SWITCH_ENABLED=${{ github.event.inputs.enable_kill_switch }}
+          export KILL_SWITCH_ENABLED
+          
           python backend/bot-coordinator.py --env ${{ github.event.inputs.environment }} --bots ${{ github.event.inputs.bots_to_start }}
 
       - name: Verify startup
@@ -63,3 +87,4 @@ jobs:
           echo "✅ Bot system started successfully"
           echo "Environment: ${{ github.event.inputs.environment }}"
           echo "Bots: ${{ github.event.inputs.bots_to_start }}"
+          echo "Kill switch: ${{ github.event.inputs.enable_kill_switch }}"

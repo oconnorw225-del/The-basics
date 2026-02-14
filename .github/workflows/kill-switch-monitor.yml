@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '*/5 * * * *'  # Every 5 minutes
   workflow_dispatch:
+    inputs:
+      enable_kill_switch:
+        description: 'Enable kill switch safety system'
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -26,6 +32,7 @@ jobs:
           python -c "
           import json
           from datetime import datetime
+          import os
           
           print('🔒 Kill Switch Configuration Check')
           print('=' * 60)
@@ -33,12 +40,29 @@ jobs:
           with open('config/kill-switch.json') as f:
               ks = json.load(f)
           
+          # Check workflow input parameter (only available for workflow_dispatch)
+          enable_kill_switch_input = '${{ github.event.inputs.enable_kill_switch }}'
+          
           # The kill switch state is runtime-only, not stored in config
           # Check if the safety system is configured properly
           print('✅ Kill switch configuration:')
-          print(f'  Safety system enabled: {ks.get(\"enabled\", False)}')
+          print(f'  Config file enabled: {ks.get(\"enabled\", False)}')
           print(f'  Auto-trigger: {ks.get(\"auto_trigger\", False)}')
           print(f'  Manual override allowed: {ks.get(\"manual_override_allowed\", False)}')
+          
+          if enable_kill_switch_input and enable_kill_switch_input != '':
+              is_enabled = enable_kill_switch_input == 'true'
+              print(f'  Workflow input enabled: {is_enabled}')
+              if is_enabled:
+                  print()
+                  print('⚠️  Kill switch ENABLED via workflow input')
+              else:
+                  print()
+                  print('✅ Kill switch DISABLED via workflow input')
+          else:
+              print()
+              print('ℹ️  Scheduled run - no workflow input parameter')
+          
           print()
           print('Note: Actual kill switch state is maintained at runtime in bot-coordinator')
           print('Normal operations can continue - safety triggers are configured and ready')
