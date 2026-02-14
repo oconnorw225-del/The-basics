@@ -5,6 +5,10 @@ on:
     - cron: '*/15 * * * *'  # Every 15 minutes
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: write  # Required to trigger bot-recovery workflow
+
 jobs:
   health-check:
     runs-on: ubuntu-latest

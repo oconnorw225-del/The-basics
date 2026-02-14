@@ -22,6 +22,9 @@ on:
           - quantum
           - shadowforge
 
+permissions:
+  contents: read
+
 jobs:
   start-bot-system:
     runs-on: ubuntu-latest
