@@ -4,7 +4,7 @@ Complete deployment instructions for the autonomous bot system.
 
 ## ⚠️ SECURITY UPDATE
 
-**IMPORTANT:** Next.js has been updated from 14.1.0 to 15.0.8 to patch critical vulnerabilities (DoS, Authorization Bypass, Cache Poisoning, SSRF). See [SECURITY_FIX_NEXTJS.md](SECURITY_FIX_NEXTJS.md) for details.
+**IMPORTANT:** Next.js has been updated from 14.1.0 to **15.2.3** to patch all critical vulnerabilities (DoS, Cache Poisoning, Authorization Bypass, SSRF). The update was done in two stages (15.0.8 → 15.2.3) to ensure all known vulnerabilities are patched. See [SECURITY_FIX_NEXTJS.md](SECURITY_FIX_NEXTJS.md) for details.
 
 ## 📋 Prerequisites
 
