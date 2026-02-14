@@ -1,5 +1,4 @@
-// Jest setup file
-import '@testing-library/jest-dom';
+// Jest setup file - Simplified for Node environment
 
 // Mock environment variables
 process.env.NODE_ENV = 'test';
