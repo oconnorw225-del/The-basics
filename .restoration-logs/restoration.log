@@ -1,0 +1,20 @@
+2026-02-14 22:02:40,493 - SystemRestoration - INFO - Restoring system configuration...
+2026-02-14 22:02:40,493 - SystemRestoration - INFO - Backing up .github/workflows/unified-system.yml to .restoration-backups/unified-system.yml.20260214_220240.bak
+2026-02-14 22:02:40,493 - SystemRestoration - INFO - ✓ System configuration restored
+2026-02-14 22:02:40,565 - SystemRestoration - INFO - Restoring bot connections...
+2026-02-14 22:02:40,565 - SystemRestoration - INFO - ✓ Found bot.js
+2026-02-14 22:02:40,565 - SystemRestoration - INFO - ✓ Found server.js
+2026-02-14 22:02:40,565 - SystemRestoration - INFO - ✓ Bot connections restored
+2026-02-14 22:02:40,638 - SystemRestoration - INFO - Restoring trading operations (mode: paper)...
+2026-02-14 22:02:40,638 - SystemRestoration - INFO - ✓ Found backend/autonomous_trading.py
+2026-02-14 22:02:40,638 - SystemRestoration - INFO - ✓ Found backend/chimera_master.py
+2026-02-14 22:02:40,638 - SystemRestoration - INFO - ✓ Trading operations restored in paper mode
+2026-02-14 22:02:40,710 - SystemRestoration - INFO - Restoring freelance AI operations...
+2026-02-14 22:02:40,710 - SystemRestoration - INFO - ✓ Found freelance engine at freelance_engine
+2026-02-14 22:02:40,710 - SystemRestoration - INFO - ✓ Freelance operations restored
+2026-02-14 22:02:40,789 - SystemRestoration - INFO - Restoring platform connections...
+2026-02-14 22:02:40,789 - SystemRestoration - INFO - ✓ Found 15 active workflows
+2026-02-14 22:02:40,789 - SystemRestoration - INFO - ✓ Platform connections restored
+2026-02-14 22:02:40,879 - SystemRestoration - INFO - Validating restored system...
+2026-02-14 22:02:40,879 - SystemRestoration - INFO - Validation complete: failed
+2026-02-14 22:02:40,880 - SystemRestoration - INFO - Validation results saved to validation_results.json

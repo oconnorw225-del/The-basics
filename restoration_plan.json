@@ -1,0 +1,150 @@
+{
+  "generated_at": "2026-02-14T22:01:47.463245",
+  "scan_results": {
+    "scan_type": "all_platforms",
+    "timestamp": "2026-02-14T22:01:29.473241",
+    "mode": "full",
+    "platforms": {
+      "github": {
+        "platform": "github",
+        "timestamp": "2026-02-14T22:01:29.473309",
+        "mode": "full",
+        "repositories_checked": [
+          {
+            "name": "The-basics",
+            "accessible": true,
+            "status": "active"
+          },
+          {
+            "name": "ndax-quantum-engine",
+            "accessible": true,
+            "status": "active"
+          },
+          {
+            "name": "quantum-engine-dashb",
+            "accessible": true,
+            "status": "active"
+          },
+          {
+            "name": "shadowforge-ai-trader",
+            "accessible": true,
+            "status": "active"
+          },
+          {
+            "name": "repository-web-app",
+            "accessible": true,
+            "status": "active"
+          }
+        ],
+        "issues": []
+      },
+      "railway": {
+        "platform": "railway",
+        "timestamp": "2026-02-14T22:01:29.473673",
+        "mode": "full",
+        "deployments_checked": [],
+        "issues": [
+          {
+            "category": "deployment",
+            "severity": "high",
+            "description": "Railway token not configured",
+            "affected_component": "Railway App",
+            "recommended_action": "Configure RAILWAY_TOKEN secret in GitHub",
+            "auto_fixable": false
+          }
+        ]
+      }
+    },
+    "total_issues": 1,
+    "critical_issues": 0,
+    "high_issues": 1,
+    "issues": [
+      {
+        "category": "deployment",
+        "severity": "high",
+        "description": "Railway token not configured",
+        "affected_component": "Railway App",
+        "recommended_action": "Configure RAILWAY_TOKEN secret in GitHub",
+        "auto_fixable": false
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "task_id": "task-001",
+      "category": "configuration",
+      "description": "Restore system configuration files",
+      "priority": 1,
+      "dependencies": [],
+      "status": "pending",
+      "result": null
+    },
+    {
+      "task_id": "task-002",
+      "category": "bots",
+      "description": "Re-establish bot connections and verify operations",
+      "priority": 2,
+      "dependencies": [
+        "task-001"
+      ],
+      "status": "pending",
+      "result": null
+    },
+    {
+      "task_id": "task-003",
+      "category": "trading",
+      "description": "Restore autonomous trading operations in paper mode",
+      "priority": 3,
+      "dependencies": [
+        "task-001",
+        "task-002"
+      ],
+      "status": "pending",
+      "result": null
+    },
+    {
+      "task_id": "task-004",
+      "category": "freelance",
+      "description": "Restore freelance AI job operations",
+      "priority": 3,
+      "dependencies": [
+        "task-001"
+      ],
+      "status": "pending",
+      "result": null
+    },
+    {
+      "task_id": "task-005",
+      "category": "platforms",
+      "description": "Re-establish connections with GitHub, Railway, and other platforms",
+      "priority": 4,
+      "dependencies": [
+        "task-001"
+      ],
+      "status": "pending",
+      "result": null
+    },
+    {
+      "task_id": "task-006",
+      "category": "validation",
+      "description": "Validate all systems operational at maximum capacity",
+      "priority": 5,
+      "dependencies": [
+        "task-001",
+        "task-002",
+        "task-003",
+        "task-004",
+        "task-005"
+      ],
+      "status": "pending",
+      "result": null
+    }
+  ],
+  "summary": {
+    "total_tasks": 6,
+    "critical_tasks": 1,
+    "restore_trading": true,
+    "restore_freelance": true,
+    "restore_bots": true
+  }
+}
