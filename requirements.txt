@@ -1,31 +1,48 @@
-# Python requirements for NDAX Quantum Engine backend
+# Core async and web frameworks
+aiohttp==3.13.3
+asyncio==3.4.3
+websockets==12.0
 
-# FastAPI framework
+# HTTP requests
+requests==2.31.0
+urllib3==2.6.3
+
+# API and server
 fastapi==0.109.1
 uvicorn[standard]==0.27.0
-pydantic==2.5.3
+flask==3.0.0
 
-# Environment and configuration
+# Environment variables
 python-dotenv==1.0.0
 
-# HTTP and async support
-httpx==0.26.0
-aiofiles==23.2.1
-
 # Data processing
-numpy==1.26.3
 pandas==2.1.4
+numpy==1.26.2
 
-# System monitoring and management
-psutil==5.9.8
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
 
-# Required for bot system
-requests==2.32.4
-aiohttp==3.13.3  # Updated to patch zip bomb, DoS, and directory traversal vulnerabilities
-websockets==12.0
-pytest==7.4.0
-pytest-asyncio==0.21.0
+# Linting and formatting
+pylint==3.0.3
+black==23.12.1
+flake8==7.0.0
 
-# Optional: For advanced features
-# python-jose[cryptography]==3.3.0
-# passlib[bcrypt]==1.7.4
+# Logging and monitoring
+colorlog==6.8.0
+python-json-logger==2.0.7
+
+# Trading and finance
+ccxt==4.2.4
+
+# Database (optional)
+sqlalchemy==2.0.25
+
+# Utilities
+pytz==2023.3.post1
+python-dateutil==2.8.2
+
+# Security
+cryptography==46.0.5
+pyjwt==2.8.0
