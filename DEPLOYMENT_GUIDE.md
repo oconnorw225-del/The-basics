@@ -2,9 +2,9 @@
 
 Complete deployment instructions for the autonomous bot system.
 
-## ⚠️ SECURITY UPDATE
+## ⚠️ CRITICAL SECURITY UPDATE
 
-**IMPORTANT:** Next.js has been updated from 14.1.0 to **15.2.3** to patch all critical vulnerabilities (DoS, Cache Poisoning, Authorization Bypass, SSRF). The update was done in two stages (15.0.8 → 15.2.3) to ensure all known vulnerabilities are patched. See [SECURITY_FIX_NEXTJS.md](SECURITY_FIX_NEXTJS.md) for details.
+**URGENT:** Next.js has been updated from 14.1.0 to **15.2.9** to patch **CRITICAL Remote Code Execution (RCE)** vulnerability plus all DoS, Cache Poisoning, and Authorization Bypass vulnerabilities. Update was done in stages (15.0.8 → 15.2.3 → 15.2.9) to ensure complete elimination of all threats including RCE. See [SECURITY_FIX_NEXTJS.md](SECURITY_FIX_NEXTJS.md) for full details.
 
 ## 📋 Prerequisites
 
