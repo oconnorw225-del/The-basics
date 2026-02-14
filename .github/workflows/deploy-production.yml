@@ -9,7 +9,7 @@ on:
       enable_kill_switch:
         description: 'Enable kill switch safety system'
         required: true
-        default: false
+        default: true
         type: boolean
 
 permissions:

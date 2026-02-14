@@ -1,6 +1,6 @@
 {
-  "enabled": false,
-  "auto_trigger": false,
+  "enabled": true,
+  "auto_trigger": true,
   "manual_override_allowed": true,
   "conditions": {
     "max_daily_loss_reached": {
