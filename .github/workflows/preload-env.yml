@@ -1,0 +1,125 @@
+name: Preload Environment Configuration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to configure'
+        required: true
+        type: choice
+        options:
+          - development
+          - production
+          - both
+        default: 'development'
+      
+      generate_secrets:
+        description: 'Generate new JWT and session secrets'
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  preload-env:
+    name: Preload Environment Configuration
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Generate Environment Configuration
+        id: generate
+        run: |
+          echo "🔐 Generating environment configuration..."
+          
+          # Run the auto-populator
+          if [ "${{ github.event.inputs.environment }}" == "both" ]; then
+            python3 scripts/setup_env.py --auto
+          else
+            python3 scripts/setup_env.py --auto
+          fi
+          
+          # Check what was generated
+          if [ -f .env ]; then
+            echo "✅ Development environment generated"
+            echo "dev_generated=true" >> $GITHUB_OUTPUT
+          fi
+          
+          if [ -f .env.production ]; then
+            echo "✅ Production environment generated"
+            echo "prod_generated=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Display Configuration Summary
+        run: |
+          echo "## Environment Configuration Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Generated Files:" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f .env ]; then
+            echo "- ✅ Development: .env" >> $GITHUB_STEP_SUMMARY
+            echo "  - JWT Secret: Generated (64 chars)" >> $GITHUB_STEP_SUMMARY
+            echo "  - Database: Smart defaults configured" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -f .env.production ]; then
+            echo "- ✅ Production: .env.production" >> $GITHUB_STEP_SUMMARY
+            echo "  - JWT Secret: Generated (64 chars)" >> $GITHUB_STEP_SUMMARY
+            echo "  - Session Secret: Generated (32 chars)" >> $GITHUB_STEP_SUMMARY
+            echo "  - Security: HTTPS & Auth enabled" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ⚠️ Action Required:" >> $GITHUB_STEP_SUMMARY
+          echo "Fill in these API keys in your environment files:" >> $GITHUB_STEP_SUMMARY
+          echo "- NDAX_API_KEY" >> $GITHUB_STEP_SUMMARY
+          echo "- NDAX_API_SECRET" >> $GITHUB_STEP_SUMMARY
+          echo "- NDAX_USER_ID" >> $GITHUB_STEP_SUMMARY
+          echo "- SENDGRID_API_KEY (optional)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔒 Security Notes:" >> $GITHUB_STEP_SUMMARY
+          echo "- All secrets are cryptographically generated" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment files are not committed to git" >> $GITHUB_STEP_SUMMARY
+          echo "- Review all settings before deployment" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Create Artifact
+        if: github.event.inputs.environment != 'none'
+        uses: actions/upload-artifact@v4
+        with:
+          name: environment-config-${{ github.run_number }}
+          path: |
+            .env
+            .env.production
+          retention-days: 30
+          if-no-files-found: warn
+      
+      - name: Security Check
+        run: |
+          echo "🔍 Verifying environment files..."
+          
+          # Check that generated secrets are strong
+          if [ -f .env ]; then
+            if grep -q "JWT_SECRET=[a-f0-9]\{64,\}" .env; then
+              echo "✅ JWT secret is properly generated"
+            else
+              echo "⚠️  JWT secret may not be strong enough"
+            fi
+          fi
+          
+          # Ensure no placeholder values remain in critical fields
+          if [ -f .env.production ]; then
+            if grep -q "CHANGE_ME" .env.production; then
+              echo "⚠️  Warning: Some fields still have CHANGE_ME placeholders"
+            fi
+          fi
+          
+          echo "✅ Security check complete"

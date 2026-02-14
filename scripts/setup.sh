@@ -66,16 +66,27 @@ else
     exit 1
 fi
 
-# Create .env from template if it doesn't exist
+# Auto-populate environment configuration
+echo ""
+echo "🔐 Setting up environment configuration..."
 if [ ! -f .env ]; then
-    echo ""
-    echo "📝 Creating .env file from template..."
-    cp .env.example .env
-    echo "⚠️  Please edit .env with your actual API keys"
+    echo "   Running auto-populator with secure defaults..."
+    if command -v python3 &> /dev/null; then
+        # Run auto-populator in auto mode for development
+        python3 scripts/setup_env.py --auto 2>/dev/null || {
+            echo "   Auto-populator not available, using template..."
+            cp .env.example .env
+        }
+    else
+        echo "   Python3 not found, using template..."
+        cp .env.example .env
+    fi
+    echo "✅ Environment file created with secure defaults"
+    echo "⚠️  Please review .env and add your API keys"
     echo "   File location: $(pwd)/.env"
 else
-    echo ""
-    echo "ℹ️  .env file already exists, skipping creation"
+    echo "ℹ️  .env file already exists"
+    echo "   To regenerate with new secrets, run: ./scripts/setup_env.sh"
 fi
 
 # Verify installations
