@@ -1,0 +1,49 @@
+# Multi-stage build for security
+FROM node:18-alpine AS builder
+
+# Security: Run as non-root user
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy application code
+COPY . .
+
+# Build frontend
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine AS production
+
+# Security: Install only security updates
+RUN apk --no-cache upgrade
+
+# Security: Run as non-root
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+USER nodejs
+
+WORKDIR /app
+
+# Copy built artifacts from builder
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/server.js ./
+COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
+
+# Security: Remove unnecessary files
+RUN rm -rf /tmp/* /var/tmp/*
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Start application
+CMD ["node", "server.js"]

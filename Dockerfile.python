@@ -1,0 +1,30 @@
+FROM python:3.11-slim AS base
+
+# Security: Install security updates only
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Security: Create non-root user
+RUN useradd -m -u 1001 appuser
+
+WORKDIR /app
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application
+COPY --chown=appuser:appuser . .
+
+# Security: Run as non-root
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"
+
+EXPOSE 8000
+
+CMD ["python", "-u", "chimera_core/main.py"]
