@@ -1,0 +1,112 @@
+name: Send Email Notifications
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # Every 30 minutes
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  send-notifications:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install SendGrid
+        run: pip install sendgrid
+      
+      - name: Check for queued notifications
+        id: check
+        run: |
+          if [ -f "notifications/outgoing.json" ]; then
+            COUNT=$(cat notifications/outgoing.json | jq '. | length')
+            echo "count=$COUNT" >> $GITHUB_OUTPUT
+            echo "has_notifications=true" >> $GITHUB_OUTPUT
+          else
+            echo "count=0" >> $GITHUB_OUTPUT
+            echo "has_notifications=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Send notifications via SendGrid
+        if: steps.check.outputs.has_notifications == 'true'
+        env:
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          SENDGRID_FROM_EMAIL: ${{ secrets.SENDGRID_FROM_EMAIL || 'noreply@tradingsystem.com' }}
+        run: |
+          python3 << 'EOF'
+          import json
+          import os
+          from sendgrid import SendGridAPIClient
+          from sendgrid.helpers.mail import Mail
+          
+          # Load queued notifications
+          with open('notifications/outgoing.json', 'r') as f:
+              notifications = json.load(f)
+          
+          # Get SendGrid API key
+          api_key = os.environ.get('SENDGRID_API_KEY')
+          from_email = os.environ.get('SENDGRID_FROM_EMAIL', 'noreply@tradingsystem.com')
+          
+          if not api_key:
+              print("⚠️  SENDGRID_API_KEY not set - skipping email send")
+              exit(0)
+          
+          sg = SendGridAPIClient(api_key)
+          sent_count = 0
+          failed_count = 0
+          remaining = []
+          
+          for notification in notifications:
+              if notification.get('sent'):
+                  continue
+              
+              try:
+                  message = Mail(
+                      from_email=from_email,
+                      to_emails=notification['to'],
+                      subject=notification['subject'],
+                      plain_text_content=notification['body']
+                  )
+                  
+                  response = sg.send(message)
+                  
+                  if response.status_code == 202:
+                      print(f"✅ Sent: {notification['subject']}")
+                      notification['sent'] = True
+                      notification['sent_at'] = str(datetime.now())
+                      sent_count += 1
+                  else:
+                      print(f"❌ Failed: {notification['subject']} (Status: {response.status_code})")
+                      remaining.append(notification)
+                      failed_count += 1
+                      
+              except Exception as e:
+                  print(f"❌ Error sending {notification['subject']}: {e}")
+                  remaining.append(notification)
+                  failed_count += 1
+          
+          # Update queue with remaining unsent notifications
+          with open('notifications/outgoing.json', 'w') as f:
+              json.dump(remaining, f, indent=2)
+          
+          print(f"\n📊 Summary:")
+          print(f"  Sent: {sent_count}")
+          print(f"  Failed: {failed_count}")
+          print(f"  Remaining: {len(remaining)}")
+          EOF
+      
+      - name: Commit updated queue
+        if: steps.check.outputs.has_notifications == 'true'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add notifications/outgoing.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update notification queue [skip ci]" && git push)
