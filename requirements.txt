@@ -4,7 +4,7 @@ asyncio==3.4.3
 websockets==12.0
 
 # HTTP requests
-requests==2.31.0
+requests==2.32.4
 urllib3==2.6.3
 
 # API and server
@@ -26,7 +26,7 @@ pytest-cov==4.1.0
 
 # Linting and formatting
 pylint==3.0.3
-black==23.12.1
+black==24.3.0
 flake8==7.0.0
 
 # Logging and monitoring
