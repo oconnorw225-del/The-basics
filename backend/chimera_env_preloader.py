@@ -401,7 +401,8 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
         # Allow simple values without quoting
         if text and all(ch.isalnum() or ch in "._-/:" for ch in text):
             return text
-        # Shell-safe single-quoted string: close, escape, and reopen on '
+        # Shell-safe single-quoted string: close quote, add escaped quote, reopen quote
+        # (e.g., "it's" becomes 'it'"'"'s' to safely escape single quotes within)
         text = text.replace("'", "'\"'\"'")
         return f"'{text}'"
 
@@ -461,7 +462,7 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
         if not self.preloaded:
             return {
                 'valid': False,
-                'errors': ['validate_railway_deployment() called before preload_all_environments()'],
+                'errors': ['Environment preload required before validation - call preload_all_environments() first'],
                 'warnings': [],
                 'railway_token': False,
                 'required_vars': [],

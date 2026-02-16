@@ -122,7 +122,7 @@ class TestChimeraEnvPreloader:
         validation = preloader.validate_railway_deployment()
         
         assert validation['valid'] is False
-        assert 'validate_railway_deployment() called before preload_all_environments()' in validation['errors']
+        assert 'Environment preload required before validation' in validation['errors'][0]
 
     @patch.dict(os.environ, {
         'RAILWAY_TOKEN': 'test-token',

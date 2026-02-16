@@ -244,8 +244,7 @@ jobs:
         run: |
           echo "🔐 Preloading environments, secrets, and credentials for Railway..."
           
-          # No need to install unnecessary dependencies - only what preloader needs
-          pip install -q typing-extensions
+          # Preloader uses only standard library - no additional packages needed
           
           # Create backend directory if it doesn't exist
           mkdir -p backend

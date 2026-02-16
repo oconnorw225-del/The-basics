@@ -847,7 +847,7 @@ echo ""
                     self.env_preloader.export_to_dotenv(".env.railway", include_secrets=include_secrets)
                     print(f"  ✓ Railway environment exported to .env.railway (secrets={include_secrets})")
                 else:
-                    print("  ⏭️  Skipping .env.railway export (set ENABLE_RAILWAY_DOTENV_EXPORT=1 to enable)")
+                    print("  ⏭  Skipping .env.railway export (set ENABLE_RAILWAY_DOTENV_EXPORT=1 to enable)")
             
             # Validate Railway deployment
             print("\n🚂 Validating Railway deployment configuration...")
