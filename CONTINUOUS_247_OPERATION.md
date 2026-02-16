@@ -22,6 +22,8 @@ CONTINUOUS_MODE=true
 AUTO_RECONNECT=true
 
 # Auto-start all services (DEFAULT: true)
+# ⚠️ BREAKING CHANGE: Was false, now defaults to true
+# Set to false if you want manual control
 AUTO_START=true
 
 # Enable all bot features
@@ -29,6 +31,8 @@ FREELANCE_ENABLED=true
 AI_ENABLED=true
 
 # Faster health checks for continuous monitoring (30 seconds)
+# ⚠️ BREAKING CHANGE: Now in milliseconds (was seconds)
+# Old value of 60 should become 60000
 HEALTH_CHECK_INTERVAL=30000
 
 # Reconnect interval (5 seconds)
@@ -70,6 +74,7 @@ All bots are now configured with autonomous defaults:
 - Maintains connection status
 - Auto-reconnects on disconnection
 - Zero downtime between bots
+- **Note:** Full WebSocket/HTTP implementation is planned for production (see Limitations below)
 
 ## Startup
 
@@ -323,6 +328,29 @@ If migrating from scheduled operation:
 5. Monitor for 24-48 hours to ensure stability
 
 6. Remove any external cron jobs or scheduled tasks
+
+## Known Limitations
+
+### Bot-to-Bot Synchronization
+The current implementation includes the infrastructure for bot-to-bot synchronization:
+- ✅ Sync interval running every 5 seconds
+- ✅ Connection tracking in `botState.continuous.botConnections`
+- ✅ Status broadcasting prepared
+- ⚠️ **Limitation:** Full WebSocket/HTTP communication between bots is not yet implemented
+
+**Current behavior:** Bots track their own status and prepare sync data, but do not yet transmit to other bot instances.
+
+**Planned for production:** 
+- WebSocket server for inter-bot communication
+- HTTP endpoints for bot discovery
+- Distributed coordination protocol
+
+**Workaround:** For now, each bot operates independently. Full inter-bot communication can be added when multiple bot instances are deployed.
+
+### Auto-Restart Limitations
+- Freelance orchestrator has max retry limit (10 attempts with exponential backoff)
+- After 10 failed restart attempts, manual intervention required
+- Check logs if auto-restart stops working
 
 ## Summary
 

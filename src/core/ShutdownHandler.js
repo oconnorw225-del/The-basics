@@ -97,6 +97,15 @@ class ShutdownHandler extends EventEmitter {
   }
 
   /**
+   * Check if continuous mode is enabled
+   * Uses consistent boolean parsing across the system
+   */
+  isContinuousMode() {
+    return process.env.CONTINUOUS_MODE === 'true' || 
+           (process.env.CONTINUOUS_MODE !== 'false' && process.env.CONTINUOUS_MODE !== undefined);
+  }
+
+  /**
    * Initiate graceful shutdown
    * In continuous mode, this performs cleanup but doesn't exit
    */
@@ -132,11 +141,7 @@ class ShutdownHandler extends EventEmitter {
       this.emit('shutdownComplete');
 
       // CONTINUOUS MODE: Don't exit, allow restart/reconnect
-      // Use consistent boolean parsing (check for explicit 'true' string)
-      const continuousMode = process.env.CONTINUOUS_MODE === 'true' || 
-                            (process.env.CONTINUOUS_MODE !== 'false' && process.env.CONTINUOUS_MODE !== undefined);
-      
-      if (continuousMode) {
+      if (this.isContinuousMode()) {
         console.log('🔄 Continuous mode enabled - will restart instead of exiting');
         this.state.shutdownInitiated = false; // Reset for restart
         this.emit('restartInitiated');
@@ -152,10 +157,7 @@ class ShutdownHandler extends EventEmitter {
       this.emit('shutdownError', error);
 
       // In continuous mode, retry instead of exit
-      const continuousMode = process.env.CONTINUOUS_MODE === 'true' || 
-                            (process.env.CONTINUOUS_MODE !== 'false' && process.env.CONTINUOUS_MODE !== undefined);
-      
-      if (continuousMode) {
+      if (this.isContinuousMode()) {
         console.log('🔄 Continuous mode - resetting for retry...');
         this.state.shutdownInitiated = false;
         setTimeout(() => {

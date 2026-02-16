@@ -153,12 +153,37 @@ function startFreelanceOrchestrator() {
     
     // AUTO-RESTART: Reconnect freelance process in continuous mode
     if (botConfig.continuousMode && !botState.killSwitch.active) {
-      console.log('🔄 Auto-restarting freelance orchestrator in continuous mode...')
+      // Check if freelance is disabled (to prevent infinite restart loop)
+      if (!botConfig.freelanceEnabled) {
+        console.log('⏸️ Freelance disabled, not restarting')
+        return
+      }
+      
+      // Implement exponential backoff to prevent resource exhaustion
+      const maxRetries = 10
+      if (botState.continuous.reconnectAttempts >= maxRetries) {
+        console.error(`❌ Freelance restart failed after ${maxRetries} attempts, giving up`)
+        botState.freelance.active = false
+        return
+      }
+      
+      // Calculate backoff delay (5s, 10s, 20s, 40s, etc. up to 5 minutes)
+      const baseDelay = botConfig.reconnectInterval
+      const backoffDelay = Math.min(baseDelay * Math.pow(2, botState.continuous.reconnectAttempts), 300000)
+      botState.continuous.reconnectAttempts++
+      
+      console.log(`🔄 Auto-restarting freelance (attempt ${botState.continuous.reconnectAttempts}/${maxRetries}) in ${backoffDelay}ms...`)
+      
       const timeoutId = setTimeout(() => {
         // Remove this timeout from tracking
         botState.continuous.restartTimeouts = botState.continuous.restartTimeouts.filter(id => id !== timeoutId)
         startFreelanceOrchestrator()
-      }, botConfig.reconnectInterval)
+        
+        // Reset attempts on successful restart
+        if (botState.freelance.active) {
+          botState.continuous.reconnectAttempts = 0
+        }
+      }, backoffDelay)
       
       // Track timeout for cleanup
       botState.continuous.restartTimeouts.push(timeoutId)
