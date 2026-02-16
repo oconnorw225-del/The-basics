@@ -16,7 +16,7 @@ Automated consolidation of best parts from:
 - 🔐 **Automatic Preloading**: All environment variables, secrets, and credentials preloaded on system startup
 - 🚂 **Railway Integration**: Seamless Railway deployment with credential validation
 - 🔄 **Platform Linkage**: Continuous synchronization between GitHub, Railway, and other platforms
-- 🛡️ **Security First**: Encrypted credential storage, secure file permissions, audit logging
+- 🛡️ **Security First**: Secure file permissions (0600/0700) and standard application logging
 - ⚡ **Optimized Strategy**: Intelligent deployment order and running strategy across platforms
 
 📖 **[Environment Preloading Guide](docs/ENVIRONMENT_PRELOADING.md)** | ⚙️ **[Secrets Template](config/secrets.template.yaml)**

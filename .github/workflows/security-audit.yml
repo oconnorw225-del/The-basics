@@ -1,12 +1,12 @@
-name: 🔐 Security Audit
+name: 🔐 Security Audit - Continuous Monitoring
 
 on:
   push:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
-  schedule:
-    - cron: '0 0 * * *'  # Daily at midnight UTC
+  # CONTINUOUS MODE: Security scans run on code changes, not schedule
+  # Continuous monitoring is handled by the running bot systems themselves
   workflow_dispatch:
 
 jobs:
