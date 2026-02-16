@@ -1,0 +1,266 @@
+{
+  "version": "1.0.0",
+  "description": "Bot public access configuration - defines what bots can view publicly",
+  "last_updated": "2026-02-16T18:13:17.286Z",
+  
+  "public_endpoints": {
+    "description": "Endpoints accessible to all bots without authentication",
+    "endpoints": [
+      {
+        "path": "/",
+        "method": "GET",
+        "description": "Root endpoint with service info",
+        "data_exposure": "service_name, version, status"
+      },
+      {
+        "path": "/health",
+        "method": "GET",
+        "description": "Health check endpoint",
+        "data_exposure": "health_status, component_status, timestamp"
+      },
+      {
+        "path": "/status",
+        "method": "GET",
+        "description": "System status overview",
+        "data_exposure": "system_status, uptime, active_services"
+      },
+      {
+        "path": "/metrics",
+        "method": "GET",
+        "description": "Public performance metrics",
+        "data_exposure": "request_count, response_times, error_rates"
+      },
+      {
+        "path": "/api/info",
+        "method": "GET",
+        "description": "API information and documentation",
+        "data_exposure": "available_endpoints, api_version, capabilities"
+      },
+      {
+        "path": "/api/products",
+        "method": "GET",
+        "description": "Product information page",
+        "data_exposure": "product_list, features, pricing_tiers"
+      },
+      {
+        "path": "/api/platform/info",
+        "method": "GET",
+        "description": "Platform information",
+        "data_exposure": "platform_capabilities, supported_features, integrations"
+      },
+      {
+        "path": "/api/bots/registry",
+        "method": "GET",
+        "description": "Bot registry public information",
+        "data_exposure": "bot_types, bot_capabilities, total_registered"
+      },
+      {
+        "path": "/api/market/public",
+        "method": "GET",
+        "description": "Public market data",
+        "data_exposure": "market_prices, trading_pairs, volume_data"
+      },
+      {
+        "path": "/docs",
+        "method": "GET",
+        "description": "Public documentation",
+        "data_exposure": "api_documentation, user_guides, examples"
+      }
+    ]
+  },
+  
+  "private_endpoints": {
+    "description": "Endpoints requiring authentication - NOT accessible to public bots",
+    "requires": "valid_api_key or authenticated_session",
+    "endpoints": [
+      {
+        "path": "/api/credentials/*",
+        "method": "*",
+        "description": "Credential management",
+        "protected_data": "api_keys, secrets, passwords, private_keys"
+      },
+      {
+        "path": "/api/wallet/*",
+        "method": "*",
+        "description": "Wallet operations",
+        "protected_data": "wallet_addresses, private_keys, balances, transactions"
+      },
+      {
+        "path": "/api/user/*",
+        "method": "*",
+        "description": "User information",
+        "protected_data": "user_identity, email, personal_data, preferences"
+      },
+      {
+        "path": "/api/trading/execute",
+        "method": "POST",
+        "description": "Trade execution",
+        "protected_data": "trading_strategies, positions, orders"
+      },
+      {
+        "path": "/api/admin/*",
+        "method": "*",
+        "description": "Administrative functions",
+        "protected_data": "system_configuration, security_settings, access_logs"
+      },
+      {
+        "path": "/api/backup/*",
+        "method": "*",
+        "description": "Backup operations",
+        "protected_data": "backup_data, recovery_keys, system_snapshots"
+      },
+      {
+        "path": "/control",
+        "method": "POST",
+        "description": "Bot control operations",
+        "protected_data": "bot_commands, configuration_changes"
+      },
+      {
+        "path": "/kill-switch",
+        "method": "*",
+        "description": "Emergency kill switch",
+        "protected_data": "safety_controls, emergency_shutdown"
+      }
+    ]
+  },
+  
+  "data_classification": {
+    "public": {
+      "description": "Safe to expose to bots and external systems",
+      "categories": [
+        "service_metadata",
+        "health_status",
+        "public_metrics",
+        "product_information",
+        "platform_capabilities",
+        "documentation",
+        "api_specifications",
+        "market_data_public",
+        "bot_registry_summary"
+      ]
+    },
+    "private": {
+      "description": "Must be protected - never expose to public bots",
+      "categories": [
+        "credentials",
+        "api_keys",
+        "secrets",
+        "private_keys",
+        "wallet_addresses",
+        "user_identity",
+        "personal_information",
+        "email_addresses",
+        "trading_positions",
+        "account_balances",
+        "transaction_history",
+        "security_settings",
+        "backup_data",
+        "internal_configuration"
+      ]
+    }
+  },
+  
+  "bot_access_levels": {
+    "description": "Different access levels for different bot types",
+    "levels": {
+      "public": {
+        "description": "Public bots - external/untrusted",
+        "allowed_endpoints": "public_endpoints only",
+        "authentication_required": false,
+        "rate_limit": "100 requests per minute"
+      },
+      "registered": {
+        "description": "Registered bots - internal system bots",
+        "allowed_endpoints": "public_endpoints + limited private access",
+        "authentication_required": true,
+        "rate_limit": "500 requests per minute",
+        "additional_access": [
+          "/api/bots/status",
+          "/api/coordination/heartbeat"
+        ]
+      },
+      "trusted": {
+        "description": "Trusted bots - trading and operation bots",
+        "allowed_endpoints": "all endpoints with proper authentication",
+        "authentication_required": true,
+        "rate_limit": "1000 requests per minute",
+        "additional_access": [
+          "/api/trading/status",
+          "/api/market/private"
+        ]
+      },
+      "admin": {
+        "description": "Admin bots - full system access",
+        "allowed_endpoints": "all endpoints",
+        "authentication_required": true,
+        "rate_limit": "unlimited"
+      }
+    }
+  },
+  
+  "security_rules": {
+    "description": "Security rules for bot access",
+    "rules": [
+      {
+        "rule": "no_credentials_in_public",
+        "description": "Never expose credentials, API keys, or secrets in public endpoints",
+        "enforcement": "strict"
+      },
+      {
+        "rule": "no_identity_leakage",
+        "description": "Never expose user identity or personal information publicly",
+        "enforcement": "strict"
+      },
+      {
+        "rule": "no_wallet_exposure",
+        "description": "Never expose wallet addresses or private keys publicly",
+        "enforcement": "strict"
+      },
+      {
+        "rule": "sanitize_errors",
+        "description": "Sanitize error messages to not leak sensitive information",
+        "enforcement": "moderate"
+      },
+      {
+        "rule": "rate_limiting",
+        "description": "Apply rate limiting to prevent abuse",
+        "enforcement": "strict"
+      },
+      {
+        "rule": "log_access",
+        "description": "Log all access to private endpoints",
+        "enforcement": "strict"
+      }
+    ]
+  },
+  
+  "platform_info": {
+    "description": "Public platform information available to bots",
+    "name": "Autonomous Chimera System",
+    "version": "1.0.0",
+    "type": "Trading and Freelance AI Platform",
+    "capabilities": [
+      "Autonomous trading operations",
+      "AI-based freelance job automation",
+      "Multi-chain crypto operations",
+      "Real-time market data",
+      "Bot coordination and management"
+    ],
+    "supported_platforms": [
+      "NDAX Exchange",
+      "Fiverr",
+      "Freelancer",
+      "Toptal",
+      "Guru",
+      "PeoplePerHour"
+    ],
+    "bot_types": [
+      "trading_bots",
+      "ai_bots",
+      "monitoring_bots",
+      "coordination_bots"
+    ],
+    "public_documentation": "/docs",
+    "api_documentation": "/api/docs"
+  }
+}
