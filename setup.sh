@@ -22,36 +22,29 @@ npm install
 # Create necessary directories
 create_directories
 
-# Create .env if it doesn't exist
+# Run environment setup script
 if [ ! -f .env ]; then
-    log_info "Creating .env file..."
-    cat > .env << 'EOF'
-# NDAX Quantum Engine Configuration
-NODE_ENV=development
-PORT=3000
-BOT_PORT=9000
-
-# Trading Mode (paper or live)
-TRADING_MODE=paper
-AUTO_START=false
-MAX_TRADES=5
-RISK_LEVEL=low
-
-# API Configuration
-VITE_API_URL=http://localhost:8000
-
-# Optional: Add your API keys here
-# NDAX_API_KEY=
-# NDAX_API_SECRET=
-EOF
-    log_success ".env file created"
+    log_info "Running environment setup..."
+    python3 scripts/setup_env.py
 else
-    log_info ".env file already exists"
+    log_info ".env file already exists (use --force to regenerate)"
+fi
+
+# Run bot configuration setup
+log_info "Initializing bot configurations..."
+python3 scripts/init_bot_configs.py
+
+# Inject secrets from environment (CI/CD only)
+if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ] || [ -n "$RAILWAY_ENVIRONMENT" ]; then
+    log_info "CI/CD detected - injecting secrets..."
+    python3 scripts/inject_secrets.py
 fi
 
 log_success "Setup complete!"
 log_info "Next steps:"
-echo "  1. Run 'npm run dev' to start the frontend development server"
-echo "  2. Run 'npm run unified' to start the Python backend (if configured)"
-echo "  3. Run 'node bot.js' to start the trading bot"
+echo "  1. Review generated .env file and add your API keys"
+echo "  2. Review config/bot-config.json for bot settings"
+echo "  3. Copy config/credentials.template.json to config/credentials.json"
+echo "  4. Run 'npm run dev' to start the frontend"
+echo "  5. Run 'npm run fia' to start the full system"
 log_info "For more information, see QUICK_START.md"
