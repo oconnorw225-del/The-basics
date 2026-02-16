@@ -1,0 +1,30 @@
+{
+  "enabled": true,
+  "mode": "autonomous_24_7",
+  "schedules": {
+    "trading": {
+      "enabled": true,
+      "continuous": true,
+      "interval": 60
+    },
+    "freelance": {
+      "enabled": true,
+      "scan_interval": 300,
+      "bid_interval": 600
+    },
+    "health_check": {
+      "enabled": true,
+      "interval": 30
+    },
+    "reporting": {
+      "enabled": true,
+      "interval": 3600
+    }
+  },
+  "rules": {
+    "auto_restart_on_error": true,
+    "max_restart_attempts": 10,
+    "notify_on_critical": true,
+    "auto_update_enabled": false
+  }
+}

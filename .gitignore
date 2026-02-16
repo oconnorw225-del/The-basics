@@ -102,6 +102,10 @@ config/secrets.yml
 *.p12
 *.pfx
 credentials.json
+config/credentials.json
 api_keys.json
 .unified-system/secrets/
 .unified-system/cache/
+
+# Bot configuration backups
+config/*.backup

@@ -1,0 +1,167 @@
+{
+  "bot": {
+    "name": "NDAX Quantum Bot",
+    "version": "2.0.0",
+    "mode": "autonomous_24_7",
+    "auto_start": true,
+    "continuous_mode": true
+  },
+  "trading": {
+    "enabled": true,
+    "mode": "paper",
+    "auto_start": true,
+    "max_trades": 5,
+    "risk_level": "low",
+    "exchanges": [
+      "NDAX"
+    ],
+    "pairs": [
+      "BTC/CAD",
+      "ETH/CAD",
+      "USDT/CAD"
+    ],
+    "strategy": "quantum_analysis"
+  },
+  "freelance": {
+    "enabled": true,
+    "auto_start": true,
+    "auto_bid": true,
+    "auto_execute": false,
+    "platforms": {
+      "fiverr": {
+        "enabled": true,
+        "max_projects": 3
+      },
+      "freelancer": {
+        "enabled": true,
+        "max_projects": 3
+      },
+      "toptal": {
+        "enabled": true,
+        "max_projects": 2
+      },
+      "guru": {
+        "enabled": true,
+        "max_projects": 2
+      },
+      "peopleperhour": {
+        "enabled": true,
+        "max_projects": 2
+      }
+    },
+    "skills": [
+      "Python",
+      "JavaScript",
+      "Node.js",
+      "React",
+      "Machine Learning",
+      "Trading Bots",
+      "API Integration"
+    ],
+    "min_rate": 50,
+    "max_rate": 150,
+    "currency": "USD"
+  },
+  "ai": {
+    "enabled": true,
+    "auto_start": true,
+    "max_concurrent_tasks": 5,
+    "task_queue_size": 100,
+    "models": {
+      "analysis": "gpt-4",
+      "trading": "custom_quantum",
+      "freelance": "gpt-4"
+    },
+    "features": {
+      "market_analysis": true,
+      "sentiment_analysis": true,
+      "task_automation": true,
+      "code_generation": true
+    }
+  },
+  "monitoring": {
+    "health_check_interval": 30000,
+    "freeze_detection": {
+      "soft_threshold": 60,
+      "hard_threshold": 300
+    },
+    "metrics": {
+      "enabled": true,
+      "interval": 60000
+    },
+    "alerts": {
+      "enabled": true,
+      "channels": [
+        "log",
+        "webhook"
+      ]
+    }
+  },
+  "recovery": {
+    "auto_reconnect": true,
+    "reconnect_interval": 5000,
+    "max_retries": 10,
+    "retry_backoff_base": 2.0,
+    "circuit_breaker": {
+      "threshold": 5,
+      "timeout": 300
+    }
+  },
+  "security": {
+    "rate_limiting": {
+      "enabled": true,
+      "window": 15,
+      "max_requests": 100
+    },
+    "authentication": {
+      "required": true,
+      "type": "jwt"
+    },
+    "encryption": {
+      "enabled": true,
+      "algorithm": "AES-256-GCM"
+    }
+  },
+  "features": {
+    "trading": {
+      "enabled": false,
+      "critical": false,
+      "autoStart": true,
+      "dependencies": []
+    },
+    "freelance": {
+      "enabled": true,
+      "critical": true,
+      "autoStart": true,
+      "dependencies": [
+        "ai"
+      ]
+    },
+    "ai": {
+      "enabled": true,
+      "critical": true,
+      "autoStart": true,
+      "dependencies": []
+    },
+    "payments": {
+      "enabled": true,
+      "critical": false,
+      "autoStart": true,
+      "dependencies": []
+    },
+    "database": {
+      "enabled": true,
+      "critical": true,
+      "autoStart": true,
+      "dependencies": []
+    },
+    "dashboard": {
+      "enabled": true,
+      "critical": false,
+      "autoStart": true,
+      "dependencies": [
+        "database"
+      ]
+    }
+  }
+}
