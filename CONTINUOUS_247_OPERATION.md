@@ -291,11 +291,38 @@ kill <PID>
 
 If migrating from scheduled operation:
 
-1. Set `CONTINUOUS_MODE=true` in environment
-2. Set `AUTO_START=true` to enable auto-start
-3. Set `AUTO_RECONNECT=true` for automatic reconnection
+1. **IMPORTANT BREAKING CHANGES:**
+   - `AUTO_START` now defaults to `true` (was `false`) - Set explicitly to `false` if you don't want auto-start
+   - `HEALTH_CHECK_INTERVAL` now in **milliseconds** (was seconds) - Update existing values by multiplying by 1000
+   - `FREELANCE_ENABLED`, `AI_ENABLED` now default to `true` (were `false`) - Disable explicitly if not needed
+
+2. Update environment variables:
+   ```bash
+   # Enable continuous mode
+   CONTINUOUS_MODE=true
+   
+   # Control auto-start (now defaults to true)
+   AUTO_START=true  # or false to disable
+   
+   # Enable auto-reconnect
+   AUTO_RECONNECT=true
+   
+   # Update health check interval (NOW IN MILLISECONDS!)
+   HEALTH_CHECK_INTERVAL=30000  # 30 seconds (NOT 30)
+   ```
+
+3. Review service defaults - all services now enabled by default:
+   ```bash
+   FREELANCE_ENABLED=true  # Now default
+   AI_ENABLED=true         # Now default
+   BOT_ENABLED=true        # Still default
+   ```
+
 4. Deploy to continuous infrastructure (PM2, Docker, Railway, etc.)
+
 5. Monitor for 24-48 hours to ensure stability
+
+6. Remove any external cron jobs or scheduled tasks
 
 ## Summary
 

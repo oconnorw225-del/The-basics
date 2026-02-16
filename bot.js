@@ -90,9 +90,10 @@ const botState = {
     enabled: botConfig.continuousMode,
     reconnecting: false,
     reconnectAttempts: 0,
-    lastReconnect: null,
+    lastSync: null,  // Renamed from lastReconnect for clarity
     botConnections: new Set(), // Track connected bots
-    syncInterval: null
+    syncInterval: null, // Store interval ID for cleanup
+    restartTimeouts: [] // Track restart timeout IDs
   },
   killSwitch: {
     active: false,
@@ -153,9 +154,14 @@ function startFreelanceOrchestrator() {
     // AUTO-RESTART: Reconnect freelance process in continuous mode
     if (botConfig.continuousMode && !botState.killSwitch.active) {
       console.log('🔄 Auto-restarting freelance orchestrator in continuous mode...')
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
+        // Remove this timeout from tracking
+        botState.continuous.restartTimeouts = botState.continuous.restartTimeouts.filter(id => id !== timeoutId)
         startFreelanceOrchestrator()
       }, botConfig.reconnectInterval)
+      
+      // Track timeout for cleanup
+      botState.continuous.restartTimeouts.push(timeoutId)
     }
   })
   
@@ -182,11 +188,14 @@ async function syncWithOtherBots() {
       }
     }
     
-    // In production, this would use WebSocket/HTTP to connect to other bots
-    console.log(`🔗 Syncing with other bots... Connected: ${botState.continuous.botConnections.size}`)
+    // TODO: In production, send botInfo via WebSocket/HTTP to other bots
+    // For now, just log the sync attempt
+    if (botState.continuous.botConnections.size > 0) {
+      console.log(`🔗 Syncing ${botState.continuous.botConnections.size} bot connections...`)
+    }
     
-    // Update last sync time
-    botState.continuous.lastReconnect = Date.now()
+    // Update last sync time (renamed from lastReconnect for clarity)
+    botState.continuous.lastSync = Date.now()
     
   } catch (error) {
     console.error('⚠️ Bot sync error:', error.message)
@@ -512,6 +521,25 @@ server.listen(PORT, () => {
 })
 
 // Graceful shutdown with integrated shutdown handler
+// NEW: Cleanup continuous mode intervals and timeouts first
+shutdownHandler.registerHook('continuous-mode-cleanup', async () => {
+  console.log('🛑 Cleaning up continuous mode intervals...')
+  
+  // Clear sync interval
+  if (botState.continuous.syncInterval) {
+    clearInterval(botState.continuous.syncInterval)
+    botState.continuous.syncInterval = null
+    console.log('✅ Bot sync interval cleared')
+  }
+  
+  // Clear all pending restart timeouts
+  botState.continuous.restartTimeouts.forEach(timeoutId => {
+    clearTimeout(timeoutId)
+  })
+  botState.continuous.restartTimeouts = []
+  console.log('✅ Restart timeouts cleared')
+}, 110)
+
 shutdownHandler.registerHook('freelance-process', async () => {
   if (freelanceProcess) {
     console.log('🛑 Stopping freelance orchestrator...')

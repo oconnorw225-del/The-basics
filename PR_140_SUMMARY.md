@@ -194,6 +194,40 @@ Even in continuous mode:
 4. **Bot Coordination** - All bots stay synchronized
 5. **Fully Autonomous** - No manual intervention required
 
+## ⚠️ Breaking Changes
+
+### Important Changes for Existing Users
+
+1. **AUTO_START Default Changed**
+   - **Old:** `false` (manual start required)
+   - **New:** `true` (auto-starts on launch)
+   - **Action:** Set `AUTO_START=false` if you don't want automatic starting
+
+2. **HEALTH_CHECK_INTERVAL Units Changed**
+   - **Old:** Value in **seconds** (e.g., `60` = 60 seconds)
+   - **New:** Value in **milliseconds** (e.g., `30000` = 30 seconds)
+   - **Action:** Multiply existing values by 1000 (60 → 60000)
+
+3. **Service Defaults Changed**
+   - **FREELANCE_ENABLED:** Now defaults to `true` (was `false`)
+   - **AI_ENABLED:** Now defaults to `true` (was `false`)
+   - **Action:** Explicitly set to `false` if you don't want these services
+
+4. **Continuous Mode Enabled by Default**
+   - **CONTINUOUS_MODE:** Defaults to `true`
+   - **AUTO_RECONNECT:** Defaults to `true`
+   - **Action:** Set to `false` if you want traditional behavior
+
+### Migration Checklist
+
+Before deploying:
+- [ ] Review AUTO_START setting
+- [ ] Update HEALTH_CHECK_INTERVAL from seconds to milliseconds
+- [ ] Verify FREELANCE_ENABLED and AI_ENABLED settings
+- [ ] Test in development environment first
+- [ ] Update deployment scripts/configs
+- [ ] Monitor logs after deployment
+
 ## Files Changed
 
 1. `bot.js` - Core bot with autonomous features
