@@ -43,6 +43,27 @@ This repository uses modern, purpose-built workflows for the bot coordination sy
    - Runs pre-deployment checks (kill switch verification)
    - Safe deployment with verification steps
 
+### 🔒 Supply Chain Security Workflows
+
+1. **dependency-submission.yml** - Dependency submission to GitHub
+   - Submits NPM and Python dependencies to dependency graph
+   - Runs daily and on dependency file changes
+   - Enables Dependabot alerts and security updates
+   - Provides complete dependency visibility
+
+2. **dependabot-auto-monitor.yml** - Autonomous dependency monitoring
+   - Monitors Dependabot alerts every 6 hours
+   - Auto-creates issues for critical vulnerabilities
+   - Checks for outdated dependencies
+   - Generates security reports
+   - Assigned to: oconnorw225-del
+
+3. **security-scan.yml** - Comprehensive security scanning
+   - Trivy vulnerability scanning
+   - NPM and Python security audits
+   - Dependency review on PRs
+   - Runs on push, PR, and weekly schedule
+
 ### 🛠️ Utility Workflows
 
 1. **auto-fix-and-deploy.yml** - Automated fixes and deployment
@@ -70,6 +91,23 @@ This repository uses modern, purpose-built workflows for the bot coordination sy
 3. Type "DEPLOY" in the confirmation field
 4. Click "Run workflow"
 5. System will run pre-deployment checks and deploy
+
+### Managing Supply Chain Security
+1. **View Dependency Graph**: Go to Insights → Dependency graph
+2. **View Security Alerts**: Go to Security → Dependabot alerts
+3. **Monitor Dependencies**:
+   - Autonomous monitoring runs every 6 hours automatically
+   - Critical alerts create GitHub issues automatically
+   - Assigned to: oconnorw225-del
+4. **Update Dependencies**:
+   - Dependabot creates PRs automatically for updates
+   - Review and merge security update PRs promptly
+   - Test grouped updates before merging
+5. **Manual Trigger**:
+   - Go to Actions → "Dependency Submission" or "Dependabot Auto Monitor"
+   - Click "Run workflow" for immediate check
+
+For detailed documentation, see [DEPENDENCY_SUBMISSION_GUIDE.md](../../DEPENDENCY_SUBMISSION_GUIDE.md)
 
 ## Removed Workflows
 
