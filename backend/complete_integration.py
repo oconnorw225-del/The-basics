@@ -19,6 +19,7 @@ from bot_registry import bot_registry
 from chimera_dashboard_writer import chimera_writer
 from complete_asset_recovery_system import asset_recovery
 from email_notifier import email_notifier
+from supply_chain_security_bot import supply_chain_bot
 
 
 class CompleteIntegrationSystem:
@@ -34,6 +35,7 @@ class CompleteIntegrationSystem:
             "bot_discovery": 30 * 60,  # Every 30 minutes
             "credential_rescan": 3600,  # Every hour
             "chimera_upgrade": 6 * 3600,  # Every 6 hours
+            "supply_chain_scan": 6 * 3600,  # Every 6 hours
             "daily_summary": self._calculate_next_8am(),  # Daily at 8 AM
         }
 
@@ -103,8 +105,26 @@ class CompleteIntegrationSystem:
             init_results["recovery_status"] = "Active"
             init_results["phases_completed"].append("asset_recovery")
 
-            # Phase 4: Dashboard Setup
-            print("\n📋 PHASE 4: Dashboard Setup")
+            # Phase 4: Supply Chain Security Bot
+            print("\n📋 PHASE 4: Supply Chain Security Bot")
+            print("-" * 60)
+            security_result = await supply_chain_bot.initialize()
+            init_results["supply_chain_status"] = "Active"
+            init_results["phases_completed"].append("supply_chain_security")
+            
+            # Register the supply chain bot
+            bot_registry.register_bot(
+                bot_id=supply_chain_bot.bot_id,
+                name=supply_chain_bot.name,
+                bot_type="security_monitoring",
+                file_path="backend/supply_chain_security_bot.py",
+                capabilities=supply_chain_bot.get_capabilities(),
+                config=supply_chain_bot.monitoring_config,
+                metadata=supply_chain_bot.get_metadata()
+            )
+
+            # Phase 5: Dashboard Setup
+            print("\n📋 PHASE 5: Dashboard Setup")
             print("-" * 60)
             print("  ✓ Dashboard components generated")
             print("  ✓ API routes created")
@@ -127,6 +147,7 @@ class CompleteIntegrationSystem:
                 f"  • Credentials found: {init_results['credentials_found']}")
             print(f"  • Bots discovered: {init_results['bots_discovered']}")
             print(f"  • Recovery status: {init_results['recovery_status']}")
+            print(f"  • Supply Chain Security: {init_results['supply_chain_status']}")
             print(f"  • Dashboard: {init_results['dashboard_status']}")
             print("=" * 60)
 
@@ -154,6 +175,7 @@ class CompleteIntegrationSystem:
             asyncio.create_task(self._recovery_scan_loop()),
             asyncio.create_task(self._bot_discovery_loop()),
             asyncio.create_task(self._credential_rescan_loop()),
+            asyncio.create_task(self._supply_chain_scan_loop()),
             asyncio.create_task(self._daily_summary_loop()),
             asyncio.create_task(self._chimera_upgrade_loop()),
         ]
@@ -218,11 +240,15 @@ class CompleteIntegrationSystem:
                 cred_stats = credential_sharing.get_shared_pool_status()
                 recovery_stats = asset_recovery.get_recovery_stats()
                 notif_stats = email_notifier.get_notification_stats()
+                security_status = await supply_chain_bot.get_status()
 
                 summary_data = {
                     "active_bots": bot_stats["total_bots"],
                     "total_credentials": cred_stats["total_credentials"],
                     "recovery_scans": recovery_stats["total_scans"],
+                    "supply_chain_scans": security_status["total_scans"],
+                    "security_alerts": security_status["total_alerts"],
+                    "critical_alerts": security_status["critical_alerts"],
                     "new_bots": 0,  # Would track daily
                     "uptime": "24h",  # Would calculate actual
                     "errors": 0,  # Would track
@@ -230,6 +256,7 @@ class CompleteIntegrationSystem:
                     "next_cred_scan": "In 1 hour",
                     "next_bot_scan": "In 30 minutes",
                     "next_recovery": "In 2 hours",
+                    "next_security_scan": "In 6 hours",
                 }
 
                 email_notifier.daily_summary_notification(summary_data)
@@ -239,6 +266,26 @@ class CompleteIntegrationSystem:
 
             except Exception as e:
                 print(f"⚠️ Daily summary error: {e}")
+
+    async def _supply_chain_scan_loop(self) -> None:
+        """Supply chain security scan every 6 hours."""
+        while self.running:
+            try:
+                await asyncio.sleep(self.schedules["supply_chain_scan"])
+                print("\n🔒 Running scheduled supply chain security scan...")
+                scan_result = await supply_chain_bot.scan_dependencies()
+                alerts = await supply_chain_bot.check_alerts()
+                
+                # Send notification if critical alerts found
+                if alerts.get("critical", 0) > 0:
+                    email_notifier.system_alert(
+                        "Critical Dependency Vulnerabilities Detected",
+                        f"{alerts['critical']} critical alerts found",
+                        alerts
+                    )
+
+            except Exception as e:
+                print(f"⚠️ Supply chain scan error: {e}")
 
     async def _chimera_upgrade_loop(self) -> None:
         """Chimera self-upgrade every 6 hours."""
@@ -314,6 +361,7 @@ if __name__ == "__main__":
 ║                                                              ║
 ║  • Autonomous Credential Discovery                           ║
 ║  • 44+ Bot Coordination                                      ║
+║  • Supply Chain Security Monitoring                          ║
 ║  • Real-Time Dashboard                                       ║
 ║  • Asset Recovery Every 2 Hours                              ║
 ║  • Email Notifications (oconnorw225@gmail.com)               ║

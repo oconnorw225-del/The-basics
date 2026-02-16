@@ -70,6 +70,8 @@ config/bot_registry.json
 config/sync/bot_states.json
 config/sync/shared_memory.json
 config/recovery_log.json
+config/supply_chain_monitoring.json
+config/dependency_alerts.json
 
 # Auto-generated dashboard components
 dashboard/frontend/src/components/bots/*.tsx
