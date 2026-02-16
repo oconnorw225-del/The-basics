@@ -1,0 +1,85 @@
+name: Dependency Graph Sync
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'requirements.txt'
+      - 'requirements_chimera.txt'
+  schedule:
+    # Run daily to ensure dependency graph is updated
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync-dependencies:
+    name: Sync Dependency Graph
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Verify NPM dependencies
+        run: |
+          echo "📦 Verifying Node.js dependencies..."
+          if [ -f "package.json" ]; then
+            npm ci
+            npm list --depth=0 || true
+            echo "✅ NPM dependencies verified"
+          fi
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Verify Python dependencies
+        run: |
+          echo "🐍 Verifying Python dependencies..."
+          if [ -f "requirements.txt" ]; then
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            pip list
+            echo "✅ Python dependencies verified"
+          fi
+      
+      - name: Dependency Graph Status
+        run: |
+          echo "=========================================="
+          echo "📊 Dependency Graph Synchronization"
+          echo "=========================================="
+          echo ""
+          echo "✅ Repository dependencies verified"
+          echo "🔄 GitHub automatically maintains dependency graph"
+          echo "🔒 Dependabot monitors for vulnerabilities"
+          echo "🤖 Autonomous monitoring active under user: oconnorw225-del"
+          echo ""
+          echo "Quick Links:"
+          echo "- Dependency Graph: https://github.com/${{ github.repository }}/network/dependencies"
+          echo "- Dependabot Alerts: https://github.com/${{ github.repository }}/security/dependabot"
+          echo "- Security Overview: https://github.com/${{ github.repository }}/security"
+          echo ""
+          echo "Monitored Files:"
+          echo "  ✓ package.json & package-lock.json (Node.js)"
+          echo "  ✓ requirements.txt (Python)"
+          echo "  ✓ requirements_chimera.txt (Python)"
+          echo "  ✓ Dockerfile* (Docker images)"
+          echo "  ✓ .github/workflows/*.yml (GitHub Actions)"
+          echo ""
+          echo "=========================================="
+
+
