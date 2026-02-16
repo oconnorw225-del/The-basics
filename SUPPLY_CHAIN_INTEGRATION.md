@@ -84,9 +84,12 @@ The autonomous bot system and GitHub Actions workflows work together:
 ### Email Notifications
 
 Critical dependency alerts trigger email notifications to:
-- **Recipient**: oconnorw225@gmail.com (hardcoded)
+- **Recipient**: oconnorw225@gmail.com (hardcoded in `email_notifier`)
 - **Content**: Alert details, affected packages, remediation links
 - **Integration**: Uses the existing `email_notifier` system
+
+**To change the email recipient**:
+Edit `backend/email_notifier.py` and update the hardcoded email address, or set the `NOTIFICATION_EMAIL` environment variable if the system supports it (check the email_notifier implementation).
 
 ## Usage
 

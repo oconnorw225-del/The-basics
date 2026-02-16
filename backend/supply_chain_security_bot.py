@@ -19,7 +19,8 @@ class SupplyChainSecurityBot:
         self.name = "Supply Chain Security Monitor"
         self.status = "initializing"
         
-        self.config_dir = Path("/home/runner/work/The-basics/The-basics/config")
+        # Use relative path from this file
+        self.config_dir = Path(__file__).parent.parent / "config"
         self.config_dir.mkdir(exist_ok=True)
         
         self.monitoring_config_file = self.config_dir / "supply_chain_monitoring.json"

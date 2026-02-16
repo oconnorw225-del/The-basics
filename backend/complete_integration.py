@@ -24,6 +24,13 @@ from supply_chain_security_bot import supply_chain_bot
 
 class CompleteIntegrationSystem:
     """Master orchestrator for the entire autonomous bot system."""
+    
+    # Schedule constants (in seconds)
+    RECOVERY_SCAN_INTERVAL = 2 * 3600  # Every 2 hours
+    BOT_DISCOVERY_INTERVAL = 30 * 60   # Every 30 minutes
+    CREDENTIAL_RESCAN_INTERVAL = 3600  # Every hour
+    SUPPLY_CHAIN_SCAN_INTERVAL = 6 * 3600  # Every 6 hours
+    CHIMERA_UPGRADE_INTERVAL = 6 * 3600    # Every 6 hours
 
     def __init__(self):
         self.running = False
@@ -31,11 +38,11 @@ class CompleteIntegrationSystem:
 
         # Schedule configuration
         self.schedules = {
-            "recovery_scan": 2 * 3600,  # Every 2 hours
-            "bot_discovery": 30 * 60,  # Every 30 minutes
-            "credential_rescan": 3600,  # Every hour
-            "chimera_upgrade": 6 * 3600,  # Every 6 hours
-            "supply_chain_scan": 6 * 3600,  # Every 6 hours
+            "recovery_scan": self.RECOVERY_SCAN_INTERVAL,
+            "bot_discovery": self.BOT_DISCOVERY_INTERVAL,
+            "credential_rescan": self.CREDENTIAL_RESCAN_INTERVAL,
+            "supply_chain_scan": self.SUPPLY_CHAIN_SCAN_INTERVAL,
+            "chimera_upgrade": self.CHIMERA_UPGRADE_INTERVAL,
             "daily_summary": self._calculate_next_8am(),  # Daily at 8 AM
         }
 
