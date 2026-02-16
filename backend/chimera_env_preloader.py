@@ -65,6 +65,14 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
     Manages credentials across platforms for optimized deployment strategy.
     """
     
+    # Optional but recommended variables for deployment validation
+    OPTIONAL_RECOMMENDED_VARS = {
+        'DATABASE_URL': 'Database connection for persistent storage',
+        'REDIS_URL': 'Redis for caching and session management',
+        'NDAX_API_KEY': 'NDAX trading functionality',
+        'NDAX_API_SECRET': 'NDAX trading functionality'
+    }
+    
     def __init__(self, config_dir: str = ".unified-system"):
         """Initialize the environment preloader."""
         super().__init__()
@@ -456,9 +464,12 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
         """
         Enhanced validation that provides comprehensive deployment insights.
         
-        This validation provides informative feedback without blocking deployment.
-        It categorizes findings into critical, warning, and info levels to help
-        users understand their deployment configuration.
+        This validation categorizes findings into critical, warning, and info
+        levels to help users understand their deployment configuration.
+        Non-critical findings (warnings and info) are intended to be
+        informational and need not block deployment, but critical issues that
+        make deployment impossible are reflected via deployment_ready = False
+        so callers can choose to block deployment when such issues are present.
         
         Requires preload_all_environments() to be called first.
         """
@@ -518,15 +529,8 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
         
         # Check optional but recommended variables
         # These are tracked for completeness but don't affect deployment readiness
-        optional_recommended = {
-            'DATABASE_URL': 'Database connection for persistent storage',
-            'REDIS_URL': 'Redis for caching and session management',
-            'NDAX_API_KEY': 'NDAX trading functionality',
-            'NDAX_API_SECRET': 'NDAX trading functionality'
-        }
-        
         missing_optional_count = 0
-        for key, description in optional_recommended.items():
+        for key, description in self.OPTIONAL_RECOMMENDED_VARS.items():
             # Track all recommended optional variables for reporting
             validation['optional_vars'].append(key)
             
@@ -536,10 +540,17 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
                 validation['configured_vars'].append(key)
                 validation['info'].append(f"✓ Optional {key} configured")
             else:
-                # Variable is either not in cache or has no value - both are treated as missing
-                missing_optional_count += 1
-                validation['info'].append(f"Optional: {key} not set ({description})")
-                validation['recommendations'].append(f"Consider setting {key} to enable {description}")
+                # Fall back to checking the actual OS environment if the cache
+                # does not contain the variable or has no value
+                os_value = os.getenv(key)
+                if os_value:
+                    validation['configured_vars'].append(key)
+                    validation['info'].append(f"✓ Optional {key} configured")
+                else:
+                    # Variable is neither configured in cache nor in OS environment
+                    missing_optional_count += 1
+                    validation['info'].append(f"Optional: {key} not set ({description})")
+                    validation['recommendations'].append(f"Consider setting {key} to enable {description}")
         
         # Determine final validation level based on configuration completeness
         if validation['critical']:
