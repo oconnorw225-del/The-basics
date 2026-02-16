@@ -4,6 +4,20 @@ Three-Stage Approval System for Security-Critical Changes
 
 This module implements automated detection of potentially harmful code patterns
 that could hinder uptime, cause system slowdowns, or introduce malicious behavior.
+
+DESIGN PHILOSOPHY:
+- Conservative detection (better false positives than false negatives)
+- Human review for flagged items (three-approval process)
+- Focus on CRITICAL and HIGH severity threats
+
+KNOWN LIMITATIONS:
+- Infinite loop detection may flag multi-line loops with break statements
+- Recursion detection may have false positives due to Python's indentation
+- Large allocation pattern doesn't catch underscored numbers (e.g., 1_000_000)
+- All flagged items should be manually reviewed before approval
+
+These limitations are acceptable because the three-stage approval process
+allows humans to override false positives while catching real threats.
 """
 
 import re
@@ -73,7 +87,7 @@ class HarmfulCodeDetector:
             name="infinite_loop",
             pattern=r"while\s+(True|1|true)\s*:\s*(?!.*break)(?!.*return)",
             severity="HIGH",
-            description="Infinite loop without break condition",
+            description="Infinite loop without break condition (Note: may have false positives for multi-line loops)",
             impact="CPU exhaustion, system freeze, uptime degradation",
             recommendation="Add timeout, break condition, or resource limits"
         ),
@@ -81,7 +95,7 @@ class HarmfulCodeDetector:
             name="recursive_without_limit",
             pattern=r"def\s+(\w+)\([^)]*\):[^}]*\1\(",
             severity="MEDIUM",
-            description="Recursive function without depth limit",
+            description="Potentially recursive function (Note: Python syntax may cause false positives)",
             impact="Stack overflow, memory exhaustion, system crash",
             recommendation="Add recursion depth limit or use iteration"
         ),
