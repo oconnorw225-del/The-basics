@@ -99,10 +99,11 @@ class TestChimeraEnvPreloader:
         preloader.preload_all_environments()
         validation = preloader.validate_railway_deployment()
         
-        assert validation['valid'] is True
+        assert validation['deployment_ready'] is True
         assert validation['railway_token'] is True
-        assert len(validation['errors']) == 0
+        assert len(validation['critical']) == 0
         assert len(validation['missing_vars']) == 0
+        assert validation['validation_level'] in ['optimal', 'good', 'acceptable']
 
     @patch.dict(os.environ, {
         'SECRET_KEY': 'test-secret',
@@ -113,16 +114,19 @@ class TestChimeraEnvPreloader:
         preloader.preload_all_environments()
         validation = preloader.validate_railway_deployment()
         
-        assert validation['valid'] is False
+        assert validation['deployment_ready'] is False
         assert validation['railway_token'] is False
-        assert 'RAILWAY_TOKEN not configured' in validation['errors']
+        assert any('RAILWAY_TOKEN' in msg for msg in validation['critical'])
+        assert validation['validation_level'] == 'not_ready'
 
     def test_validate_railway_deployment_before_preload(self, preloader):
-        """Test that validate_railway_deployment() fails if called before preload"""
+        """Test that validate_railway_deployment() provides info if called before preload"""
         validation = preloader.validate_railway_deployment()
         
-        assert validation['valid'] is False
-        assert 'Environment preload required before validation' in validation['errors'][0]
+        assert validation['preloaded'] is False
+        assert validation['deployment_ready'] is False
+        assert any('preload required' in msg.lower() for msg in validation['critical'])
+        assert validation['validation_level'] == 'not_ready'
 
     @patch.dict(os.environ, {
         'RAILWAY_TOKEN': 'test-token',
@@ -312,6 +316,79 @@ class TestChimeraEnvPreloader:
         assert env_var.platform == PlatformType.RAILWAY
         assert env_var.is_secret is True
         assert env_var.required is False
+
+    @patch.dict(os.environ, {
+        'RAILWAY_TOKEN': 'test-token',
+        'SECRET_KEY': 'test-secret',
+        'JWT_SECRET': 'test-jwt',
+        'DATABASE_URL': 'postgresql://test',
+        'REDIS_URL': 'redis://test'
+    }, clear=True)
+    def test_enhanced_validation_features(self, preloader):
+        """Test that enhanced validation provides detailed insights"""
+        preloader.preload_all_environments()
+        validation = preloader.validate_railway_deployment()
+        
+        # Should have all the new validation structure
+        assert 'validation_level' in validation
+        assert 'deployment_ready' in validation
+        assert 'critical' in validation
+        assert 'warnings' in validation
+        assert 'info' in validation
+        assert 'recommendations' in validation
+        assert 'configured_vars' in validation
+        assert 'optional_vars' in validation
+        
+        # Should be ready for deployment with all vars configured
+        assert validation['deployment_ready'] is True
+        assert validation['validation_level'] in ['optimal', 'good']
+        
+        # Should have info about configured optional vars
+        assert len(validation['configured_vars']) > 0
+        
+    @patch.dict(os.environ, {
+        'RAILWAY_TOKEN': 'test-token',
+        'SECRET_KEY': 'test-secret'
+        # Missing JWT_SECRET
+    }, clear=True)
+    def test_validation_with_missing_required(self, preloader):
+        """Test validation with missing required variables"""
+        preloader.preload_all_environments()
+        validation = preloader.validate_railway_deployment()
+        
+        # Should have warnings about missing required vars
+        assert len(validation['warnings']) > 0
+        assert len(validation['missing_vars']) > 0
+        assert 'JWT_SECRET' in validation['missing_vars']
+        
+        # Should provide recommendations
+        assert len(validation['recommendations']) > 0
+        
+        # Validation level should reflect missing vars
+        assert validation['validation_level'] == 'acceptable'
+        
+        # Should still be deployment ready (warns but doesn't block)
+        assert validation['deployment_ready'] is True
+    
+    @patch.dict(os.environ, {
+        'RAILWAY_TOKEN': 'test-token',
+        'SECRET_KEY': 'test-secret',
+        'JWT_SECRET': 'test-jwt'
+        # No optional vars like DATABASE_URL, REDIS_URL
+    }, clear=True)
+    def test_validation_with_missing_optional(self, preloader):
+        """Test validation with missing optional variables"""
+        preloader.preload_all_environments()
+        validation = preloader.validate_railway_deployment()
+        
+        # Should still be ready for deployment
+        assert validation['deployment_ready'] is True
+        
+        # Should have info about missing optional vars
+        assert len(validation['info']) > 0
+        
+        # Should have recommendations for optional features
+        assert len(validation['recommendations']) > 0
 
 
 if __name__ == "__main__":

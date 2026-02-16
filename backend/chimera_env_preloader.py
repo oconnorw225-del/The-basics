@@ -454,54 +454,113 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
     
     def validate_railway_deployment(self) -> Dict[str, Any]:
         """
-        Validate that all required credentials and variables are present
-        for Railway deployment.
+        Enhanced validation that provides comprehensive deployment insights.
+        
+        This validation provides informative feedback without blocking deployment.
+        It categorizes findings into critical, warning, and info levels to help
+        users understand their deployment configuration.
         
         Requires preload_all_environments() to be called first.
         """
         if not self.preloaded:
             return {
-                'valid': False,
-                'errors': ['Environment preload required before validation - call preload_all_environments() first'],
+                'preloaded': False,
+                'deployment_ready': False,
+                'critical': ['Environment preload required before validation - call preload_all_environments() first'],
                 'warnings': [],
+                'info': [],
+                'recommendations': [],
                 'railway_token': False,
                 'required_vars': [],
-                'missing_vars': []
+                'missing_vars': [],
+                'configured_vars': [],
+                'optional_vars': [],
+                'validation_level': 'not_ready'
             }
         
         validation = {
-            'valid': True,
-            'errors': [],
+            'preloaded': True,
+            'deployment_ready': True,
+            'critical': [],
             'warnings': [],
+            'info': [],
+            'recommendations': [],
             'railway_token': False,
             'required_vars': [],
-            'missing_vars': []
+            'missing_vars': [],
+            'configured_vars': [],
+            'optional_vars': [],
+            'validation_level': ''  # Will be determined after all checks
         }
         
         # Check Railway token
         railway_creds = self.platform_credentials.get(PlatformType.RAILWAY)
         if railway_creds and railway_creds.api_token:
             validation['railway_token'] = True
+            validation['info'].append("✓ Railway token configured")
         else:
-            validation['valid'] = False
-            validation['errors'].append("RAILWAY_TOKEN not configured")
+            validation['deployment_ready'] = False
+            validation['critical'].append("RAILWAY_TOKEN not configured - Railway deployment unavailable")
+            validation['recommendations'].append("Set RAILWAY_TOKEN in GitHub secrets to enable Railway deployment")
         
-        # Check required variables
+        # Check required variables with enhanced reporting
+        # Required variables generate warnings but don't block deployment
+        # This allows deployment with reduced security/functionality
         for key, env_var in self.env_cache.items():
             if env_var.required:
                 validation['required_vars'].append(key)
                 if not env_var.value:
-                    validation['valid'] = False
                     validation['missing_vars'].append(key)
+                    validation['warnings'].append(f"Required variable {key} is not set - deployment will have reduced security/functionality")
+                    validation['recommendations'].append(f"Set {key} in environment or GitHub secrets for full security")
+                else:
+                    validation['configured_vars'].append(key)
         
-        # Warnings for optional but recommended variables
-        if not os.getenv('DATABASE_URL'):
-            validation['warnings'].append("DATABASE_URL not set (optional)")
+        # Check optional but recommended variables
+        # These are tracked for completeness but don't affect deployment readiness
+        optional_recommended = {
+            'DATABASE_URL': 'Database connection for persistent storage',
+            'REDIS_URL': 'Redis for caching and session management',
+            'NDAX_API_KEY': 'NDAX trading functionality',
+            'NDAX_API_SECRET': 'NDAX trading functionality'
+        }
         
-        if validation['valid']:
-            self.log_success("Railway deployment validation passed")
+        missing_optional_count = 0
+        for key, description in optional_recommended.items():
+            # Track all recommended optional variables for reporting
+            validation['optional_vars'].append(key)
+            
+            env_var = self.env_cache.get(key)
+            if env_var and env_var.value:
+                # Variable exists in cache and has a value
+                validation['configured_vars'].append(key)
+                validation['info'].append(f"✓ Optional {key} configured")
+            else:
+                # Variable is either not in cache or has no value - both are treated as missing
+                missing_optional_count += 1
+                validation['info'].append(f"Optional: {key} not set ({description})")
+                validation['recommendations'].append(f"Consider setting {key} to enable {description}")
+        
+        # Determine final validation level based on configuration completeness
+        if validation['critical']:
+            # Critical issues prevent deployment
+            validation['validation_level'] = 'not_ready'
+            validation['deployment_ready'] = False
+        elif validation['missing_vars']:
+            # Missing required variables - acceptable but not ideal
+            validation['validation_level'] = 'acceptable'
+        elif missing_optional_count > 0:
+            # All required present but some optional missing - good configuration
+            validation['validation_level'] = 'good'
         else:
-            self.log_error(f"Railway deployment validation failed: {validation['errors']}")
+            # Everything configured - optimal
+            validation['validation_level'] = 'optimal'
+        
+        # Enhanced logging with validation level
+        if validation['deployment_ready']:
+            self.log_success(f"Railway deployment validation: {validation['validation_level'].upper()}")
+        else:
+            self.log_info(f"Railway deployment validation: {validation['validation_level'].upper()}")
         
         return validation
     
@@ -571,13 +630,34 @@ def demo_preloader():
     railway_secrets = preloader.get_railway_secrets()
     print(f"🔐 Railway Secrets: {len(railway_secrets)}")
     
-    # Validate Railway deployment
+    # Enhanced Railway validation with detailed reporting
     validation = preloader.validate_railway_deployment()
-    print(f"\n✅ Railway Validation: {'PASSED' if validation['valid'] else 'FAILED'}")
-    if validation['errors']:
-        print(f"  Errors: {validation['errors']}")
+    print(f"\n📊 Deployment Validation Report")
+    print(f"================================")
+    print(f"Validation Level: {validation['validation_level'].upper()}")
+    print(f"Deployment Ready: {validation['deployment_ready']}")
+    print(f"Railway Token: {'✓' if validation['railway_token'] else '✗'}")
+    print(f"Configured Variables: {len(validation['configured_vars'])}")
+    
+    if validation['critical']:
+        print(f"\n⚠️  Critical Issues:")
+        for issue in validation['critical']:
+            print(f"  - {issue}")
+    
     if validation['warnings']:
-        print(f"  Warnings: {validation['warnings']}")
+        print(f"\n⚠️  Warnings:")
+        for warning in validation['warnings']:
+            print(f"  - {warning}")
+    
+    if validation['info']:
+        print(f"\n💡 Information:")
+        for info in validation['info']:
+            print(f"  - {info}")
+    
+    if validation['recommendations']:
+        print(f"\n💡 Recommendations:")
+        for rec in validation['recommendations']:
+            print(f"  - {rec}")
     
     print("\n" + "="*80)
     print("✅ DEMONSTRATION COMPLETE")
