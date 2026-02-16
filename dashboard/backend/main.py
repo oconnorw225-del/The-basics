@@ -21,6 +21,13 @@ from backend.email_notifier import email_notifier
 from backend.complete_asset_recovery_system import asset_recovery
 from backend.autonomous_sync import autonomous_sync
 
+# Import public bot API routes
+try:
+    from api.public_bot_api import register_public_bot_routes
+    PUBLIC_BOT_API_AVAILABLE = True
+except ImportError:
+    PUBLIC_BOT_API_AVAILABLE = False
+
 # Create FastAPI app
 app = FastAPI(
     title="Autonomous Bot Dashboard API",
@@ -36,6 +43,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register public bot API routes if available
+if PUBLIC_BOT_API_AVAILABLE:
+    register_public_bot_routes(app)
+    print("✅ Public bot API routes registered")
 
 # WebSocket connection manager
 class ConnectionManager:
