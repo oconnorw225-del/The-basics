@@ -490,7 +490,7 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
             'missing_vars': [],
             'configured_vars': [],
             'optional_vars': [],
-            'validation_level': 'optimal'
+            'validation_level': ''  # Will be determined after all checks
         }
         
         # Check Railway token

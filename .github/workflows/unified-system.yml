@@ -305,7 +305,10 @@ jobs:
                   print(f'   Fix the critical issues above to enable Railway deployment')
                   sys.exit(1)
               elif validation['validation_level'] in ['acceptable', 'good']:
-                  # Deployment possible but not optimal - proceed with warning
+                  # Both acceptable and good levels proceed with deployment
+                  # - acceptable: missing required vars (reduced security/functionality)
+                  # - good: missing only optional vars (full functionality available)
+                  # Both cases show warnings to guide users toward optimal configuration
                   print(f'\n⚠️  Proceeding with {validation[\"validation_level\"].upper()} configuration')
                   print(f'   Consider addressing warnings and recommendations for optimal deployment')
               else:

@@ -366,6 +366,9 @@ class TestChimeraEnvPreloader:
         
         # Validation level should reflect missing vars
         assert validation['validation_level'] == 'acceptable'
+        
+        # Should still be deployment ready (warns but doesn't block)
+        assert validation['deployment_ready'] is True
     
     @patch.dict(os.environ, {
         'RAILWAY_TOKEN': 'test-token',
