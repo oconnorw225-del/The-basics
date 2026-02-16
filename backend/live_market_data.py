@@ -105,12 +105,9 @@ class LiveMarketData:
         symbols = ['btcusdt', 'ethusdt', 'bnbusdt', 'adausdt', 'dogeusdt']
         stream_names = [f"{s}@ticker" for s in symbols]
         
-        if not stream_names:
-            logger.warning("No stream names provided for Binance WebSocket")
-            return
-        
         while self.running:
             try:
+                # Binance combined streams format: wss://stream.binance.com:9443/stream?streams=btcusdt@ticker/ethusdt@ticker/...
                 stream_url = f"{self.binance_ws}{'/'.join(stream_names)}"
                 
                 async with websockets.connect(stream_url) as websocket:
