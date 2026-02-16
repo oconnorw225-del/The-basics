@@ -504,17 +504,20 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
             validation['recommendations'].append("Set RAILWAY_TOKEN in GitHub secrets to enable Railway deployment")
         
         # Check required variables with enhanced reporting
+        # Required variables generate warnings but don't block deployment
+        # This allows deployment with reduced security/functionality
         for key, env_var in self.env_cache.items():
             if env_var.required:
                 validation['required_vars'].append(key)
                 if not env_var.value:
                     validation['missing_vars'].append(key)
-                    validation['warnings'].append(f"Required variable {key} is not set")
-                    validation['recommendations'].append(f"Set {key} in environment or GitHub secrets")
+                    validation['warnings'].append(f"Required variable {key} is not set - deployment will have reduced security/functionality")
+                    validation['recommendations'].append(f"Set {key} in environment or GitHub secrets for full security")
                 else:
                     validation['configured_vars'].append(key)
         
         # Check optional but recommended variables
+        # These are tracked for completeness but don't affect deployment readiness
         optional_recommended = {
             'DATABASE_URL': 'Database connection for persistent storage',
             'REDIS_URL': 'Redis for caching and session management',
@@ -524,15 +527,16 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
         
         missing_optional_count = 0
         for key, description in optional_recommended.items():
-            env_var = self.env_cache.get(key)
-            # Track all optional variables
+            # Track all recommended optional variables for reporting
             validation['optional_vars'].append(key)
+            
+            env_var = self.env_cache.get(key)
             if env_var and env_var.value:
-                # Variable is configured
+                # Variable exists in cache and has a value
                 validation['configured_vars'].append(key)
                 validation['info'].append(f"✓ Optional {key} configured")
             else:
-                # Variable is missing or not set
+                # Variable is either not in cache or has no value - both are treated as missing
                 missing_optional_count += 1
                 validation['info'].append(f"Optional: {key} not set ({description})")
                 validation['recommendations'].append(f"Consider setting {key} to enable {description}")
