@@ -97,7 +97,17 @@ class ShutdownHandler extends EventEmitter {
   }
 
   /**
+   * Check if continuous mode is enabled
+   * Uses consistent boolean parsing across the system
+   */
+  isContinuousMode() {
+    return process.env.CONTINUOUS_MODE === 'true' || 
+           (process.env.CONTINUOUS_MODE !== 'false' && process.env.CONTINUOUS_MODE !== undefined);
+  }
+
+  /**
    * Initiate graceful shutdown
+   * In continuous mode, this performs cleanup but doesn't exit
    */
   async initiateShutdown(reason = 'manual') {
     if (this.state.shutdownInitiated) {
@@ -130,14 +140,33 @@ class ShutdownHandler extends EventEmitter {
       console.log('✅ Graceful shutdown complete');
       this.emit('shutdownComplete');
 
-      // Exit with success code
+      // CONTINUOUS MODE: Don't exit, allow restart/reconnect
+      if (this.isContinuousMode()) {
+        console.log('🔄 Continuous mode enabled - will restart instead of exiting');
+        this.state.shutdownInitiated = false; // Reset for restart
+        this.emit('restartInitiated');
+        // Let the application handle restart, don't exit
+        return;
+      }
+
+      // Exit with success code (only in non-continuous mode)
       process.exit(0);
 
     } catch (error) {
       console.error('❌ Error during shutdown:', error);
       this.emit('shutdownError', error);
 
-      // Force shutdown after delay
+      // In continuous mode, retry instead of exit
+      if (this.isContinuousMode()) {
+        console.log('🔄 Continuous mode - resetting for retry...');
+        this.state.shutdownInitiated = false;
+        setTimeout(() => {
+          this.emit('restartInitiated');
+        }, this.config.forceShutdownDelay);
+        return;
+      }
+
+      // Force shutdown after delay (non-continuous mode only)
       console.log(`⚠️ Forcing shutdown in ${this.config.forceShutdownDelay}ms...`);
       setTimeout(() => {
         process.exit(1);
