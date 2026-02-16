@@ -27,7 +27,7 @@ class LiveMarketData:
         # API endpoints
         self.coingecko_base = "https://api.coingecko.com/api/v3"
         self.coinmarketcap_base = "https://pro-api.coinmarketcap.com/v1"
-        self.binance_ws = "wss://stream.binance.com:9443/ws"
+        self.binance_ws = "wss://stream.binance.com:9443/stream?streams="
         
     async def start(self):
         """Start all live data feeds"""
@@ -107,14 +107,15 @@ class LiveMarketData:
         
         while self.running:
             try:
-                stream_url = f"{self.binance_ws}/{'/' .join(stream_names)}"
+                stream_url = f"{self.binance_ws}{'/'.join(stream_names)}"
                 
                 async with websockets.connect(stream_url) as websocket:
                     self.ws_connections['binance'] = websocket
                     
                     while self.running:
                         message = await websocket.recv()
-                        data = json.loads(message)
+                        raw = json.loads(message)
+                        data = raw.get('data', raw)
                         
                         if 'e' in data and data['e'] == '24hrTicker':
                             symbol = data['s'].replace('USDT', '')
