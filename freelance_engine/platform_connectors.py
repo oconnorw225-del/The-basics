@@ -102,7 +102,10 @@ class FiverrConnector(PlatformConnector):
         """
         Scan Fiverr for buyer requests.
         
-        TODO: Implement actual Fiverr API integration
+        NOTE: This is a MOCK implementation. To integrate with real Fiverr API:
+        1. Obtain API credentials from https://developers.fiverr.com/
+        2. Replace this mock with actual API calls
+        3. See freelance_engine/README.md for integration guide
         """
         logger.info(f"{self.name}: Scanning for jobs...")
         
@@ -174,7 +177,10 @@ class FreelancerConnector(PlatformConnector):
         """
         Scan Freelancer for projects.
         
-        TODO: Implement actual Freelancer API integration
+        NOTE: This is a MOCK implementation. To integrate with real Freelancer API:
+        1. Register for API access at https://www.freelancer.com/api
+        2. Replace this mock with actual API calls
+        3. See freelance_engine/README.md for integration guide
         """
         logger.info(f"{self.name}: Scanning for jobs...")
         
@@ -246,7 +252,10 @@ class ToptalConnector(PlatformConnector):
         """
         Scan Toptal for opportunities.
         
-        TODO: Implement actual Toptal integration
+        NOTE: This is a MOCK implementation. Toptal integration requires:
+        1. Toptal partnership/approval (strict screening process)
+        2. Contact Toptal for API access
+        3. See freelance_engine/README.md for details
         """
         logger.info(f"{self.name}: Scanning for jobs...")
         

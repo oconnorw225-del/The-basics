@@ -213,13 +213,37 @@ async function syncWithOtherBots() {
       }
     }
     
-    // TODO: In production, send botInfo via WebSocket/HTTP to other bots
-    // For now, just log the sync attempt
-    if (botState.continuous.botConnections.size > 0) {
-      console.log(`🔗 Syncing ${botState.continuous.botConnections.size} bot connections...`)
+    // IMPLEMENTATION: Send botInfo via HTTP to other bots
+    // This discovers and syncs with other bot instances running on the network
+    const botDiscoveryPorts = [9001, 9002, 9003] // Configurable bot ports
+    
+    for (const port of botDiscoveryPorts) {
+      try {
+        // Skip our own port
+        if (port === parseInt(process.env.BOT_PORT || 9000)) continue
+        
+        const response = await fetch(`http://localhost:${port}/api/bot/sync`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(botInfo),
+          signal: AbortSignal.timeout(2000) // 2 second timeout
+        })
+        
+        if (response.ok) {
+          const otherBot = await response.json()
+          botState.continuous.botConnections.add(otherBot.bot_id)
+          console.log(`✅ Synced with bot: ${otherBot.bot_id}`)
+        }
+      } catch (err) {
+        // Bot not available on this port, continue silently
+      }
     }
     
-    // Update last sync time (renamed from lastReconnect for clarity)
+    if (botState.continuous.botConnections.size > 0) {
+      console.log(`🔗 Active bot connections: ${botState.continuous.botConnections.size}`)
+    }
+    
+    // Update last sync time
     botState.continuous.lastSync = Date.now()
     
   } catch (error) {
@@ -474,6 +498,57 @@ const server = createServer(async (req, res) => {
       profit: botState.trading.profit,
       riskLevel: botConfig.riskLevel
     }))
+  }
+  else if (url === '/api/bot/sync' && req.method === 'POST') {
+    // ENHANCED: Bot-to-bot synchronization endpoint
+    let body = ''
+    let bodySize = 0
+    const maxBodySize = 5000 // 5KB limit for bot sync
+    
+    req.on('data', chunk => {
+      bodySize += chunk.length
+      if (bodySize > maxBodySize) {
+        req.destroy()
+        res.writeHead(413)
+        res.end(JSON.stringify({ error: 'Payload too large' }))
+        return
+      }
+      body += chunk
+    })
+    
+    req.on('end', () => {
+      try {
+        const otherBotInfo = JSON.parse(body)
+        
+        // Validate bot info
+        if (!otherBotInfo.bot_id || !otherBotInfo.timestamp) {
+          res.writeHead(400)
+          res.end(JSON.stringify({ error: 'Invalid bot info' }))
+          return
+        }
+        
+        // Add to connected bots
+        botState.continuous.botConnections.add(otherBotInfo.bot_id)
+        
+        // Respond with our bot info
+        res.writeHead(200)
+        res.end(JSON.stringify({
+          bot_id: 'ndax-quantum',
+          timestamp: Date.now(),
+          status: {
+            trading: botState.trading.active,
+            freelance: botState.freelance.active,
+            ai: botState.ai.active,
+            uptime: Date.now() - botState.startTime
+          },
+          synced: true
+        }))
+      } catch (error) {
+        console.error('Bot sync endpoint error:', error)
+        res.writeHead(400)
+        res.end(JSON.stringify({ error: 'Invalid JSON' }))
+      }
+    })
   }
   else {
     res.writeHead(404)
