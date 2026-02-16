@@ -524,26 +524,32 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
             'NDAX_API_SECRET': 'NDAX trading functionality'
         }
         
+        missing_optional_count = 0
         for key, description in optional_recommended.items():
             env_var = self.env_cache.get(key)
             if env_var:
                 validation['optional_vars'].append(key)
                 if not env_var.value:
+                    missing_optional_count += 1
                     validation['info'].append(f"Optional: {key} not set ({description})")
                     validation['recommendations'].append(f"Consider setting {key} to enable {description}")
                 else:
                     validation['configured_vars'].append(key)
                     validation['info'].append(f"✓ Optional {key} configured")
         
-        # Determine final validation level
+        # Determine final validation level based on configuration completeness
         if validation['critical']:
+            # Critical issues prevent deployment
             validation['validation_level'] = 'not_ready'
             validation['deployment_ready'] = False
         elif validation['missing_vars']:
+            # Missing required variables - acceptable but not ideal
             validation['validation_level'] = 'acceptable'
-        elif validation['info']:
+        elif missing_optional_count > 0:
+            # All required present but some optional missing - good configuration
             validation['validation_level'] = 'good'
         else:
+            # Everything configured - optimal
             validation['validation_level'] = 'optimal'
         
         # Enhanced logging with validation level
