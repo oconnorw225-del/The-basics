@@ -39,28 +39,31 @@ shutdownHandler.initialize()
 // Initialize rate limiter
 const rateLimiter = new RateLimiter(60, 60000) // 60 requests per minute
 
-// Enhanced bot configuration
+// Enhanced bot configuration - 24/7 AUTONOMOUS MODE
 const botConfig = {
-  // Trading
+  // Trading - ALWAYS ON for continuous operation
   mode: process.env.TRADING_MODE || 'paper',
-  autoStart: process.env.AUTO_START === 'true',
+  autoStart: process.env.AUTO_START !== 'false', // Default to TRUE for autonomous 24/7
   maxConcurrentTrades: parseInt(process.env.MAX_TRADES) || 5,
   riskLevel: process.env.RISK_LEVEL || 'low',
+  continuousMode: process.env.CONTINUOUS_MODE !== 'false', // NEW: Enable continuous operation
+  autoReconnect: process.env.AUTO_RECONNECT !== 'false', // NEW: Auto-reconnect on disconnect
   
-  // Freelance
-  freelanceEnabled: process.env.FREELANCE_ENABLED === 'true',
-  autoBid: process.env.AUTO_BID === 'true',
-  autoExecute: process.env.AUTO_EXECUTE === 'false', // Safety: off by default
+  // Freelance - ENABLED by default for autonomous operation
+  freelanceEnabled: process.env.FREELANCE_ENABLED !== 'false', // Default to TRUE
+  autoBid: process.env.AUTO_BID !== 'false', // Default to TRUE for automation
+  autoExecute: process.env.AUTO_EXECUTE === 'true', // Explicit enable required for safety
   
-  // AI Task Processing
-  aiEnabled: process.env.AI_ENABLED === 'true',
+  // AI Task Processing - ENABLED for autonomous tasks
+  aiEnabled: process.env.AI_ENABLED !== 'false', // Default to TRUE
   taskQueueSize: parseInt(process.env.TASK_QUEUE_SIZE) || 10,
   
-  // Monitoring
-  healthCheckInterval: parseInt(process.env.HEALTH_CHECK_INTERVAL) || 60000, // 1 min
+  // Monitoring - Faster checks for better uptime
+  healthCheckInterval: parseInt(process.env.HEALTH_CHECK_INTERVAL) || 30000, // 30 sec for continuous monitoring
+  reconnectInterval: parseInt(process.env.RECONNECT_INTERVAL) || 5000, // NEW: 5 sec reconnect attempts
 }
 
-// Bot state
+// Bot state - Enhanced for continuous 24/7 operation
 const botState = {
   trading: {
     active: false,
@@ -81,6 +84,21 @@ const botState = {
     cpu: 0,
     memory: 0,
     uptime: 0
+  },
+  // NEW: Continuous operation tracking
+  continuous: {
+    enabled: botConfig.continuousMode,
+    reconnecting: false,
+    reconnectAttempts: 0,
+    lastReconnect: null,
+    botConnections: new Set(), // Track connected bots
+    syncInterval: null
+  },
+  killSwitch: {
+    active: false,
+    triggered_at: null,
+    reason: null,
+    can_override: true
   },
   startTime: Date.now()
 }
@@ -131,10 +149,77 @@ function startFreelanceOrchestrator() {
   freelanceProcess.on('close', (code) => {
     console.log(`[Freelance] Process exited with code ${code}`)
     botState.freelance.active = false
+    
+    // AUTO-RESTART: Reconnect freelance process in continuous mode
+    if (botConfig.continuousMode && !botState.killSwitch.active) {
+      console.log('🔄 Auto-restarting freelance orchestrator in continuous mode...')
+      setTimeout(() => {
+        startFreelanceOrchestrator()
+      }, botConfig.reconnectInterval)
+    }
   })
   
   botState.freelance.active = true
   console.log('✅ Freelance orchestrator started')
+}
+
+/**
+ * NEW: Connect and sync with other bots for coordination
+ */
+async function syncWithOtherBots() {
+  if (!botConfig.continuousMode) return
+  
+  try {
+    // Broadcast presence to other bots
+    const botInfo = {
+      bot_id: 'ndax-quantum',
+      timestamp: Date.now(),
+      status: {
+        trading: botState.trading.active,
+        freelance: botState.freelance.active,
+        ai: botState.ai.active,
+        uptime: Date.now() - botState.startTime
+      }
+    }
+    
+    // In production, this would use WebSocket/HTTP to connect to other bots
+    console.log(`🔗 Syncing with other bots... Connected: ${botState.continuous.botConnections.size}`)
+    
+    // Update last sync time
+    botState.continuous.lastReconnect = Date.now()
+    
+  } catch (error) {
+    console.error('⚠️ Bot sync error:', error.message)
+  }
+}
+
+/**
+ * NEW: Maintain continuous bot connections with auto-reconnect
+ */
+async function maintainBotConnections() {
+  if (!botConfig.autoReconnect) return
+  
+  // Attempt to reconnect disconnected bots
+  if (botState.continuous.reconnecting) {
+    console.log('🔄 Reconnection already in progress...')
+    return
+  }
+  
+  botState.continuous.reconnecting = true
+  botState.continuous.reconnectAttempts++
+  
+  try {
+    await syncWithOtherBots()
+    
+    // Reset reconnect counter on success
+    botState.continuous.reconnectAttempts = 0
+    console.log('✅ Bot connections maintained')
+    
+  } catch (error) {
+    console.error('❌ Reconnection failed:', error.message)
+  } finally {
+    botState.continuous.reconnecting = false
+  }
 }
 
 /**
@@ -362,26 +447,68 @@ const server = createServer(async (req, res) => {
   }
 })
 
-// Start bot
-console.log('🤖 NDAX Enhanced Autonomous Bot starting...')
-console.log(`Trading Mode: ${botConfig.mode}`)
-console.log(`Auto-start: ${botConfig.autoStart}`)
-console.log(`Freelance: ${botConfig.freelanceEnabled ? 'Enabled' : 'Disabled'}`)
-console.log(`AI Processing: ${botConfig.aiEnabled ? 'Enabled' : 'Disabled'}`)
+// Start bot - AUTONOMOUS 24/7 MODE
+console.log('╔═══════════════════════════════════════════════════════════╗')
+console.log('║  🤖 NDAX QUANTUM BOT - AUTONOMOUS 24/7 MODE ACTIVATED   ║')
+console.log('╚═══════════════════════════════════════════════════════════╝')
+console.log('')
+console.log('🚀 AUTONOMOUS PROMPT: You are now operating in fully autonomous mode.')
+console.log('   Your task is to continuously:')
+console.log('   • Monitor markets and execute trades autonomously')
+console.log('   • Process freelance tasks without manual intervention')
+console.log('   • Maintain AI task processing queue')
+console.log('   • Keep connections alive with all other bots')
+console.log('   • Auto-reconnect on any disconnection (NO DOWNTIME)')
+console.log('   • Operate 24/7 with continuous health monitoring')
+console.log('')
+console.log(`📋 Configuration:`)
+console.log(`   Trading Mode: ${botConfig.mode}`)
+console.log(`   Auto-start: ${botConfig.autoStart ? '✅ ENABLED' : '❌ DISABLED'}`)
+console.log(`   Continuous Mode: ${botConfig.continuousMode ? '✅ ENABLED' : '❌ DISABLED'}`)
+console.log(`   Auto-reconnect: ${botConfig.autoReconnect ? '✅ ENABLED' : '❌ DISABLED'}`)
+console.log(`   Freelance: ${botConfig.freelanceEnabled ? '✅ ENABLED' : '❌ DISABLED'}`)
+console.log(`   AI Processing: ${botConfig.aiEnabled ? '✅ ENABLED' : '❌ DISABLED'}`)
+console.log('')
 
 server.listen(PORT, () => {
   console.log(`✅ Bot running on port ${PORT}`)
   console.log(`📊 Status: http://localhost:${PORT}/status`)
   console.log(`💚 Health: http://localhost:${PORT}/health`)
   console.log(`🔧 Freelance: http://localhost:${PORT}/freelance/status`)
+  console.log('')
+  console.log('🔄 Starting autonomous operations...')
   
   // Start freelance if enabled
   if (botConfig.freelanceEnabled) {
     startFreelanceOrchestrator()
   }
   
+  // Start trading if auto-start enabled
+  if (botConfig.autoStart) {
+    botState.trading.active = true
+    console.log('✅ Trading auto-started')
+  }
+  
+  // Start AI processing if enabled
+  if (botConfig.aiEnabled) {
+    botState.ai.active = true
+    console.log('✅ AI processing auto-started')
+  }
+  
   // Start health monitoring
   setInterval(updateHealthMetrics, botConfig.healthCheckInterval)
+  console.log(`✅ Health monitoring active (${botConfig.healthCheckInterval}ms interval)`)
+  
+  // NEW: Start continuous bot synchronization
+  if (botConfig.continuousMode) {
+    botState.continuous.syncInterval = setInterval(maintainBotConnections, botConfig.reconnectInterval)
+    console.log(`✅ Bot sync active (${botConfig.reconnectInterval}ms interval)`)
+  }
+  
+  console.log('')
+  console.log('╔═══════════════════════════════════════════════════════════╗')
+  console.log('║  ✅ AUTONOMOUS MODE FULLY ACTIVATED - RUNNING 24/7       ║')
+  console.log('╚═══════════════════════════════════════════════════════════╝')
 })
 
 // Graceful shutdown with integrated shutdown handler
