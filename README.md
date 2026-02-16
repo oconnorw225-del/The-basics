@@ -277,6 +277,33 @@ Copy `.env.example` to `.env` and configure:
 - [Error Handling Guide](docs/ERROR_HANDLING.md) - Error handling patterns
 - [Feature Management Guide](docs/FEATURE_MANAGEMENT.md) - Feature lifecycle management
 - [System Monitoring Guide](docs/SYSTEM_MONITORING.md) - Health monitoring and metrics
+- [Dependency Submission Guide](DEPENDENCY_SUBMISSION_GUIDE.md) - Supply chain security and autonomous dependency monitoring
+
+## Supply Chain Security
+
+🔒 **Autonomous Dependency Monitoring Active**
+
+The platform includes comprehensive supply chain security with autonomous oversight:
+
+- **Dependency Graph**: Complete visibility of all Node.js and Python dependencies
+- **Dependabot Alerts**: Automatic vulnerability detection for all packages
+- **Auto-Updates**: Automated security patches via pull requests
+- **24/7 Monitoring**: Autonomous monitoring every 6 hours
+- **Issue Creation**: Critical vulnerabilities automatically create GitHub issues
+- **Owner**: oconnorw225-del
+
+**Quick Links**:
+- [View Dependency Graph](https://github.com/oconnorw225-del/The-basics/network/dependencies)
+- [View Security Alerts](https://github.com/oconnorw225-del/The-basics/security/dependabot)
+- [Full Documentation](DEPENDENCY_SUBMISSION_GUIDE.md)
+
+**Monitored Ecosystems**:
+- ✅ NPM (Node.js) - Daily updates
+- ✅ Python (pip) - Daily updates  
+- ✅ GitHub Actions - Weekly updates
+- ✅ Docker - Weekly updates
+
+See [DEPENDENCY_SUBMISSION_GUIDE.md](DEPENDENCY_SUBMISSION_GUIDE.md) for complete documentation.
 
 ## Key Features
 

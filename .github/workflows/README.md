@@ -45,11 +45,11 @@ This repository uses modern, purpose-built workflows for the bot coordination sy
 
 ### 🔒 Supply Chain Security Workflows
 
-1. **dependency-submission.yml** - Dependency submission to GitHub
-   - Submits NPM and Python dependencies to dependency graph
+1. **dependency-submission.yml** - Dependency graph synchronization
+   - Verifies NPM and Python dependencies are valid
    - Runs daily and on dependency file changes
+   - GitHub automatically maintains dependency graph
    - Enables Dependabot alerts and security updates
-   - Provides complete dependency visibility
 
 2. **dependabot-auto-monitor.yml** - Autonomous dependency monitoring
    - Monitors Dependabot alerts every 6 hours

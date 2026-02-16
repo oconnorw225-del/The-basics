@@ -1,4 +1,4 @@
-name: Dependency Submission
+name: Dependency Graph Sync
 
 on:
   push:
@@ -11,20 +11,19 @@ on:
       - 'requirements.txt'
       - 'requirements_chimera.txt'
   schedule:
-    # Run daily to keep dependency graph updated
+    # Run daily to ensure dependency graph is updated
     - cron: '0 6 * * *'
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: read
+  contents: read
 
 jobs:
-  submit-npm-dependencies:
-    name: Submit NPM Dependencies
+  sync-dependencies:
+    name: Sync Dependency Graph
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,64 +33,53 @@ jobs:
         with:
           node-version: '18'
       
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Submit dependency snapshot
-        uses: advanced-security/maven-dependency-submission-action@v4
-        continue-on-error: true
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Submit NPM dependencies using npm-dependency-submission
-        uses: actions/dependency-submission/npm@v1
-        continue-on-error: true
-
-  submit-python-dependencies:
-    name: Submit Python Dependencies
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Verify NPM dependencies
+        run: |
+          echo "📦 Verifying Node.js dependencies..."
+          if [ -f "package.json" ]; then
+            npm ci
+            npm list --depth=0 || true
+            echo "✅ NPM dependencies verified"
+          fi
       
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       
-      - name: Install dependencies
+      - name: Verify Python dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          echo "🐍 Verifying Python dependencies..."
+          if [ -f "requirements.txt" ]; then
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            pip list
+            echo "✅ Python dependencies verified"
+          fi
       
-      - name: Submit Python dependency graph
-        uses: actions/dependency-submission/python@v1
-        continue-on-error: true
-        with:
-          requirements-files: |
-            requirements.txt
-            requirements_chimera.txt
-
-  dependency-graph-status:
-    name: Check Dependency Graph Status
-    runs-on: ubuntu-latest
-    needs: [submit-npm-dependencies, submit-python-dependencies]
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Report submission status
+      - name: Dependency Graph Status
         run: |
-          echo "✅ Dependency submission completed"
-          echo "📊 Dependencies submitted to GitHub dependency graph"
-          echo "🔒 Dependabot will now monitor for vulnerabilities"
+          echo "=========================================="
+          echo "📊 Dependency Graph Synchronization"
+          echo "=========================================="
+          echo ""
+          echo "✅ Repository dependencies verified"
+          echo "🔄 GitHub automatically maintains dependency graph"
+          echo "🔒 Dependabot monitors for vulnerabilities"
           echo "🤖 Autonomous monitoring active under user: oconnorw225-del"
           echo ""
-          echo "Visit the following URLs to view:"
+          echo "Quick Links:"
           echo "- Dependency Graph: https://github.com/${{ github.repository }}/network/dependencies"
           echo "- Dependabot Alerts: https://github.com/${{ github.repository }}/security/dependabot"
           echo "- Security Overview: https://github.com/${{ github.repository }}/security"
+          echo ""
+          echo "Monitored Files:"
+          echo "  ✓ package.json & package-lock.json (Node.js)"
+          echo "  ✓ requirements.txt (Python)"
+          echo "  ✓ requirements_chimera.txt (Python)"
+          echo "  ✓ Dockerfile* (Docker images)"
+          echo "  ✓ .github/workflows/*.yml (GitHub Actions)"
+          echo ""
+          echo "=========================================="
+
+

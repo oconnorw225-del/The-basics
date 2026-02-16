@@ -14,7 +14,7 @@ The dependency submission API is now fully integrated with GitHub's security fea
 
 ## Architecture
 
-### 1. Dependency Submission Workflow
+### 1. Dependency Graph Sync Workflow
 
 **File**: `.github/workflows/dependency-submission.yml`
 
@@ -24,9 +24,13 @@ This workflow runs:
 - Manually via workflow dispatch
 
 **What it does**:
-- Submits NPM (Node.js) dependencies to GitHub's dependency graph
-- Submits Python (pip) dependencies to GitHub's dependency graph
-- Keeps the dependency graph current and comprehensive
+- Verifies NPM (Node.js) and Python dependencies are installable
+- Ensures dependency files are valid and up-to-date
+- GitHub automatically populates the dependency graph from:
+  - `package.json` and `package-lock.json` (NPM)
+  - `requirements.txt` and `requirements_chimera.txt` (Python)
+  - `Dockerfile*` (Docker images)
+  - `.github/workflows/*.yml` (GitHub Actions)
 - Enables Dependabot to monitor for vulnerabilities
 
 ### 2. Dependabot Auto Monitor Workflow
@@ -171,10 +175,10 @@ https://github.com/oconnorw225-del/The-basics/insights/dependency-graph
 
 ## Manual Triggers
 
-### Run Dependency Submission Manually
+### Run Dependency Graph Sync Manually
 ```bash
 # Via GitHub UI:
-# 1. Go to Actions → Dependency Submission
+# 1. Go to Actions → Dependency Graph Sync
 # 2. Click "Run workflow"
 # 3. Select branch
 # 4. Click "Run workflow"
@@ -218,7 +222,7 @@ This dependency submission system integrates with existing security workflows:
 
 | Workflow | Frequency | Purpose |
 |----------|-----------|---------|
-| Dependency Submission | Daily 6:00 AM + on dependency changes | Keep dependency graph current |
+| Dependency Graph Sync | Daily 6:00 AM + on dependency changes | Verify dependencies are valid |
 | Dependabot Monitor | Every 6 hours | Autonomous vulnerability monitoring |
 | Security Scan | On push + weekly Sunday | Comprehensive security scanning |
 | Dependabot Updates | Daily 6:00 AM | Check and update dependencies |
@@ -271,13 +275,14 @@ This dependency submission system integrates with existing security workflows:
 ## Troubleshooting
 
 ### Dependency Submission Fails
-**Symptoms**: Workflow fails, dependencies not appearing in graph
+**Symptoms**: Workflow fails, dependencies not validating
 
 **Solutions**:
 1. Check workflow logs for specific errors
 2. Verify `package.json` and `requirements.txt` are valid
-3. Ensure GitHub token has correct permissions
+3. Ensure all dependencies can be installed
 4. Re-run workflow manually
+5. GitHub automatically updates dependency graph from manifest files
 
 ### No Dependabot Alerts Appearing
 **Symptoms**: Known vulnerabilities not showing alerts
