@@ -26,9 +26,9 @@ The Chimera Autonomous Learning System now includes an advanced environment and 
 
 ### 🛡️ Security
 - Secrets never committed to git
-- Secure file permissions (0600/0700)
-- Encrypted credential storage
-- Audit logging for credential access
+- Secure file permissions (0600/0700) on cached credentials
+- Local JSON credential cache (unencrypted-at-rest; relies on OS/filesystem protections)
+- Relies on platform (e.g., GitHub, Railway) audit logs for credential access tracking
 
 ## Quick Start
 

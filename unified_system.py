@@ -116,15 +116,28 @@ class UnifiedSystem:
         logger.info(f"Unified System initialized at: {self.repo_path.absolute()}")
     
     def _init_env_preloader(self):
-        """Initialize the Chimera environment preloader."""
+        """Initialize the Chimera environment preloader using importlib."""
         try:
-            # Import locally to avoid circular dependencies
-            sys.path.insert(0, str(self.repo_path / "backend"))
-            from chimera_env_preloader import create_env_preloader
+            # Use importlib for safer imports
+            import importlib.util
             
-            self.env_preloader = create_env_preloader(str(self.config_dir))
-            logger.info("Environment preloader initialized")
-        except ImportError as e:
+            preloader_path = self.repo_path / "backend" / "chimera_env_preloader.py"
+            if not preloader_path.exists():
+                logger.warning(f"Environment preloader not found at {preloader_path}")
+                self.env_preloader = None
+                return
+            
+            spec = importlib.util.spec_from_file_location("chimera_env_preloader", preloader_path)
+            if spec and spec.loader:
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                
+                self.env_preloader = module.create_env_preloader(str(self.config_dir))
+                logger.info("Environment preloader initialized")
+            else:
+                logger.warning("Could not load environment preloader spec")
+                self.env_preloader = None
+        except Exception as e:
             logger.warning(f"Could not initialize environment preloader: {e}")
             self.env_preloader = None
         
@@ -825,11 +838,16 @@ echo ""
             print(f"  ✓ {preload_summary['secrets_count']} secrets configured")
             print(f"  ✓ Platforms: {', '.join(preload_summary['platforms'])}")
             
-            # Export Railway environment if Railway is configured
+            # Export Railway environment if Railway is configured and explicitly enabled
             if preload_summary.get('credentials_loaded', {}).get('railway'):
                 print("  ✓ Railway credentials detected")
-                self.env_preloader.export_to_dotenv(".env.railway")
-                print("  ✓ Railway environment exported to .env.railway")
+                if os.getenv("ENABLE_RAILWAY_DOTENV_EXPORT") == "1":
+                    # Only export non-secrets by default
+                    include_secrets = os.getenv("EXPORT_RAILWAY_SECRETS") == "1"
+                    self.env_preloader.export_to_dotenv(".env.railway", include_secrets=include_secrets)
+                    print(f"  ✓ Railway environment exported to .env.railway (secrets={include_secrets})")
+                else:
+                    print("  ⏭️  Skipping .env.railway export (set ENABLE_RAILWAY_DOTENV_EXPORT=1 to enable)")
             
             # Validate Railway deployment
             print("\n🚂 Validating Railway deployment configuration...")

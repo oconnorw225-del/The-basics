@@ -233,11 +233,19 @@ jobs:
 
       - name: Preload environment variables and secrets
         if: env.RAILWAY_TOKEN != ''
+        env:
+          # Pass required secrets to preloader for validation
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          NDAX_API_KEY: ${{ secrets.NDAX_API_KEY }}
+          NDAX_API_SECRET: ${{ secrets.NDAX_API_SECRET }}
         run: |
           echo "🔐 Preloading environments, secrets, and credentials for Railway..."
           
-          # Install Python dependencies for preloader
-          pip install -q fastapi uvicorn pydantic aiofiles
+          # No need to install unnecessary dependencies - only what preloader needs
+          pip install -q typing-extensions
           
           # Create backend directory if it doesn't exist
           mkdir -p backend
@@ -245,30 +253,41 @@ jobs:
           # Run the environment preloader
           python3 -c "
           import sys
-          sys.path.insert(0, 'backend')
-          from chimera_env_preloader import create_env_preloader
+          import importlib.util
           
-          # Create and run preloader
-          preloader = create_env_preloader()
-          summary = preloader.preload_all_environments()
-          
-          print(f'✅ Preloaded {summary[\"total_variables\"]} variables')
-          print(f'✅ {summary[\"secrets_count\"]} secrets configured')
-          print(f'✅ Platforms: {summary[\"platforms\"]}')
-          
-          # Validate Railway deployment
-          validation = preloader.validate_railway_deployment()
-          if validation['valid']:
-              print('✅ Railway deployment validated')
+          # Load preloader using importlib
+          spec = importlib.util.spec_from_file_location('chimera_env_preloader', 'backend/chimera_env_preloader.py')
+          if spec and spec.loader:
+              module = importlib.util.module_from_spec(spec)
+              spec.loader.exec_module(module)
+              
+              # Create and run preloader
+              preloader = module.create_env_preloader()
+              summary = preloader.preload_all_environments()
+              
+              print(f'✅ Preloaded {summary[\"total_variables\"]} variables')
+              print(f'✅ {summary[\"secrets_count\"]} secrets configured')
+              print(f'✅ Platforms: {summary[\"platforms\"]}')
+              
+              # Validate Railway deployment
+              validation = preloader.validate_railway_deployment()
+              if validation['valid']:
+                  print('✅ Railway deployment validated')
+              else:
+                  print('❌ Railway deployment validation FAILED')
+                  print('Errors:', validation['errors'])
+                  print('Missing vars:', validation.get('missing_vars', []))
+                  sys.exit(1)
+              
+              # Do NOT export .env.railway by default (security best practice)
+              # The workflow explicitly sets all required env vars below
+              print('✅ Validation complete - ready for deployment')
           else:
-              print('⚠️ Validation warnings:', validation['errors'])
-          
-          # Export to .env.railway for deployment
-          preloader.export_to_dotenv('.env.railway')
-          print('✅ Environment exported to .env.railway')
+              print('❌ Failed to load preloader')
+              sys.exit(1)
           "
           
-          echo "✅ Environment preloading complete"
+          echo "✅ Environment validation complete"
 
       - name: Install Railway CLI
         if: env.RAILWAY_TOKEN != ''

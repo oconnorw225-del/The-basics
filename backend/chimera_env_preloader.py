@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from datetime import datetime
-import hashlib
 import secrets as crypto_secrets
 from enum import Enum
 
@@ -92,8 +91,9 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
     
     def load_platform_credentials(self, platform: PlatformType) -> Optional[PlatformCredentials]:
         """
-        Load credentials for a specific platform.
-        Checks environment variables first, then config files.
+        Load credentials for a specific platform from environment variables.
+        Credentials are read from the current process environment and cached
+        in memory for subsequent use.
         """
         self.log_info(f"Loading credentials for platform: {platform.value}")
         
@@ -180,20 +180,22 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
                 description="Maximum position size"
             ),
             
-            # Security settings
+            # Security settings (required - no auto-generation in production)
             EnvironmentVariable(
                 key="SECRET_KEY",
-                value=os.getenv("SECRET_KEY", self._generate_secret_key()),
+                value=os.getenv("SECRET_KEY", ""),
                 platform=PlatformType.RAILWAY,
                 is_secret=True,
-                description="Application secret key"
+                required=True,
+                description="Application secret key (must be provided)"
             ),
             EnvironmentVariable(
                 key="JWT_SECRET",
-                value=os.getenv("JWT_SECRET", self._generate_secret_key()),
+                value=os.getenv("JWT_SECRET", ""),
                 platform=PlatformType.RAILWAY,
                 is_secret=True,
-                description="JWT token secret"
+                required=True,
+                description="JWT token secret (must be provided)"
             ),
             
             # Database (optional)
@@ -381,45 +383,91 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
         
         return railway_secrets
     
-    def export_to_dotenv(self, filepath: str = ".env.railway") -> None:
+    def _format_env_value_for_dotenv(self, value: Any) -> str:
         """
-        Export environment variables to a .env file for Railway.
-        WARNING: Contains sensitive data - never commit to git!
+        Format a value for safe inclusion in a .env file.
+
+        - Normalizes newlines and escapes them as literal '\\n'.
+        - Leaves values with only safe characters unquoted.
+        - Otherwise, wraps the value in single quotes and escapes existing
+          single quotes in a shell-safe way.
+        """
+        if value is None:
+            return ""
+        text = str(value)
+        # Normalize newlines
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
+        text = text.replace("\n", "\\n")
+        # Allow simple values without quoting
+        if text and all(ch.isalnum() or ch in "._-/:" for ch in text):
+            return text
+        # Shell-safe single-quoted string: close, escape, and reopen on '
+        text = text.replace("'", "'\"'\"'")
+        return f"'{text}'"
+
+    def export_to_dotenv(self, filepath: str = ".env.railway", include_secrets: bool = False) -> None:
+        """
+        Export Railway environment variables to a .env file.
+
+        By default, only non-secret variables are exported. To include secrets
+        in the exported file, explicitly set include_secrets=True.
+        WARNING: The resulting file may contain sensitive data - never commit to git!
         """
         if not self.preloaded:
             self.preload_all_environments()
-        
+
         env_file_path = Path(filepath)
-        
+
         with open(env_file_path, 'w', encoding='utf-8') as f:
             f.write("# CHIMERA SYSTEM - RAILWAY ENVIRONMENT VARIABLES\n")
             f.write(f"# Auto-generated: {datetime.now().isoformat()}\n")
-            f.write("# WARNING: Contains sensitive data - never commit to git!\n\n")
-            
+            f.write("# WARNING: This file may contain sensitive data - never commit to git!\n\n")
+
             # Group by type
             f.write("# === CORE SETTINGS ===\n")
             for key, env_var in self.env_cache.items():
+                # Only export Railway-specific variables
+                if env_var.platform != PlatformType.RAILWAY:
+                    continue
                 if not env_var.is_secret and env_var.value:
-                    f.write(f"{key}={env_var.value}\n")
-            
-            f.write("\n# === SECRETS (Handle with care) ===\n")
-            for key, env_var in self.env_cache.items():
-                if env_var.is_secret and env_var.value:
-                    f.write(f"{key}={env_var.value}\n")
-        
+                    formatted_value = self._format_env_value_for_dotenv(env_var.value)
+                    f.write(f"{key}={formatted_value}\n")
+
+            if include_secrets:
+                f.write("\n# === SECRETS (Handle with care) ===\n")
+                for key, env_var in self.env_cache.items():
+                    # Only export Railway-specific secrets
+                    if env_var.platform != PlatformType.RAILWAY:
+                        continue
+                    if env_var.is_secret and env_var.value:
+                        formatted_value = self._format_env_value_for_dotenv(env_var.value)
+                        f.write(f"{key}={formatted_value}\n")
+
         # Set secure permissions
         try:
             os.chmod(env_file_path, 0o600)
         except Exception as e:
             logger.warning(f"Could not set file permissions: {e}")
-        
-        self.log_success(f"Environment variables exported to {filepath}")
+
+        self.log_success(f"Environment variables exported to {filepath} (include_secrets={include_secrets})")
     
     def validate_railway_deployment(self) -> Dict[str, Any]:
         """
         Validate that all required credentials and variables are present
         for Railway deployment.
+        
+        Requires preload_all_environments() to be called first.
         """
+        if not self.preloaded:
+            return {
+                'valid': False,
+                'errors': ['validate_railway_deployment() called before preload_all_environments()'],
+                'warnings': [],
+                'railway_token': False,
+                'required_vars': [],
+                'missing_vars': []
+            }
+        
         validation = {
             'valid': True,
             'errors': [],
