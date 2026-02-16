@@ -154,7 +154,11 @@ class LiveWalletFeed:
         """Check transactions in a block for monitored wallets"""
         try:
             if chain == 'ethereum' and self.w3_eth and self.w3_eth.is_connected():
-                block = self.w3_eth.eth.get_block(block_number, full_transactions=True)
+                block = await asyncio.to_thread(
+                    self.w3_eth.eth.get_block,
+                    block_number,
+                    full_transactions=True
+                )
                 
                 for tx in block['transactions']:
                     # Check if transaction involves monitored wallets
@@ -227,15 +231,15 @@ class LiveWalletFeed:
                         # BSC balance
                         bsc_balance = await self.get_bsc_balance(session, address)
                         
-                        # ERC20 tokens
-                        tokens = await self.get_token_balances(session, address, 'ethereum')
+                        # ERC20 token metadata
+                        token_metadata = await self.get_token_metadata(session, address, 'ethereum')
                         
                         # Update wallet data
                         if address in self.wallet_data:
                             self.wallet_data[address]['balances'] = {
                                 'ETH': eth_balance,
                                 'BNB': bsc_balance,
-                                'tokens': tokens,
+                                'tokens': token_metadata,
                                 'updated_at': datetime.now().isoformat()
                             }
                             
