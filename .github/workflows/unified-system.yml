@@ -268,7 +268,7 @@ jobs:
               print(f'✅ {summary[\"secrets_count\"]} secrets configured')
               print(f'✅ Platforms: {summary[\"platforms\"]}')
               
-              # Enhanced validation - provides informative feedback without blocking
+              # Enhanced validation - provides informative feedback
               validation = preloader.validate_railway_deployment()
               
               print(f'\n📊 Deployment Validation Report')
@@ -298,10 +298,21 @@ jobs:
                   for rec in validation['recommendations']:
                       print(f'  - {rec}')
               
-              # Proceed with deployment regardless of validation level
-              # The validation provides insights but doesn't block deployment
-              print(f'\n✅ Validation complete - proceeding with deployment')
-              print(f'   (Deployment will use available configuration)')
+              # Handle deployment readiness
+              if not validation['deployment_ready']:
+                  # Critical issues prevent Railway deployment
+                  print(f'\n❌ Railway deployment not available due to critical issues')
+                  print(f'   Fix the critical issues above to enable Railway deployment')
+                  sys.exit(1)
+              elif validation['validation_level'] in ['acceptable', 'good']:
+                  # Deployment possible but not optimal - proceed with warning
+                  print(f'\n⚠️  Proceeding with {validation[\"validation_level\"].upper()} configuration')
+                  print(f'   Consider addressing warnings and recommendations for optimal deployment')
+              else:
+                  # Optimal configuration
+                  print(f'\n✅ Validation complete - optimal configuration')
+              
+              print(f'   Deployment will use available configuration')
           else:
               print('❌ Failed to load preloader')
               sys.exit(1)

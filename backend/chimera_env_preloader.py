@@ -511,8 +511,6 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
                     validation['missing_vars'].append(key)
                     validation['warnings'].append(f"Required variable {key} is not set")
                     validation['recommendations'].append(f"Set {key} in environment or GitHub secrets")
-                    if validation['validation_level'] == 'optimal':
-                        validation['validation_level'] = 'acceptable'
                 else:
                     validation['configured_vars'].append(key)
         
@@ -527,15 +525,17 @@ class ChimeraEnvPreloader(ChimeraComponentBase):
         missing_optional_count = 0
         for key, description in optional_recommended.items():
             env_var = self.env_cache.get(key)
-            if env_var:
-                validation['optional_vars'].append(key)
-                if not env_var.value:
-                    missing_optional_count += 1
-                    validation['info'].append(f"Optional: {key} not set ({description})")
-                    validation['recommendations'].append(f"Consider setting {key} to enable {description}")
-                else:
-                    validation['configured_vars'].append(key)
-                    validation['info'].append(f"✓ Optional {key} configured")
+            # Track all optional variables
+            validation['optional_vars'].append(key)
+            if env_var and env_var.value:
+                # Variable is configured
+                validation['configured_vars'].append(key)
+                validation['info'].append(f"✓ Optional {key} configured")
+            else:
+                # Variable is missing or not set
+                missing_optional_count += 1
+                validation['info'].append(f"Optional: {key} not set ({description})")
+                validation['recommendations'].append(f"Consider setting {key} to enable {description}")
         
         # Determine final validation level based on configuration completeness
         if validation['critical']:
