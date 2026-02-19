@@ -277,6 +277,7 @@ Copy `.env.example` to `.env` and configure:
 - [Error Handling Guide](docs/ERROR_HANDLING.md) - Error handling patterns
 - [Feature Management Guide](docs/FEATURE_MANAGEMENT.md) - Feature lifecycle management
 - [System Monitoring Guide](docs/SYSTEM_MONITORING.md) - Health monitoring and metrics
+- [Bot Public Access](BOT_PUBLIC_ACCESS_README.md) - Public platform information for bots
 
 ## Key Features
 
@@ -285,7 +286,8 @@ Copy `.env.example` to `.env` and configure:
 ✅ **Graceful Shutdown**: Clean shutdown without data loss  
 ✅ **Health Monitoring**: Real-time system health dashboard  
 ✅ **Easy to Extend**: Simple feature registration system  
-✅ **Production Ready**: Comprehensive logging and monitoring
+✅ **Production Ready**: Comprehensive logging and monitoring  
+✅ **Bot Public Access**: Secure public information for bots without exposing sensitive data
 
 ## Safety
 

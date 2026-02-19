@@ -239,15 +239,32 @@ class APIGateway:
         }
 
 
-def create_api_gateway(logger=None, rate_limit: int = 100) -> APIGateway:
+def create_api_gateway(logger=None, rate_limit: int = 100, enable_access_control: bool = True) -> APIGateway:
     """
     Factory function to create API gateway.
     
     Args:
         logger: Logger instance
         rate_limit: Rate limit (requests per minute)
+        enable_access_control: Enable bot access control middleware
         
     Returns:
         APIGateway instance
     """
-    return APIGateway(logger=logger, rate_limit=rate_limit)
+    gateway = APIGateway(logger=logger, rate_limit=rate_limit)
+    
+    # Add bot access control middleware if enabled
+    if enable_access_control:
+        try:
+            from ..middleware.bot_access_control import create_access_control_middleware, access_control_middleware
+            
+            access_control = create_access_control_middleware()
+            gateway.add_middleware(access_control_middleware(access_control))
+            
+            if logger:
+                logger.info("Bot access control middleware enabled")
+        except Exception as e:
+            if logger:
+                logger.warning(f"Failed to enable bot access control: {e}")
+    
+    return gateway
