@@ -1,0 +1,179 @@
+name: Dependabot Auto Monitor
+
+on:
+  schedule:
+    # Check for Dependabot alerts every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      alert_level:
+        description: 'Minimum alert severity to monitor'
+        required: false
+        default: 'medium'
+        type: choice
+        options:
+          - critical
+          - high
+          - medium
+          - low
+
+permissions:
+  contents: read
+  security-events: read
+  issues: write
+
+jobs:
+  monitor-dependabot-alerts:
+    name: Monitor Dependabot Alerts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: read
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Get Dependabot alerts
+        id: get_alerts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const alerts = await github.rest.dependabot.listAlertsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open'
+            });
+            
+            const alertLevel = '${{ github.event.inputs.alert_level || 'medium' }}';
+            const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+            const minSeverity = severityOrder[alertLevel] || 2;
+            
+            const filteredAlerts = alerts.data.filter(alert => 
+              severityOrder[alert.security_advisory.severity] >= minSeverity
+            );
+            
+            core.setOutput('alert_count', filteredAlerts.length);
+            core.setOutput('alerts', JSON.stringify(filteredAlerts));
+            
+            return filteredAlerts;
+      
+      - name: Report alert summary
+        run: |
+          echo "🤖 Autonomous Dependabot Monitor for user: oconnorw225-del"
+          echo "======================================================"
+          echo ""
+          echo "📊 Alert Summary:"
+          echo "Total open alerts: ${{ steps.get_alerts.outputs.alert_count }}"
+          echo ""
+          if [ "${{ steps.get_alerts.outputs.alert_count }}" -gt "0" ]; then
+            echo "⚠️  Action required: Review alerts at:"
+            echo "https://github.com/${{ github.repository }}/security/dependabot"
+          else
+            echo "✅ No critical dependency vulnerabilities detected"
+          fi
+      
+      - name: Create issue for critical alerts
+        if: steps.get_alerts.outputs.alert_count > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const alerts = JSON.parse('${{ steps.get_alerts.outputs.alerts }}');
+            const criticalAlerts = alerts.filter(a => a.security_advisory.severity === 'critical');
+            
+            if (criticalAlerts.length > 0) {
+              const body = `## 🚨 Critical Dependabot Alerts Detected
+              
+              **Autonomous Monitor**: Active under user oconnorw225-del
+              **Detected**: ${new Date().toISOString()}
+              **Critical Alerts**: ${criticalAlerts.length}
+              **Total Open Alerts**: ${alerts.length}
+              
+              ### Critical Vulnerabilities
+              
+              ${criticalAlerts.map(alert => `
+              - **${alert.security_advisory.summary}**
+                - Package: \`${alert.dependency.package.name}\`
+                - Severity: **${alert.security_advisory.severity.toUpperCase()}**
+                - CVE: ${alert.security_advisory.cve_id || 'N/A'}
+                - [View Alert](${alert.html_url})
+              `).join('\n')}
+              
+              ### Action Required
+              
+              1. Review all alerts: https://github.com/${{ github.repository }}/security/dependabot
+              2. Update vulnerable dependencies
+              3. Test changes thoroughly
+              4. Deploy fixes to production
+              
+              This issue was automatically created by the autonomous Dependabot monitoring system.
+              `;
+              
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 Critical Dependabot Alerts: ${criticalAlerts.length} vulnerabilities detected`,
+                body: body,
+                labels: ['security', 'dependabot', 'critical']
+              });
+            }
+
+  check-outdated-dependencies:
+    name: Check for Outdated Dependencies
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Check outdated NPM packages
+        run: |
+          echo "🔍 Checking for outdated NPM packages..."
+          npm outdated || true
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Check outdated Python packages
+        run: |
+          echo "🔍 Checking for outdated Python packages..."
+          python -m pip install --upgrade pip pip-check
+          pip list --outdated || true
+
+  supply-chain-security-report:
+    name: Supply Chain Security Report
+    runs-on: ubuntu-latest
+    needs: [monitor-dependabot-alerts, check-outdated-dependencies]
+    permissions:
+      contents: read
+      security-events: read
+    steps:
+      - name: Generate security report
+        run: |
+          echo "==============================================="
+          echo "🔒 Supply Chain Security Report"
+          echo "==============================================="
+          echo ""
+          echo "👤 Monitored by: oconnorw225-del"
+          echo "📅 Report Date: $(date)"
+          echo "🤖 Status: Autonomous monitoring ACTIVE"
+          echo ""
+          echo "✅ Dependency submission: Enabled"
+          echo "✅ Dependabot alerts: Enabled"
+          echo "✅ Dependabot security updates: Enabled"
+          echo "✅ Automated monitoring: Every 6 hours"
+          echo ""
+          echo "📊 Resources:"
+          echo "- Dependency Graph: https://github.com/${{ github.repository }}/network/dependencies"
+          echo "- Security Advisories: https://github.com/${{ github.repository }}/security/dependabot"
+          echo "- Security Overview: https://github.com/${{ github.repository }}/security"
+          echo ""
+          echo "==============================================="

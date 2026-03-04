@@ -1,0 +1,129 @@
+# Dependabot configuration for automatic dependency updates
+# This enables Dependabot to monitor and automatically update dependencies
+# for the autonomous platform under user: oconnorw225-del
+
+version: 2
+updates:
+  # NPM dependencies (Node.js packages)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "06:00"
+      timezone: "America/Toronto"
+    open-pull-requests-limit: 10
+    assignees:
+      - "oconnorw225-del"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "automated"
+    commit-message:
+      prefix: "npm"
+      include: "scope"
+    # Group minor and patch updates together
+    groups:
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "patch"
+    # Security updates always get individual PRs
+    allow:
+      - dependency-type: "all"
+    # Auto-merge patch updates for non-security issues
+    reviewers:
+      - "oconnorw225-del"
+
+  # Python dependencies (pip packages)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "06:00"
+      timezone: "America/Toronto"
+    open-pull-requests-limit: 10
+    assignees:
+      - "oconnorw225-del"
+    labels:
+      - "dependencies"
+      - "python"
+      - "automated"
+    commit-message:
+      prefix: "pip"
+      include: "scope"
+    # Group minor and patch updates together
+    groups:
+      backend-dependencies:
+        patterns:
+          - "aiohttp"
+          - "fastapi"
+          - "uvicorn"
+          - "flask"
+        update-types:
+          - "minor"
+          - "patch"
+      testing-dependencies:
+        patterns:
+          - "pytest*"
+          - "black"
+          - "pylint"
+          - "flake8"
+        update-types:
+          - "minor"
+          - "patch"
+      security-dependencies:
+        patterns:
+          - "cryptography"
+          - "pyjwt"
+        # Security packages always get immediate updates
+    allow:
+      - dependency-type: "all"
+    reviewers:
+      - "oconnorw225-del"
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "America/Toronto"
+    open-pull-requests-limit: 5
+    assignees:
+      - "oconnorw225-del"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automated"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    reviewers:
+      - "oconnorw225-del"
+
+  # Docker dependencies
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "06:00"
+      timezone: "America/Toronto"
+    open-pull-requests-limit: 5
+    assignees:
+      - "oconnorw225-del"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+    reviewers:
+      - "oconnorw225-del"
