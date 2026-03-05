@@ -1,6 +1,6 @@
 # Core async and web frameworks
 aiohttp==3.13.3
-asyncio==3.4.3
+asyncio==4.0.0
 websockets==12.0
 
 # HTTP requests
@@ -9,7 +9,7 @@ urllib3==2.6.3
 
 # API and server
 fastapi==0.109.1
-uvicorn[standard]==0.27.0
+uvicorn[standard]==0.41.0
 flask==3.0.0
 
 # Environment variables
@@ -17,24 +17,24 @@ python-dotenv==1.0.0
 
 # Data processing
 pandas==2.1.4
-numpy==1.26.2
+numpy==2.2.6
 
 # Testing
 pytest==7.4.3
 pytest-asyncio==0.21.1
-pytest-cov==4.1.0
+pytest-cov==7.0.0
 
 # Linting and formatting
 pylint==3.0.3
 black==23.12.1
-flake8==7.0.0
+flake8==7.3.0
 
 # Logging and monitoring
 colorlog==6.10.1
 python-json-logger==2.0.7
 
 # Trading and finance
-ccxt==4.2.4
+ccxt==4.5.41
 
 # Database (optional)
 sqlalchemy==2.0.25
@@ -45,4 +45,4 @@ python-dateutil==2.8.2
 
 # Security
 cryptography==46.0.5
-pyjwt==2.8.0
+pyjwt==2.11.0
