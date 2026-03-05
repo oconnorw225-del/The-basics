@@ -34,7 +34,7 @@ colorlog==6.8.0
 python-json-logger==2.0.7
 
 # Trading and finance
-ccxt==4.2.4
+ccxt==4.5.41
 
 # Database (optional)
 sqlalchemy==2.0.25
