@@ -9,7 +9,7 @@ urllib3==2.6.3
 
 # API and server
 fastapi==0.109.1
-uvicorn[standard]==0.27.0
+uvicorn[standard]==0.41.0
 flask==3.0.0
 
 # Environment variables
