@@ -37,7 +37,7 @@ python-json-logger==2.0.7
 ccxt==4.5.41
 
 # Database (optional)
-sqlalchemy==2.0.25
+sqlalchemy==2.0.48
 
 # Utilities
 pytz==2023.3.post1
