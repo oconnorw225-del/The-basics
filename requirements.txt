@@ -25,7 +25,7 @@ pytest-asyncio==0.21.1
 pytest-cov==7.0.0
 
 # Linting and formatting
-pylint==3.0.3
+pylint==4.0.5
 black==23.12.1
 flake8==7.3.0
 
