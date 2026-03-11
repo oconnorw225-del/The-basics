@@ -1,5 +1,5 @@
 # Multi-stage build for security
-FROM node:18-alpine AS builder
+FROM node:25-alpine AS builder
 
 # Security: Run as non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
@@ -18,7 +18,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:25-alpine AS production
 
 # Security: Install only security updates and wget for health checks
 RUN apk --no-cache upgrade && apk add --no-cache wget
