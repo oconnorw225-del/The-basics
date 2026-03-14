@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build || echo "Frontend build skipped"
 
 # Python backend stage
-FROM python:3.11-slim AS backend
+FROM python:3.14-slim AS backend
 
 WORKDIR /app
 
