@@ -41,7 +41,7 @@ COPY server.js .
 
 # Create dist directory and copy built frontend if available
 RUN mkdir -p ./dist
-COPY --from=frontend-builder /app/dist ./dist/ || true
+COPY --from=frontend-builder /app/dist ./dist/
 COPY --from=frontend-builder /app/package*.json ./
 
 # Install Node production dependencies
