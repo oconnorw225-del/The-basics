@@ -16,7 +16,7 @@ flask==3.0.0
 python-dotenv==1.0.0
 
 # Data processing
-pandas==2.1.4
+pandas==2.2.3
 numpy==2.2.6
 
 # Testing
