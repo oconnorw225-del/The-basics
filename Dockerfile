@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies (use npm install if no lock file exists)
-RUN npm install || npm ci
+RUN npm install --legacy-peer-deps
 
 # Copy source files
 COPY . .
@@ -41,7 +41,7 @@ COPY server.js .
 
 # Create dist directory and copy built frontend if available
 RUN mkdir -p ./dist
-COPY --from=frontend-builder /app/dist ./dist/ || true
+COPY --from=frontend-builder /app/dist ./dist/
 COPY --from=frontend-builder /app/package*.json ./
 
 # Install Node production dependencies
