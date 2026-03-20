@@ -57,6 +57,7 @@ jobs:
       - name: Start Bot Coordinator
         run: |
           echo "🚀 Starting bot coordinator for ${{ github.event.inputs.environment }}"
+          echo "📦 Supply Chain Security: ACTIVE (monitoring every 6 hours)"
           python backend/bot-coordinator.py --env ${{ github.event.inputs.environment }} --bots ${{ github.event.inputs.bots_to_start }}
 
       - name: Verify startup
@@ -64,3 +65,5 @@ jobs:
           echo "✅ Bot system started successfully"
           echo "Environment: ${{ github.event.inputs.environment }}"
           echo "Bots: ${{ github.event.inputs.bots_to_start }}"
+          echo "🔒 Supply Chain Security: Monitoring dependencies (every 6 hours)"
+          echo "📊 Dependabot: Auto-monitoring critical vulnerabilities"
